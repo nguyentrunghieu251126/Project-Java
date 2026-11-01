@@ -1,0 +1,126 @@
+/* =====================================================================
+   RESPONSIVE – TRANG CHỦ
+   File này phải được nạp SAU style-index.css.
+   Thứ tự breakpoint (theo Bootstrap 5):
+     ≤ 1199.98px : laptop / màn hình nhỏ
+     ≤  991.98px : tablet
+     ≤  575.98px : điện thoại
+   ===================================================================== */
+
+/* ===== Laptop / màn hình nhỏ (≤ 1199.98px) ===== */
+@media (max-width: 1199.98px) {
+  .hero-slide {
+    padding: 40px 44px 116px;
+  }
+  .hero-text h2 {
+    font-size: 2rem;
+  }
+  .hero-visual {
+    width: 260px;
+    height: 260px;
+    margin-right: 16px;
+  }
+}
+
+/* ===== Tablet (≤ 991.98px) ===== */
+@media (max-width: 991.98px) {
+  .hero-slide {
+    height: 470px;
+    padding: 36px 32px 100px;
+  }
+  .hero-slide::after {
+    font-size: 6rem;
+  }
+  .hero-text {
+    max-width: 58%;
+  }
+  .hero-visual {
+    width: 200px;
+    height: 200px;
+    margin-right: 8px;
+  }
+  .chip-info {
+    left: -20px;
+    bottom: 10px;
+  }
+  .hero .hero-cats {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
+  .hero .hero-cats span {
+    display: none;
+  }
+}
+
+/* ===== Điện thoại (≤ 575.98px) ===== */
+@media (max-width: 575.98px) {
+  /* --- Logo --- */
+  .logo-img {
+    height: 36px;
+  }
+
+  /* --- Banner (hero) --- */
+  .hero {
+    border-radius: 20px;
+  }
+  .hero-slide {
+    height: 520px;
+    padding: 26px 22px 92px;
+    align-items: flex-start;
+  }
+  .hero-slide::after {
+    font-size: 4.2rem;
+    right: 16px;
+    bottom: 86px;
+  }
+  .hero-text {
+    max-width: 100%;
+  }
+  .hero-text h2 {
+    font-size: 1.6rem;
+  }
+  .hero-text p {
+    font-size: 0.9rem;
+  }
+  /* Thu nhỏ hình, đặt góc phải trên */
+  .hero-visual {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 56px;
+    height: 56px;
+    margin: 0;
+  }
+  .hero-visual::after,
+  .hero-chip {
+    display: none;
+  }
+  .hero .hero-cats {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    padding: 4px;
+    gap: 2px;
+  }
+  .hero .hero-cats [data-bs-target] {
+    padding: 10px 0;
+  }
+
+  /* --- Danh mục, sản phẩm, đăng ký nhận tin --- */
+  .category span {
+    width: 56px;
+    height: 56px;
+    font-size: 1.4rem;
+  }
+  .category {
+    font-size: 0.78rem;
+  }
+  .product-img {
+    height: 110px;
+    font-size: 3.2rem;
+  }
+  .newsletter {
+    padding: 22px;
+  }
+}
