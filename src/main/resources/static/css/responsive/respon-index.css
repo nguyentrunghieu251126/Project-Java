@@ -107,6 +107,22 @@
     padding: 10px 0;
   }
 
+  /* --- Khối cam kết --- */
+  .features-box {
+    border-radius: 20px;
+    padding: 10px;
+  }
+  .feature-item {
+    padding: 12px;
+    gap: 12px;
+  }
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    font-size: 1.25rem;
+  }
+
   /* --- Danh mục, sản phẩm, đăng ký nhận tin --- */
   .category span {
     width: 56px;
