@@ -15,7 +15,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 1. Trang công khai: ai cũng xem được
                         .requestMatchers("/", "/san-pham/**", "/danh-muc/**", "/tim-kiem",
-                                "/dang-ky", "/dang-nhap", "/error",
+                                "/dang-ky", "/dang-nhap", "/quen-mat-khau", "/error",
                                 "/css/**", "/js/**", "/images/**")
                         .permitAll()
                         // 2. Chỉ quản trị viên
@@ -27,8 +27,25 @@ public class SecurityConfig {
                         .hasRole("KHACH_HANG")
                         // 5. Các trang còn lại: phải đăng nhập
                         .anyRequest().authenticated())
-                .formLogin(form -> form.permitAll()) // tạm dùng trang đăng nhập mặc định
-                .logout(logout -> logout.logoutSuccessUrl("/")); // đăng xuất xong quay về trang chủ
+
+                .formLogin(form -> form
+                        .loginPage("/dang-nhap")
+                        .loginProcessingUrl("/dang-nhap")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/dang-nhap?error")
+                        .permitAll()
+                )
+
+
+                .logout(logout -> logout
+                        .logoutUrl("/dang-xuat")
+                        .logoutSuccessUrl("/dang-nhap?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
+                );
         return http.build();
     }
 
