@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Đăng ký | PDMJV - Điện máy & Công nghệ</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" th:href="@{/css/style-index/style-index.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive/respon-index.css}">
+    <link rel="stylesheet" th:href="@{/css/style-DangKy/DangKy.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive/respon-DangKy.css}">
+</head>
+
+<body>
+
+<main class="dang-ky-page">
+    <div class="container">
+
+        <div class="dang-ky-card">
+            <div class="dang-ky-brand">
+
+                <a th:href="@{/}"
+                   aria-label="Về trang chủ PDMJV">
+
+                    <img th:src="@{/images/header-banner/logo-header.png}"
+                         alt="PDMJV - Điện máy & Công nghệ"
+                         class="dang-ky-logo">
+                </a>
+
+                <div class="brand-line"></div>
+            </div>
+
+            <div class="dang-ky-content">
+
+                <h1 class="dang-ky-title">
+                    Đăng ký tài khoản
+                </h1>
+
+                <p class="dang-ky-subtitle">
+                    Tạo tài khoản để mua sắm tại PDMJV
+                </p>
+
+                <div th:if="${thongBaoLoi}"
+                     class="alert alert-danger"
+                     role="alert"
+                     th:text="${thongBaoLoi}">
+                </div>
+
+                <form th:action="@{/dang-ky}"
+                      th:object="${dangKyForm}"
+                      method="post"
+                      id="dangKyForm"
+                      novalidate>
+
+                    <div class="mb-3">
+
+                        <label for="hoTen" class="form-label">
+                            Họ và tên
+                            <span class="bat-buoc">*</span>
+                        </label>
+
+                        <input type="text"
+                               id="hoTen"
+                               th:field="*{hoTen}"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('hoTen')} ? 'is-invalid' : ''"
+                               placeholder="Nhập họ và tên"
+                               maxlength="100"
+                               autocomplete="name"
+                               required>
+
+
+                        <div id="loi-hoTen"
+                             class="invalid-feedback"
+                             role="alert"
+                             th:text="${#fields.hasErrors('hoTen') ? #fields.errors('hoTen')[0] : ''}">
+                        </div>
+
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label for="email" class="form-label">
+                            Email
+                            <span class="bat-buoc">*</span>
+                        </label>
+
+                        <input type="email"
+                               id="email"
+                               th:field="*{email}"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                               placeholder="Nhập email"
+                               maxlength="100"
+                               autocomplete="email"
+                               required>
+
+                        <div id="loi-email"
+                             class="invalid-feedback"
+                             role="alert"
+                             th:text="${#fields.hasErrors('email') ? #fields.errors('email')[0] : ''}">
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label for="soDienThoai" class="form-label">
+                            Số điện thoại
+                            <span class="text-muted fw-normal">
+                                (không bắt buộc)
+                            </span>
+                        </label>
+
+                        <input type="tel"
+                               id="soDienThoai"
+                               th:field="*{soDienThoai}"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('soDienThoai')} ? 'is-invalid' : ''"
+                               placeholder="Nhập số điện thoại"
+                               maxlength="11"
+                               inputmode="numeric"
+                               autocomplete="tel">
+
+
+                        <div id="loi-soDienThoai"
+                             class="invalid-feedback"
+                             role="alert"
+                             th:text="${#fields.hasErrors('soDienThoai') ? #fields.errors('soDienThoai')[0] : ''}">
+                        </div>
+
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label for="matKhau" class="form-label">
+                            Mật khẩu
+                            <span class="bat-buoc">*</span>
+                        </label>
+
+                        <input type="password"
+                               id="matKhau"
+                               name="matKhau"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('matKhau')} ? 'is-invalid' : ''"
+                               placeholder="Nhập mật khẩu"
+                               minlength="8"
+                               maxlength="72"
+                               autocomplete="new-password"
+                               required>
+
+                        <div id="loi-matKhau"
+                             class="invalid-feedback"
+                             role="alert"
+                             th:text="${#fields.hasErrors('matKhau') ? (#strings.isEmpty(dangKyForm.matKhau) ? 'Vui lòng nhập mật khẩu.' : #fields.errors('matKhau')[0]) : ''}">
+                        </div>
+
+
+                        <div class="form-text">
+                            Mật khẩu phải có từ 8 đến 72 ký tự, không dấu và không có khoảng trắng.
+                        </div>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <label for="xacNhanMatKhau"
+                               class="form-label">
+                            Xác nhận mật khẩu
+                            <span class="bat-buoc">*</span>
+                        </label>
+
+                        <input type="password"
+                               id="xacNhanMatKhau"
+                               name="xacNhanMatKhau"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('xacNhanMatKhau')} ? 'is-invalid' : ''"
+                               placeholder="Nhập lại mật khẩu"
+                               minlength="8"
+                               maxlength="72"
+                               autocomplete="new-password"
+                               required>
+
+
+                        <div id="loi-xacNhanMatKhau"
+                             class="invalid-feedback"
+                             role="alert"
+                             th:text="${#fields.hasErrors('xacNhanMatKhau') ? #fields.errors('xacNhanMatKhau')[0] : ''}">
+                        </div>
+
+
+                    </div>
+
+                    <input type="hidden"
+                           th:if="${_csrf != null}"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <button type="submit"
+                            class="btn btn-dang-ky">
+                        Đăng ký tài khoản
+                    </button>
+
+                </form>
+
+                <p class="dang-nhap-text">
+                    Đã có tài khoản?
+                    <a th:href="@{/dang-nhap}">
+                        Đăng nhập ngay
+                    </a>
+                </p>
+
+                <div class="quay-ve-trang-chu">
+                    <a th:href="@{/}">
+                        ← Quay về trang chủ
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<script th:src="@{/js/kiemTraDangKy.js}"></script>
+
+</body>
+</html>
