@@ -2,10 +2,8 @@ package project.dien_may.project_java.controller;
 
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
@@ -18,23 +16,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import project.dien_may.project_java.dto.QuenMatKhauForm;
 import project.dien_may.project_java.service.TaiKhoanService;
 import project.dien_may.project_java.service.TaiKhoanService.KetQuaDatLaiMatKhau;
 
-
 @Controller
+@RequestMapping("/quen-mat-khau")
 public class DoiMatKhauController {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(DoiMatKhauController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DoiMatKhauController.class);
 
     private static final String VIEW_QUEN_MAT_KHAU = "auth/QuenMatKhau";
 
     private final TaiKhoanService taiKhoanService;
-
 
     @Value("${app.password-reset.allow-lan-demo:false}")
     private boolean choPhepDemoLan;
@@ -56,13 +52,13 @@ public class DoiMatKhauController {
         dataBinder.registerCustomEditor(String.class, "soDienThoai", trim);
     }
 
-    @GetMapping("/quen-mat-khau")
+    @GetMapping
     public String hienThiQuenMatKhau(Model model) {
         model.addAttribute("quenMatKhauForm", new QuenMatKhauForm());
         return VIEW_QUEN_MAT_KHAU;
     }
 
-    @PostMapping("/quen-mat-khau")
+    @PostMapping
     public String xuLyQuenMatKhau(
             @Valid @ModelAttribute("quenMatKhauForm") QuenMatKhauForm form,
             BindingResult bindingResult,

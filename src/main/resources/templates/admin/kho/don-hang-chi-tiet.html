@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout(${'Đơn hàng #' + donHang.maDonHang}, 'don-hang', ~{::main})}">
+<body>
+<main>
+    <div class="thanh-hanh-dong">
+        <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/kho/don-hang}">
+            <i class="bi bi-arrow-left" aria-hidden="true"></i> Danh sách đơn hàng</a>
+        <span th:replace="~{admin/fragments :: nhan(${donHang.trangThai})}"></span>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <section class="the h-100 mb-0">
+                <div class="the-tieu-de"><h2>Giao hàng</h2></div>
+                <dl class="bang-thong-tin">
+                    <dt>Người nhận</dt><dd th:text="${donHang.hoTenNguoiNhan}"></dd>
+                    <dt>Điện thoại</dt><dd th:text="${donHang.soDienThoaiNguoiNhan}"></dd>
+                    <dt>Địa chỉ</dt><dd th:text="${donHang.diaChiGiaoHang}"></dd>
+                </dl>
+            </section>
+        </div>
+        <div class="col-lg-6">
+            <section class="the h-100 mb-0">
+                <div class="the-tieu-de"><h2>Thông tin đơn</h2></div>
+                <dl class="bang-thong-tin">
+                    <dt>Ngày đặt</dt><dd th:text="${#temporals.format(donHang.ngayDat, 'dd/MM/yyyy HH:mm')}"></dd>
+                    <dt>Ngày giao</dt>
+                    <dd th:text="${donHang.ngayGiao != null} ? ${#temporals.format(donHang.ngayGiao, 'dd/MM/yyyy HH:mm')} : 'Chưa giao'"></dd>
+                    <dt>Khách hàng</dt><dd th:text="${donHang.taiKhoan.email}"></dd>
+                    <dt>Khuyến mãi</dt>
+                    <dd th:text="${donHang.khuyenMai != null} ? ${donHang.khuyenMai.maGiamGia} : 'Không dùng'"></dd>
+                </dl>
+            </section>
+        </div>
+    </div>
+
+    <section class="the">
+        <div class="the-tieu-de"><h2>Sản phẩm trong đơn</h2></div>
+        <div class="table-responsive">
+            <table class="table bang">
+                <thead><tr><th>Sản phẩm</th><th class="so">Đơn giá</th><th class="so">Số lượng</th><th class="so">Thành tiền</th></tr></thead>
+                <tbody>
+                <tr th:each="c : ${dsChiTiet}">
+                    <td><span class="ten-chinh" th:text="${c.sanPham.tenSanPham}"></span>
+                        <span class="ten-phu" th:text="${c.sanPham.maModel}"></span></td>
+                    <td class="so" th:text="|${#numbers.formatInteger(c.donGia, 1, 'POINT')} ₫|"></td>
+                    <td class="so" th:text="${c.soLuong}"></td>
+                    <td class="so" th:text="|${#numbers.formatInteger(c.thanhTien, 1, 'POINT')} ₫|"></td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr th:if="${donHang.tienGiam.signum() > 0}">
+                    <td colspan="3" class="so">Giảm giá</td>
+                    <td class="so" th:text="|-${#numbers.formatInteger(donHang.tienGiam, 1, 'POINT')} ₫|"></td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="so">Tổng thanh toán</td>
+                    <td class="so" th:text="|${#numbers.formatInteger(donHang.tongTien, 1, 'POINT')} ₫|"></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout('Yêu cầu nhập hàng', 'yeu-cau-nhap', ~{::main})}">
+<body>
+<main>
+    <section class="the">
+        <div class="tien-trinh mb-3">
+            <a class="chip-loc" th:classappend="${trangThai == null} ? 'active'" th:href="@{/admin/kho/yeu-cau-nhap}">Tất cả</a>
+            <a class="chip-loc" th:each="t : ${dsTrangThai}" th:classappend="${trangThai == t} ? 'active'"
+               th:href="@{/admin/kho/yeu-cau-nhap(trangThai=${t.name()})}">
+                <span th:text="${t.nhan}"></span>
+                <strong th:if="${t.name() == 'CHO_DUYET'}" th:text="${soChoDuyet}"></strong>
+            </a>
+        </div>
+
+        <div class="table-responsive" th:if="${trang.hasContent()}">
+            <table class="table table-hover bang">
+                <thead><tr><th>Mã</th><th>Ngày yêu cầu</th><th>Người gửi</th><th class="so">Mặt hàng</th>
+                    <th class="so">Tổng số lượng</th><th>Người duyệt</th><th>Trạng thái</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="y : ${trang.content}">
+                    <td th:text="|#${y.maYeuCauNhap}|"></td>
+                    <td th:text="${#temporals.format(y.ngayYeuCau, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${y.taiKhoan.hoTen}"></td>
+                    <td class="so" th:text="${y.chiTiet.size()}"></td>
+                    <td class="so" th:text="${y.tongSoLuong}"></td>
+                    <td th:text="${y.nguoiDuyet != null} ? ${y.nguoiDuyet.hoTen} : '–'"></td>
+                    <td><span th:replace="~{admin/fragments :: nhan(${y.trangThai})}"></span></td>
+                    <td class="so">
+                        <a class="btn btn-sm" th:classappend="${y.trangThai.name() == 'CHO_DUYET'} ? 'btn-chinh' : 'btn-outline-secondary'"
+                           th:href="@{/admin/kho/yeu-cau-nhap/{ma}(ma=${y.maYeuCauNhap})}"
+                           th:text="${y.trangThai.name() == 'CHO_DUYET'} ? 'Xem và duyệt' : 'Xem'"></a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="bang-trong" th:unless="${trang.hasContent()}">Không có yêu cầu nào.</p>
+        <nav th:replace="~{admin/fragments :: phan-trang(${trang})}"></nav>
+    </section>
+</main>
+</body>
+</html>

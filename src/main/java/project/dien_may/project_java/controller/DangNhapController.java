@@ -1,4 +1,3 @@
-
 package project.dien_may.project_java.controller;
 
 import org.springframework.stereotype.Controller;
@@ -11,8 +10,7 @@ public class DangNhapController {
 
     @GetMapping("/dang-nhap")
     public String hienThiTrangDangNhap(
-            @RequestParam(value = "error", required = false)
-            String error,
+            @RequestParam(value = "error", required = false) String error,
             Model model) {
 
         if (error != null) {

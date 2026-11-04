@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{admin/layout :: layout('Tổng quan', 'tong-quan', ~{::main})}">
+<body>
+<main class="trang-day">
+    <div class="luoi-so-lieu">
+        <a sec:authorize="hasAuthority('BAOCAO_DOANHTHU')" th:href="@{/admin/bao-cao/doanh-thu}" class="o-so-lieu">
+            <div class="nhan-so"><i class="bi bi-cash-stack" aria-hidden="true"></i> Doanh thu 30 ngày</div>
+            <div class="gia-tri" th:text="|${#numbers.formatInteger(doanhThu30Ngay, 1, 'POINT')} ₫|"></div>
+            <div class="chu-thich" th:if="${thayDoiDoanhThu != null}"
+                 th:text="|${thayDoiDoanhThu >= 0 ? '+' : ''}${thayDoiDoanhThu}% so với 30 ngày trước|"></div>
+        </a>
+        <a sec:authorize="hasAuthority('DONHANG_XEM_TATCA')" th:href="@{/admin/kho/don-hang(trangThai='CHO_XAC_NHAN')}"
+           class="o-so-lieu">
+            <div class="nhan-so"><i class="bi bi-hourglass-split" aria-hidden="true"></i> Đơn chờ xác nhận</div>
+            <div class="gia-tri" th:text="${soDonChoXacNhan}"></div>
+        </a>
+        <a sec:authorize="hasAuthority('KHO_DUYET_NHAP')" th:href="@{/admin/kho/yeu-cau-nhap(trangThai='CHO_DUYET')}"
+           class="o-so-lieu">
+            <div class="nhan-so"><i class="bi bi-clipboard-check" aria-hidden="true"></i> Yêu cầu nhập chờ duyệt</div>
+            <div class="gia-tri" th:text="${soYeuCauChoDuyet}"></div>
+        </a>
+        <a sec:authorize="hasAuthority('BAOCAO_TONKHO')" th:href="@{/admin/bao-cao/ton-kho}" class="o-so-lieu">
+            <div class="nhan-so"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i> Sản phẩm cần nhập</div>
+            <div class="gia-tri" th:text="${tonKho.soHetHang + tonKho.soSapHet}"></div>
+            <div class="chu-thich" th:text="|${tonKho.soHetHang} hết hàng, ${tonKho.soSapHet} sắp hết|"></div>
+        </a>
+    </div>
+
+    <section class="the the-bieu-do" sec:authorize="hasAuthority('BAOCAO_DOANHTHU')">
+        <div class="the-tieu-de">
+            <h2 th:text="|Doanh thu năm ${bieuDo.nam}|"></h2>
+            <a th:href="@{/admin/bao-cao/doanh-thu}">Xem báo cáo</a>
+        </div>
+        <div th:replace="~{admin/fragments :: bieu-do-duong(${bieuDo})}"></div>
+    </section>
+</main>
+</body>
+</html>

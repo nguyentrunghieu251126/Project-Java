@@ -42,6 +42,10 @@
                         <span>Bạn đã đăng xuất thành công.</span>
                     </div>
 
+                    <div th:if="${param.khoa != null}" class="alert alert-danger" role="alert">
+                        Tài khoản của bạn đã bị khóa hoặc không còn tồn tại.
+                    </div>
+
                     <div th:if="${thongBaoDoiMatKhau}"
                          class="thong-bao-dang-ky"
                          role="status">

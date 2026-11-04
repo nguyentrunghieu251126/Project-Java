@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Nhãn trạng thái: luôn có icon và chữ, không chỉ dựa vào màu -->
+<span th:fragment="nhan(t)" class="nhan" th:classappend="'nhan-' + ${t.mau}">
+    <i class="bi" th:classappend="${t.icon}" aria-hidden="true"></i> <span th:text="${t.nhan}"></span>
+</span>
+
+<nav th:fragment="phan-trang(trang)" class="phan-trang" aria-label="Phân trang">
+    <span class="phan-trang-tong">
+        <th:block th:if="${trang.totalElements > 0}">
+            Hiển thị <strong th:text="${trang.number * trang.size + 1}"></strong>–<strong
+                th:text="${trang.number * trang.size + trang.numberOfElements}"></strong>
+            trên <strong th:text="${trang.totalElements}"></strong>
+        </th:block>
+    </span>
+    <ul class="pagination pagination-sm mb-0" th:if="${trang.totalPages > 1}"
+        th:with="hienTai=${trang.number + 1}, cuoi=${trang.totalPages}">
+        <li class="page-item" th:classappend="${hienTai == 1} ? 'disabled'">
+            <a class="page-link" th:href="${urlPhanTrang + (hienTai - 1)}" aria-label="Trang trước">‹</a>
+        </li>
+        <th:block th:each="i : ${#numbers.sequence(1, cuoi)}">
+            <li class="page-item" th:if="${i == 1 or i == cuoi or (i >= hienTai - 2 and i <= hienTai + 2)}"
+                th:classappend="${i == hienTai} ? 'active'">
+                <a class="page-link" th:href="${urlPhanTrang + i}" th:text="${i}"></a>
+            </li>
+            <li class="page-item disabled" th:if="${(i == 2 and hienTai > 4) or (i == cuoi - 1 and hienTai < cuoi - 3)}">
+                <span class="page-link">…</span>
+            </li>
+        </th:block>
+        <li class="page-item" th:classappend="${hienTai == cuoi} ? 'disabled'">
+            <a class="page-link" th:href="${urlPhanTrang + (hienTai + 1)}" aria-label="Trang sau">›</a>
+        </li>
+    </ul>
+</nav>
+
+<!-- Biểu đồ đường doanh thu 12 tháng; tháng chưa tới không có điểm để không bị hiểu là doanh thu 0 -->
+<div th:fragment="bieu-do-duong(bieuDo)" class="bieu-do" role="img"
+     th:aria-label="|Biểu đồ doanh thu theo tháng năm ${bieuDo.nam}|">
+    <div class="bieu-do-moc" th:each="m : ${bieuDo.moc}" th:style="'bottom:' + ${m.phanTram} + '%'">
+        <span th:text="${m.nhan}"></span>
+    </div>
+    <svg class="bieu-do-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+            <linearGradient id="nenDuong" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#2f6fb0" stop-opacity="0.22"/>
+                <stop offset="1" stop-color="#2f6fb0" stop-opacity="0.02"/>
+            </linearGradient>
+        </defs>
+        <path th:if="${!bieuDo.vungTo.isEmpty()}" th:d="${bieuDo.vungTo}" fill="url(#nenDuong)"/>
+        <path th:if="${!bieuDo.duongCong.isEmpty()}" th:d="${bieuDo.duongCong}" class="duong"
+              vector-effect="non-scaling-stroke"/>
+    </svg>
+    <div class="bieu-do-thang">
+        <div class="cot-thang" th:each="d : ${bieuDo.diem}" th:attr="tabindex=${d.chuaToi} ? null : 0">
+            <th:block th:unless="${d.chuaToi}">
+                <span class="duong-doc"></span>
+                <span class="diem" th:style="'bottom:' + ${d.phanTram} + '%'"></span>
+                <div class="cot-tip">
+                    <strong th:text="|Tháng ${d.thang}/${bieuDo.nam}|"></strong>
+                    <span th:text="|${#numbers.formatInteger(d.doanhThu, 1, 'POINT')} ₫|"></span>
+                    <span th:text="|${d.soDon} đơn đã giao|"></span>
+                </div>
+            </th:block>
+            <span class="cot-nhan" th:text="|T${d.thang}|"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Biểu đồ cột số lượng bán, mỗi cột một mặt hàng; nhiều mặt hàng thì cuộn ngang -->
+<div th:fragment="bieu-do-san-pham(bieuDo)" class="bieu-do-cuon">
+    <div class="bieu-do bieu-do-sp" role="img" aria-label="Biểu đồ số lượng bán theo từng mặt hàng, số liệu chi tiết ở bảng"
+         th:style="|min-width:${bieuDo.cot.size() * 88}px|">
+        <div class="bieu-do-moc" th:each="m : ${bieuDo.moc}" th:style="'bottom:' + ${m.phanTram} + '%'">
+            <span th:text="${m.nhan}"></span>
+        </div>
+        <div class="bieu-do-cot">
+            <div class="cot" tabindex="0" th:each="c : ${bieuDo.cot}">
+                <div class="cot-than" th:style="'height:' + ${c.phanTram} + '%'"></div>
+                <div class="cot-tip">
+                    <strong th:text="${c.sanPham.tenSanPham}"></strong>
+                    <span th:text="|Đã bán: ${c.sanPham.soLuongBan}|"></span>
+                    <span th:text="|Doanh số: ${#numbers.formatInteger(c.sanPham.doanhSo, 1, 'POINT')} ₫|"></span>
+                </div>
+                <span class="cot-nhan" th:text="${c.sanPham.tenSanPham}"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{admin/layout :: layout('Quản lý sản phẩm', 'san-pham', ~{::main})}">
+<body>
+<main>
+    <section class="the">
+        <form class="bo-loc" method="get" th:action="@{/admin/san-pham}">
+            <div class="o-loc-rong"><label for="tuKhoa">Tìm kiếm</label>
+                <input class="form-control form-control-sm" id="tuKhoa" name="tuKhoa" th:value="${tuKhoa}"
+                       placeholder="Tên sản phẩm hoặc mã model"></div>
+            <div class="o-loc"><label for="maDanhMuc">Danh mục</label>
+                <select class="form-select form-select-sm" id="maDanhMuc" name="maDanhMuc">
+                    <option value="">Tất cả</option>
+                    <option th:each="d : ${dsDanhMuc}" th:value="${d.maDanhMuc}" th:text="${d.tenDanhMuc}"
+                            th:selected="${maDanhMuc == d.maDanhMuc}"></option>
+                </select></div>
+            <div class="o-loc"><label for="thuongHieu">Thương hiệu</label>
+                <select class="form-select form-select-sm" id="thuongHieu" name="thuongHieu">
+                    <option value="">Tất cả</option>
+                    <option th:each="t : ${dsThuongHieu}" th:value="${t}" th:text="${t}"
+                            th:selected="${thuongHieu == t}"></option>
+                </select></div>
+            <div class="o-loc"><label for="tinhTrang">Tồn kho</label>
+                <select class="form-select form-select-sm" id="tinhTrang" name="tinhTrang">
+                    <option value="">Tất cả</option>
+                    <option th:each="t : ${dsTinhTrang}" th:value="${t.name()}" th:text="${t.nhan}"
+                            th:selected="${tinhTrang == t}"></option>
+                </select></div>
+            <div class="o-loc"><label for="dangKinhDoanh">Kinh doanh</label>
+                <select class="form-select form-select-sm" id="dangKinhDoanh" name="dangKinhDoanh">
+                    <option value="">Tất cả</option>
+                    <option value="true" th:selected="${dangKinhDoanh == true}">Đang kinh doanh</option>
+                    <option value="false" th:selected="${dangKinhDoanh == false}">Ngừng kinh doanh</option>
+                </select></div>
+            <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-funnel" aria-hidden="true"></i> Lọc</button>
+            <a class="btn btn-sm btn-link" th:href="@{/admin/san-pham}">Xóa lọc</a>
+            <a sec:authorize="hasAuthority('SANPHAM_THEM')" class="btn btn-sm btn-chinh ms-auto" th:href="@{/admin/san-pham/them}">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i> Thêm sản phẩm</a>
+        </form>
+
+        <div class="table-responsive" th:if="${trang.hasContent()}">
+            <table class="table table-hover bang">
+                <thead><tr><th></th><th>Sản phẩm</th><th>Danh mục</th><th class="so">Đơn giá</th><th class="so">Tồn</th>
+                    <th>Tình trạng</th><th class="so">Thao tác</th></tr></thead>
+                <tbody>
+                <tr th:each="s : ${trang.content}">
+                    <td>
+                        <div class="anh-nho"><i class="bi bi-image" aria-hidden="true"></i>
+                            <img th:if="${s.hinhAnh}" th:src="@{${s.hinhAnh}}" alt="" hidden
+                                 onload="this.hidden = false; this.previousElementSibling.remove()" onerror="this.remove()">
+                        </div>
+                    </td>
+                    <td><span class="ten-chinh" th:text="${s.tenSanPham}"></span>
+                        <span class="ten-phu" th:text="|${s.thuongHieu} · ${s.maModel}|"></span></td>
+                    <td th:text="${s.danhMuc.tenDanhMuc}"></td>
+                    <td class="so" th:text="|${#numbers.formatInteger(s.donGia, 1, 'POINT')} ₫|"></td>
+                    <td class="so" th:text="${s.soLuong}"></td>
+                    <td>
+                        <th:block th:if="${s.dangKinhDoanh}">
+                            <span th:replace="~{admin/fragments :: nhan(${s.tinhTrangTonKho})}"></span>
+                        </th:block>
+                        <span th:unless="${s.dangKinhDoanh}" class="nhan nhan-trung-tinh">
+                            <i class="bi bi-slash-circle" aria-hidden="true"></i> Ngừng kinh doanh</span>
+                    </td>
+                    <td>
+                        <div class="nhom-nut">
+                            <a sec:authorize="hasAuthority('SANPHAM_SUA')" class="btn btn-sm btn-outline-secondary"
+                               th:href="@{/admin/san-pham/{ma}/sua(ma=${s.maSanPham})}"
+                               th:aria-label="|Sửa ${s.tenSanPham}|"><i class="bi bi-pencil" aria-hidden="true"></i></a>
+                            <form sec:authorize="hasAuthority('SANPHAM_XOA')" method="post"
+                                  th:action="@{/admin/san-pham/{ma}/xoa(ma=${s.maSanPham})}"
+                                  th:data-xac-nhan="|Xóa sản phẩm ${s.tenSanPham}? Nếu đã có đơn hàng, sản phẩm sẽ chuyển sang ngừng kinh doanh.|">
+                                <button class="btn btn-sm btn-outline-danger" type="submit"
+                                        th:aria-label="|Xóa ${s.tenSanPham}|"><i class="bi bi-trash" aria-hidden="true"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="bang-trong" th:unless="${trang.hasContent()}">Không tìm thấy sản phẩm phù hợp.</p>
+        <nav th:replace="~{admin/fragments :: phan-trang(${trang})}"></nav>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout(${form.maTaiKhoan == null ? 'Thêm tài khoản' : 'Sửa tài khoản'}, 'tai-khoan', ~{::main})}">
+<body>
+<main>
+    <form class="the" method="post" th:object="${form}" novalidate
+          th:action="${form.maTaiKhoan == null} ? @{/admin/tai-khoan/them} : @{/admin/tai-khoan/{ma}/sua(ma=${form.maTaiKhoan})}">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label" for="hoTen">Họ và tên *</label>
+                <input class="form-control" th:field="*{hoTen}" th:errorclass="is-invalid" maxlength="100">
+                <div class="invalid-feedback" th:errors="*{hoTen}"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="email">Email đăng nhập *</label>
+                <input type="email" class="form-control" th:field="*{email}" th:errorclass="is-invalid" maxlength="100"
+                       th:readonly="${laChinhMinh}" autocomplete="off">
+                <div class="invalid-feedback" th:errors="*{email}"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="soDienThoai">Số điện thoại</label>
+                <input class="form-control" th:field="*{soDienThoai}" th:errorclass="is-invalid" maxlength="11">
+                <div class="invalid-feedback" th:errors="*{soDienThoai}"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="maVaiTro">Vai trò *</label>
+                <!-- Ô select bị disabled không gửi giá trị nên phải kèm trường ẩn -->
+                <input type="hidden" th:if="${laChinhMinh}" name="maVaiTro" th:value="*{maVaiTro}">
+                <select class="form-select" id="maVaiTro" th:name="${laChinhMinh} ? '' : 'maVaiTro'"
+                        th:disabled="${laChinhMinh}"
+                        th:classappend="${#fields.hasErrors('maVaiTro')} ? 'is-invalid'">
+                    <option value="" th:unless="${laChinhMinh}">Chọn vai trò</option>
+                    <option th:each="v : ${dsVaiTro}" th:value="${v.maVaiTro}" th:text="${v.tenHienThi}"
+                            th:selected="${form.maVaiTro == v.maVaiTro}"></option>
+                </select>
+                <div class="invalid-feedback" th:errors="*{maVaiTro}"></div>
+                <div class="form-text" th:if="${laChinhMinh}">Bạn không thể tự đổi vai trò và email của mình.</div>
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="diaChi">Địa chỉ</label>
+                <input class="form-control" th:field="*{diaChi}" th:errorclass="is-invalid" maxlength="255">
+                <div class="invalid-feedback" th:errors="*{diaChi}"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="matKhau"
+                       th:text="${form.maTaiKhoan == null} ? 'Mật khẩu *' : 'Mật khẩu mới'"></label>
+                <input type="password" class="form-control" id="matKhau" name="matKhau"
+                       th:classappend="${#fields.hasErrors('matKhau')} ? 'is-invalid'" maxlength="72" autocomplete="new-password">
+                <div class="invalid-feedback" th:errors="*{matKhau}"></div>
+                <div class="form-text" th:if="${form.maTaiKhoan != null}">Để trống nếu không đổi mật khẩu.</div>
+            </div>
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-chinh" type="submit">Lưu</button>
+            <a class="btn btn-outline-secondary" th:href="@{/admin/tai-khoan}">Hủy</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>
