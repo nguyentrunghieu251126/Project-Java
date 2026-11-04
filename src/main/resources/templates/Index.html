@@ -41,8 +41,18 @@
               <button class="btn" type="submit"><i class="bi bi-search"></i></button>
             </form>
             <ul class="navbar-nav align-items-lg-center gap-lg-2">
-              <li class="nav-item">
-                <a class="nav-link" href="#"><i class="bi bi-person-circle"></i> Đăng nhập</a>
+              <li class="nav-item" th:if="${#authorization.expression('isAnonymous()')}">
+                <a class="nav-link" th:href="@{/dang-nhap}"><i class="bi bi-person-circle"></i> Đăng nhập</a>
+              </li>
+              <li class="nav-item"
+                  th:if="${#authorization.expression('isAuthenticated()')}">
+                <form th:action="@{/dang-xuat}" method="post" class="m-0">
+                  <button type="submit"
+                          class="nav-link border-0 bg-transparent">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Đăng xuất
+                  </button>
+                </form>
               </li>
               <li class="nav-item">
                 <a class="nav-link cart-link" href="#">

@@ -1,0 +1,199 @@
+.dang-nhap-page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    background:
+            linear-gradient(180deg, #eef2f6 0%, #f2f4f7 100%);
+}
+
+.dang-nhap-wrapper {
+    max-width: 460px;
+    margin: 0 auto;
+}
+
+.dang-nhap-card {
+    background: #ffffff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 18px 40px -24px rgba(15, 23, 42, 0.28);
+    border: 1px solid #e5e7eb;
+}
+
+/* ===== Brand / logo ===== */
+.dang-nhap-brand {
+    background: #ffffff;
+    padding: 28px 28px 18px;
+    text-align: center;
+}
+
+.dang-nhap-logo {
+    max-width: 260px;
+    width: 100%;
+    height: auto;
+    display: inline-block;
+}
+
+.brand-line {
+    width: 72px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--header-accent);
+    margin: 18px auto 0;
+}
+
+/* ===== Content ===== */
+.dang-nhap-content {
+    padding: 12px 32px 32px;
+}
+
+.dang-nhap-title {
+    text-align: center;
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.dang-nhap-subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin-bottom: 28px;
+}
+
+/* ===== Form ===== */
+.dang-nhap-form .form-label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.dang-nhap-form .form-control {
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid #d8dee6;
+    font-size: 0.95rem;
+    padding: 0 14px;
+    color: var(--text);
+    background: #fff;
+}
+
+.dang-nhap-form .form-control::placeholder {
+    color: #98a2b3;
+}
+
+.dang-nhap-form .form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(10, 143, 60, 0.12);
+}
+
+/* ===== Alert ===== */
+.dang-nhap-content .alert {
+    border-radius: 12px;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    margin-bottom: 18px;
+}
+
+/* ===== Links ===== */
+.dang-nhap-actions {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.link-phu {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.link-phu:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* ===== Button ===== */
+.btn-dang-nhap {
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: 12px;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.btn-dang-nhap:hover {
+    background: var(--primary-dark);
+    color: #ffffff;
+}
+
+.btn-dang-nhap:focus-visible,
+.link-phu:focus-visible,
+.dang-ky-text a:focus-visible,
+.quay-ve-trang-chu a:focus-visible {
+    outline: 3px solid rgba(245, 196, 81, 0.6);
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+
+/* ===== Dang ky ===== */
+.dang-ky-text {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin: 22px 0 0;
+}
+
+.dang-ky-text a {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.dang-ky-text a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* ===== Quay ve ===== */
+.quay-ve-trang-chu {
+    text-align: center;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #eef0f3;
+}
+
+.quay-ve-trang-chu a {
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.quay-ve-trang-chu a:hover {
+    color: var(--primary);
+}
+
+.thong-bao-dang-ky {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    margin-bottom: 18px;
+    background: #f0faf3;
+    border: 1px solid #d3eedd;
+    border-radius: 10px;
+    color: #066b2c;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.thong-bao-dang-ky span:first-child {
+    font-size: 15px;
+    font-weight: 700;
+}

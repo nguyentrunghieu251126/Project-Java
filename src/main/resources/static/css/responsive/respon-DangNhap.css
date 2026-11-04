@@ -1,0 +1,64 @@
+/* Tablet */
+@media (max-width: 767.98px) {
+
+    .dang-nhap-page {
+        padding: 25px 0;
+    }
+
+    .dang-nhap-box {
+        max-width: 420px;
+    }
+
+    .dang-nhap-content {
+        padding: 28px;
+    }
+}
+
+/* Dien thoai */
+@media (max-width: 575.98px) {
+
+    .dang-nhap-page {
+        padding: 20px 0;
+    }
+
+    .dang-nhap-box {
+        max-width: 100%;
+        border-radius: 12px;
+    }
+
+    .dang-nhap-header {
+        padding: 22px 15px 18px;
+    }
+
+    .ten-thuong-hieu {
+        font-size: 26px;
+    }
+
+    .dang-nhap-content {
+        padding: 25px 20px;
+    }
+
+    .dang-nhap-content h1 {
+        font-size: 21px;
+    }
+
+    .form-control {
+        font-size: 16px;
+    }
+
+    .btn-dang-nhap {
+        min-height: 46px;
+    }
+}
+
+/* Dien thoai nho */
+@media (max-width: 359.98px) {
+
+    .dang-nhap-content {
+        padding: 22px 15px;
+    }
+
+    .ten-thuong-hieu {
+        font-size: 23px;
+    }
+}

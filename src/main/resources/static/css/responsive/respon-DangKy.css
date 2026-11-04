@@ -1,0 +1,72 @@
+@media (max-width: 767.98px) {
+
+    .dang-ky-page {
+        padding: 28px 0;
+    }
+
+    .dang-ky-card {
+        max-width: 430px;
+    }
+
+    .dang-ky-content {
+        padding: 10px 26px 28px;
+    }
+
+    .dang-ky-logo {
+        max-width: 230px;
+    }
+}
+
+/* Dien thoai */
+@media (max-width: 575.98px) {
+
+    .dang-ky-page {
+        padding: 18px 0;
+    }
+
+    .dang-ky-card {
+        max-width: 100%;
+        border-radius: 16px;
+    }
+
+    .dang-ky-brand {
+        padding: 22px 18px 14px;
+    }
+
+    .dang-ky-logo {
+        max-width: 210px;
+    }
+
+    .dang-ky-content {
+        padding: 8px 18px 24px;
+    }
+
+    .dang-ky-title {
+        font-size: 1.45rem;
+    }
+
+    .dang-ky-subtitle {
+        font-size: 0.85rem;
+        margin-bottom: 22px;
+    }
+
+    .dang-ky-content .form-control {
+        font-size: 16px;
+    }
+
+    .btn-dang-ky {
+        min-height: 46px;
+    }
+}
+
+/* Dien thoai nho */
+@media (max-width: 359.98px) {
+
+    .dang-ky-content {
+        padding: 8px 14px 20px;
+    }
+
+    .dang-ky-logo {
+        max-width: 180px;
+    }
+}
