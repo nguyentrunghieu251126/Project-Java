@@ -37,11 +37,6 @@
                         <span th:text="${thongBaoDangKy}"></span>
                     </div>
 
-                    <div th:if="${param.logout != null}" class="thong-bao-dang-ky" role="status">
-                        <span aria-hidden="true">✓</span>
-                        <span>Bạn đã đăng xuất thành công.</span>
-                    </div>
-
                     <div th:if="${thongBaoDoiMatKhau}"
                          class="thong-bao-dang-ky"
                          role="status">

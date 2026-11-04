@@ -197,3 +197,13 @@
     font-size: 15px;
     font-weight: 700;
 }
+
+/* ===== Thong bao dang xuat ===== */
+#logoutSuccessAlert {
+    z-index: 1100;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+

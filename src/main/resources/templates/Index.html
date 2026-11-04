@@ -41,18 +41,30 @@
               <button class="btn" type="submit"><i class="bi bi-search"></i></button>
             </form>
             <ul class="navbar-nav align-items-lg-center gap-lg-2">
+              <!-- Tài khoản (chưa đăng nhập): icon người, bấm để sang trang đăng nhập -->
               <li class="nav-item" th:if="${#authorization.expression('isAnonymous()')}">
-                <a class="nav-link" th:href="@{/dang-nhap}"><i class="bi bi-person-circle"></i> Đăng nhập</a>
+                <a class="nav-link account-link" th:href="@{/dang-nhap}" title="Đăng nhập" aria-label="Đăng nhập">
+                  <i class="bi bi-person-circle"></i>
+                </a>
               </li>
-              <li class="nav-item"
+              <!-- Tài khoản (đã đăng nhập): icon người, bấm để mở menu tài khoản (có Đăng xuất) -->
+              <li class="nav-item dropdown account-menu"
                   th:if="${#authorization.expression('isAuthenticated()')}">
-                <form th:action="@{/dang-xuat}" method="post" class="m-0">
-                  <button type="submit"
-                          class="nav-link border-0 bg-transparent">
-                    <i class="bi bi-box-arrow-right"></i>
-                    Đăng xuất
-                  </button>
-                </form>
+                <a class="nav-link account-link" href="#" role="button" data-bs-toggle="dropdown"
+                   aria-expanded="false" title="Tài khoản" aria-label="Tài khoản">
+                  <i class="bi bi-person-circle"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end account-dropdown">
+                  <!-- Sau này thêm: Thông tin tài khoản, Đơn hàng của tôi... khi trang tài khoản hoàn thiện -->
+                  <li>
+                    <!-- Đăng xuất: POST /dang-xuat (th:action tự thêm CSRF token) -->
+                    <form th:action="@{/dang-xuat}" method="post" class="m-0">
+                      <button type="submit" class="dropdown-item account-logout">
+                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                      </button>
+                    </form>
+                  </li>
+                </ul>
               </li>
               <li class="nav-item">
                 <a class="nav-link cart-link" href="#">
@@ -605,12 +617,33 @@
     </footer>
 
     <!-- Thông báo -->
+    <div id="loginSuccessAlert" class="alert alert-success alert-dismissible fade position-fixed top-0 end-0 m-3 shadow" role="alert" style="z-index: 1100; display: none;">
+      <i class="bi bi-check-circle-fill me-2"></i>Đăng nhập thành công!
+      <button type="button" class="btn-close" aria-label="Đóng"></button>
+    </div>
+
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
       <div id="cartToast" class="toast align-items-center text-bg-success border-0">
         <div class="d-flex">
           <div class="toast-body" id="toastMsg">Đã thêm vào giỏ hàng!</div>
           <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
         </div>
+      </div>
+    </div>
+    <!-- Thong bao dang xuat thanh cong -->
+    <div id="logoutSuccessAlert"
+         class="alert alert-success fade position-fixed top-0 end-0 m-3 shadow"
+         role="status"
+         style="z-index: 1100; display: none;">
+
+      <div class="d-flex align-items-center gap-2">
+        <span aria-hidden="true">✓</span>
+        <span>Đăng xuất thành công!</span>
+
+        <button type="button"
+                class="btn-close ms-2"
+                aria-label="Đóng">
+        </button>
       </div>
     </div>
 

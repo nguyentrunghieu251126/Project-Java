@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/dang-nhap")
                         .usernameParameter("username")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/", true)
+                        .defaultSuccessUrl("/?dangnhap", true)
                         .failureUrl("/dang-nhap?error")
                         .permitAll()
                 )
@@ -41,7 +41,7 @@ public class SecurityConfig {
 
                 .logout(logout -> logout
                         .logoutUrl("/dang-xuat")
-                        .logoutSuccessUrl("/dang-nhap?logout")
+                        .logoutSuccessUrl("/?dangxuat")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
