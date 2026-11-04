@@ -56,3 +56,63 @@ window.addEventListener("scroll", () => {
   backToTop.classList.toggle("show", window.scrollY > 400);
 });
 backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+
+// Thong bao dang nhap va dang xuat
+document.addEventListener("DOMContentLoaded", function () {
+  const url = new URL(window.location.href);
+  let alertId = null;
+
+  if (url.searchParams.has("dangxuat")) {
+    alertId = "logoutSuccessAlert";
+    url.searchParams.delete("dangxuat");
+  } else if (url.searchParams.has("dangnhap")) {
+    alertId = "loginSuccessAlert";
+    url.searchParams.delete("dangnhap");
+  }
+
+  if (!alertId) {
+    return;
+  }
+
+  const alertElement = document.getElementById(alertId);
+
+  window.history.replaceState(
+      {},
+      "",
+      url.pathname + url.search + url.hash
+  );
+
+  if (!alertElement) {
+    return;
+  }
+
+  alertElement.style.display = "block";
+
+  requestAnimationFrame(function () {
+    alertElement.classList.add("show");
+  });
+
+  let daDong = false;
+
+  function dongThongBao() {
+    if (daDong) {
+      return;
+    }
+
+    daDong = true;
+    alertElement.classList.remove("show");
+
+    setTimeout(function () {
+      alertElement.remove();
+    }, 200);
+  }
+
+  const nutDong = alertElement.querySelector(".btn-close");
+
+  if (nutDong) {
+    nutDong.addEventListener("click", dongThongBao);
+  }
+
+  setTimeout(dongThongBao, 3000);
+});
