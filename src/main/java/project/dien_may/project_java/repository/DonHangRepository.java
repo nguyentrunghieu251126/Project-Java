@@ -38,8 +38,6 @@ public interface DonHangRepository extends JpaRepository<DonHang, Integer> {
             """)
     List<DemTrangThaiDon> demTheoTrangThai();
 
-    long countByTrangThai(TrangThaiDonHang trangThai);
-
     @Query("SELECT MIN(YEAR(d.ngayDat)) FROM DonHang d")
     Integer namDauTien();
 

@@ -161,12 +161,6 @@
                              role="alert"
                              th:text="${#fields.hasErrors('matKhau') ? (#strings.isEmpty(dangKyForm.matKhau) ? 'Vui lòng nhập mật khẩu.' : #fields.errors('matKhau')[0]) : ''}">
                         </div>
-
-
-                        <div class="form-text">
-                            Mật khẩu phải có từ 8 đến 72 ký tự, không dấu và không có khoảng trắng.
-                        </div>
-
                     </div>
 
                     <div class="mb-4">

@@ -725,28 +725,6 @@ a.o-so-lieu:hover {
 }
 
 /* ===== Trang lỗi ===== */
-.trang-loi {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 24px;
-  text-align: center;
-}
-
-.trang-loi .bi {
-  color: var(--chu-phu);
-  font-size: 3rem;
-}
-
-.trang-loi h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
 @media (max-width: 575.98px) {
   .noi-dung {
     padding: 14px;

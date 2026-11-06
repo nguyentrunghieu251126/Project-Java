@@ -8,10 +8,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,5 +61,56 @@ class PhanQuyenUrlTests {
     @Test
     void urlQuanTriChuaKhaiBaoQuyenBiChanMacDinh() throws Exception {
         mockMvc.perform(get("/admin/chuc-nang-moi").with(user(QUAN_TRI))).andExpect(status().isForbidden());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/", "/so-sanh", "/san-pham/1"})
+    void trangCongKhaiVaoDuocKhiChuaDangNhap(String url) throws Exception {
+        mockMvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("title=\"Đăng nhập\"")))
+                .andExpect(content().string(containsString("id=\"cartCount\"")));
+    }
+
+    @Test
+    void khachHangCoMenuTaiKhoanVaVaoDuocHoSo() throws Exception {
+        mockMvc.perform(get("/").with(user(KHACH_HANG)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Tổng quan tài khoản")))
+                .andExpect(content().string(not(containsString("Trang quản trị"))));
+        mockMvc.perform(get("/tai-khoan").with(user(KHACH_HANG))).andExpect(status().isOk());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/", "/so-sanh", "/san-pham/1"})
+    void quanTriCoLinkVeTrangQuanTri(String url) throws Exception {
+        mockMvc.perform(get(url).with(user(QUAN_TRI)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("admin-link")))
+                .andExpect(content().string(not(containsString("Tổng quan tài khoản"))));
+    }
+
+    @Test
+    void tongQuanHienBonSoLieuDoanhThu() throws Exception {
+        mockMvc.perform(get("/admin").with(user(QUAN_TRI)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Doanh thu cả năm")))
+                .andExpect(content().string(containsString("Doanh thu tháng hiện tại")))
+                .andExpect(content().string(containsString("Doanh thu tháng cao nhất")))
+                .andExpect(content().string(containsString("Doanh thu tháng thấp nhất")));
+    }
+
+    @Test
+    void trangLoiDanLoiVeDungKhuVuc() throws Exception {
+        mockMvc.perform(get("/403").with(user(QUAN_TRI)))
+                .andExpect(content().string(containsString("Về trang quản trị")));
+        mockMvc.perform(get("/403").with(user(KHACH_HANG)))
+                .andExpect(content().string(not(containsString("Về trang quản trị"))));
+    }
+
+    @Test
+    void dangXuatVeTrangChuKemThongBao() throws Exception {
+        mockMvc.perform(post("/dang-xuat").with(user(KHACH_HANG)).with(csrf()))
+                .andExpect(redirectedUrl("/?dangxuat"));
     }
 }

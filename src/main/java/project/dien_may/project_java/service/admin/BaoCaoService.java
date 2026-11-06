@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -63,6 +64,11 @@ public class BaoCaoService {
                             BigDecimal tongTienGiam, BigDecimal tongDoanhThu, BigDecimal giaTriDonTrungBinh) {
     }
 
+    /** thangCaoNhat và thangThapNhat là null khi chưa có tháng nào đủ điều kiện so sánh. */
+    public record TomTatDoanhThu(BigDecimal caNam, DoanhThuThang thangHienTai,
+                                 DoanhThuThang thangCaoNhat, DoanhThuThang thangThapNhat) {
+    }
+
     public record CotSanPham(SanPhamBanChay sanPham, double phanTram) {
     }
 
@@ -97,12 +103,6 @@ public class BaoCaoService {
     }
 
     @Transactional(readOnly = true)
-    public BigDecimal tongDoanhThu(LocalDate tuNgay, LocalDate denNgay) {
-        return doanhThuTrongKhoang(tuNgay.atStartOfDay(), denNgay.plusDays(1).atStartOfDay()).stream()
-                .map(DoanhThuNgay::doanhThu).reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    @Transactional(readOnly = true)
     public BaoCaoNam doanhThuTheoNam(int nam) {
         long[] soDon = new long[13];
         BigDecimal[] tienGiam = new BigDecimal[13];
@@ -133,6 +133,21 @@ public class BaoCaoService {
         BigDecimal trungBinh = tongDon == 0 ? BigDecimal.ZERO
                 : tong.divide(BigDecimal.valueOf(tongDon), 0, RoundingMode.HALF_UP);
         return new BaoCaoNam(nam, dsThang, veBieuDoDuong(nam, dsThang), tongDon, tongGiam, tong, trungBinh);
+    }
+
+    /**
+     * Chỉ so sánh từ tháng đầu tiên có đơn, vì các tháng trước đó chưa có dữ liệu chứ không phải bán ế.
+     * Tháng thấp nhất bỏ qua tháng đang chạy, nếu không tháng mới bắt đầu luôn thành thấp nhất.
+     */
+    public TomTatDoanhThu tomTatDoanhThu(BaoCaoNam baoCao, int thangNay) {
+        List<DoanhThuThang> tuThangCoDon = baoCao.dsThang().stream()
+                .dropWhile(t -> t.soDon() == 0)
+                .filter(t -> t.thang() <= thangNay)
+                .toList();
+        Comparator<DoanhThuThang> theoDoanhThu = Comparator.comparing(DoanhThuThang::doanhThu);
+        return new TomTatDoanhThu(baoCao.tongDoanhThu(), baoCao.dsThang().get(thangNay - 1),
+                tuThangCoDon.stream().max(theoDoanhThu).orElse(null),
+                tuThangCoDon.stream().filter(t -> t.thang() < thangNay).min(theoDoanhThu).orElse(null));
     }
 
     @Transactional(readOnly = true)

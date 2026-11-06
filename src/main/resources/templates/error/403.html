@@ -1,20 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Không đủ quyền truy cập | PDMJV</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>403 - Bạn không có quyền truy cập | PDMJV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/style-error/TrangLoi.css}" href="/css/style-error/TrangLoi.css" />
 </head>
-<body class="admin">
-<main class="trang-loi">
-    <i class="bi bi-shield-lock" aria-hidden="true"></i>
-    <h1>Bạn không có quyền truy cập trang này</h1>
-    <p class="chu-thich">Liên hệ quản trị viên nếu bạn cần được cấp quyền cho chức năng này.</p>
-    <a sec:authorize="hasRole('QUAN_TRI')" th:href="@{/admin}" class="btn btn-chinh">Về trang quản trị</a>
-    <a sec:authorize="!hasRole('QUAN_TRI')" th:href="@{/}" class="btn btn-chinh">Về trang chủ</a>
-</main>
+<body class="error-page">
+  <header class="error-header">
+    <div class="error-header-inner">
+      <a class="error-logo" th:href="@{/}" href="/" aria-label="PDMJV - Về trang chủ">
+        <img th:src="@{/images/header-banner/logo-header.png}" src="/images/header-banner/logo-header.png" alt="PDMJV - Điện máy và Công nghệ" />
+      </a>
+      <a class="error-header-link" th:href="@{/}" href="/"><i class="bi bi-house-door" aria-hidden="true"></i> Trang chủ</a>
+    </div>
+  </header>
+  <main class="error-main">
+    <section class="error-card" aria-labelledby="error-title">
+      <div class="error-visual" aria-hidden="true">
+        <span class="error-halo"></span>
+        <span class="error-picture"><span class="error-symbol">×</span></span>
+      </div>
+      <div class="error-code">403</div>
+      <div class="error-kicker"><i class="bi bi-shield-check" aria-hidden="true"></i> Giới hạn quyền truy cập</div>
+      <h1 class="error-title" id="error-title">Bạn không có quyền truy cập</h1>
+      <p class="error-description">Tài khoản hiện tại không có quyền truy cập trang này. Vui lòng quay về trang chủ hoặc sử dụng tài khoản có quyền phù hợp.</p>
+      <div class="error-actions">
+        <a sec:authorize="hasRole('QUAN_TRI')" class="error-button error-button-primary" th:href="@{/admin}" href="/admin"><i class="bi bi-speedometer2" aria-hidden="true"></i> Về trang quản trị</a>
+        <a sec:authorize="!hasRole('QUAN_TRI')" class="error-button error-button-primary" th:href="@{/}" href="/"><i class="bi bi-house-door-fill" aria-hidden="true"></i> Về trang chủ</a>
+        <a class="error-button error-button-secondary" th:href="@{/#product-list}" href="/#product-list"><i class="bi bi-arrow-left" aria-hidden="true"></i> Xem sản phẩm</a>
+      </div>
+      <hr class="error-divider" />
+      <p class="error-note">Nếu sự cố tiếp tục xảy ra, vui lòng liên hệ bộ phận hỗ trợ của cửa hàng.</p>
+    </section>
+  </main>
+  <footer class="error-footer">PDMJV · Điện máy &amp; Công nghệ</footer>
 </body>
 </html>

@@ -140,3 +140,34 @@
     padding: 22px;
   }
 }
+
+/* May tinh (>= 992px): bo loc la khung trang ben trai. */
+@media (min-width: 992px) {
+  #product-list .product-filter-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #ffffff;
+  }
+  #product-list .product-filter-header {
+    padding: 14px 16px 6px;
+  }
+  #product-list .product-filter-body {
+    padding: 8px 16px 16px;
+  }
+  #product-list .product-filter-header .btn-close {
+    display: none;
+  }
+}
+
+@media (max-width: 991.98px) {
+  #product-list .product-sort {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #product-list .product-sort-label {
+    width: 100%;
+  }
+}

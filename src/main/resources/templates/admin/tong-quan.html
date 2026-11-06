@@ -3,27 +3,26 @@
       th:replace="~{admin/layout :: layout('Tổng quan', 'tong-quan', ~{::main})}">
 <body>
 <main class="trang-day">
-    <div class="luoi-so-lieu">
-        <a sec:authorize="hasAuthority('BAOCAO_DOANHTHU')" th:href="@{/admin/bao-cao/doanh-thu}" class="o-so-lieu">
-            <div class="nhan-so"><i class="bi bi-cash-stack" aria-hidden="true"></i> Doanh thu 30 ngày</div>
-            <div class="gia-tri" th:text="|${#numbers.formatInteger(doanhThu30Ngay, 1, 'POINT')} ₫|"></div>
-            <div class="chu-thich" th:if="${thayDoiDoanhThu != null}"
-                 th:text="|${thayDoiDoanhThu >= 0 ? '+' : ''}${thayDoiDoanhThu}% so với 30 ngày trước|"></div>
+    <div class="luoi-so-lieu" sec:authorize="hasAuthority('BAOCAO_DOANHTHU')">
+        <a th:href="@{/admin/bao-cao/doanh-thu}" class="o-so-lieu">
+            <div class="nhan-so"><i class="bi bi-cash-stack" aria-hidden="true"></i> Doanh thu cả năm</div>
+            <div class="gia-tri" th:text="|${#numbers.formatInteger(tomTat.caNam, 1, 'POINT')} ₫|"></div>
+            <div class="chu-thich" th:text="|Năm ${bieuDo.nam}|"></div>
         </a>
-        <a sec:authorize="hasAuthority('DONHANG_XEM_TATCA')" th:href="@{/admin/kho/don-hang(trangThai='CHO_XAC_NHAN')}"
-           class="o-so-lieu">
-            <div class="nhan-so"><i class="bi bi-hourglass-split" aria-hidden="true"></i> Đơn chờ xác nhận</div>
-            <div class="gia-tri" th:text="${soDonChoXacNhan}"></div>
+        <a th:href="@{/admin/bao-cao/doanh-thu}" class="o-so-lieu">
+            <div class="nhan-so"><i class="bi bi-calendar-check" aria-hidden="true"></i> Doanh thu tháng hiện tại</div>
+            <div class="gia-tri" th:text="|${#numbers.formatInteger(tomTat.thangHienTai.doanhThu, 1, 'POINT')} ₫|"></div>
+            <div class="chu-thich" th:text="|Tháng ${tomTat.thangHienTai.thang}/${bieuDo.nam}|"></div>
         </a>
-        <a sec:authorize="hasAuthority('KHO_DUYET_NHAP')" th:href="@{/admin/kho/yeu-cau-nhap(trangThai='CHO_DUYET')}"
-           class="o-so-lieu">
-            <div class="nhan-so"><i class="bi bi-clipboard-check" aria-hidden="true"></i> Yêu cầu nhập chờ duyệt</div>
-            <div class="gia-tri" th:text="${soYeuCauChoDuyet}"></div>
+        <a th:href="@{/admin/bao-cao/doanh-thu}" class="o-so-lieu" th:with="cao=${tomTat.thangCaoNhat}">
+            <div class="nhan-so"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i> Doanh thu tháng cao nhất</div>
+            <div class="gia-tri" th:text="${cao != null} ? |${#numbers.formatInteger(cao.doanhThu, 1, 'POINT')} ₫| : '—'"></div>
+            <div class="chu-thich" th:text="${cao != null} ? |Tháng ${cao.thang}/${bieuDo.nam}| : 'Chưa có dữ liệu'"></div>
         </a>
-        <a sec:authorize="hasAuthority('BAOCAO_TONKHO')" th:href="@{/admin/bao-cao/ton-kho}" class="o-so-lieu">
-            <div class="nhan-so"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i> Sản phẩm cần nhập</div>
-            <div class="gia-tri" th:text="${tonKho.soHetHang + tonKho.soSapHet}"></div>
-            <div class="chu-thich" th:text="|${tonKho.soHetHang} hết hàng, ${tonKho.soSapHet} sắp hết|"></div>
+        <a th:href="@{/admin/bao-cao/doanh-thu}" class="o-so-lieu" th:with="thap=${tomTat.thangThapNhat}">
+            <div class="nhan-so"><i class="bi bi-graph-down-arrow" aria-hidden="true"></i> Doanh thu tháng thấp nhất</div>
+            <div class="gia-tri" th:text="${thap != null} ? |${#numbers.formatInteger(thap.doanhThu, 1, 'POINT')} ₫| : '—'"></div>
+            <div class="chu-thich" th:text="${thap != null} ? |Tháng ${thap.thang}/${bieuDo.nam}| : 'Chưa có dữ liệu'"></div>
         </a>
     </div>
 

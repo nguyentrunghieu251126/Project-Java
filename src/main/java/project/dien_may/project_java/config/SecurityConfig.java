@@ -1,5 +1,6 @@
 package project.dien_may.project_java.config;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
@@ -23,9 +24,11 @@ public class SecurityConfig {
             throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
+                        // NFR10: Cho phép Spring Boot hiển thị trang lỗi, không nới quyền URL thông thường.
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         // 1. Trang công khai: ai cũng xem được
                         .requestMatchers("/", "/san-pham/**", "/danh-muc/**", "/tim-kiem",
-                                "/dang-ky", "/dang-nhap", "/quen-mat-khau", "/error", "/403",
+                                "/so-sanh", "/dang-ky", "/dang-nhap", "/quen-mat-khau", "/error", "/403",
                                 "/css/**", "/js/**", "/images/**")
                         .permitAll()
                         // 2. Khu quản trị (NFR05): phải là quản trị viên VÀ có đúng quyền chức năng.
@@ -65,7 +68,7 @@ public class SecurityConfig {
                         // 3. Chỉ nhân viên kho
                         .requestMatchers("/kho/**").hasRole("NHAN_VIEN_KHO")
                         // 4. Chỉ khách hàng đã đăng nhập
-                        .requestMatchers("/gio-hang/**", "/dat-hang/**", "/don-hang/**", "/tai-khoan/**")
+                        .requestMatchers("/gio-hang/**", "/dat-hang/**", "/don-hang/**", "/tai-khoan", "/tai-khoan/**")
                         .hasRole("KHACH_HANG")
                         // 5. Các trang còn lại: phải đăng nhập
                         .anyRequest().authenticated())
@@ -75,11 +78,11 @@ public class SecurityConfig {
                         .loginProcessingUrl("/dang-nhap")
                         .usernameParameter("username")
                         .passwordParameter("password")
-                        // Quản trị viên vào thẳng khu quản trị, các vai trò khác về trang chủ
+                        // Quản trị viên vào thẳng khu quản trị, các vai trò khác về trang chủ kèm thông báo
                         .successHandler((request, response, authentication) -> {
                             boolean laQuanTri = authentication.getAuthorities().stream()
                                     .anyMatch(a -> ROLE_QUAN_TRI.equals(a.getAuthority()));
-                            response.sendRedirect(request.getContextPath() + (laQuanTri ? "/admin" : "/"));
+                            response.sendRedirect(request.getContextPath() + (laQuanTri ? "/admin" : "/?dangnhap"));
                         })
                         .failureUrl("/dang-nhap?error")
                         .permitAll()
@@ -87,7 +90,7 @@ public class SecurityConfig {
 
                 .logout(logout -> logout
                         .logoutUrl("/dang-xuat")
-                        .logoutSuccessUrl("/dang-nhap?logout")
+                        .logoutSuccessUrl("/?dangxuat")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
