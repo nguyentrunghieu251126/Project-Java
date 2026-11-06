@@ -1,5 +1,6 @@
 package project.dien_may.project_java.config;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,9 +14,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
+                        // NFR10: Cho phép Spring Boot hiển thị trang lỗi, không nới quyền URL thông thường.
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         // 1. Trang công khai: ai cũng xem được
                         .requestMatchers("/", "/san-pham/**", "/danh-muc/**", "/tim-kiem",
-                                "/dang-ky", "/dang-nhap", "/quen-mat-khau", "/error",
+                                "/so-sanh", "/dang-ky", "/dang-nhap", "/quen-mat-khau", "/error",
                                 "/css/**", "/js/**", "/images/**")
                         .permitAll()
                         // 2. Chỉ quản trị viên
@@ -23,7 +26,7 @@ public class SecurityConfig {
                         // 3. Chỉ nhân viên kho
                         .requestMatchers("/kho/**").hasRole("NHAN_VIEN_KHO")
                         // 4. Chỉ khách hàng đã đăng nhập
-                        .requestMatchers("/gio-hang/**", "/dat-hang/**", "/don-hang/**", "/tai-khoan/**")
+                        .requestMatchers("/gio-hang/**", "/dat-hang/**", "/don-hang/**", "/tai-khoan", "/tai-khoan/**")
                         .hasRole("KHACH_HANG")
                         // 5. Các trang còn lại: phải đăng nhập
                         .anyRequest().authenticated())

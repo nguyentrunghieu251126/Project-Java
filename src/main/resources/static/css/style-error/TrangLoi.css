@@ -1,0 +1,71 @@
+
+:root {
+    --error-green: #009b40;
+    --error-green-dark: #087f39;
+    --error-text: #12213e;
+    --error-muted: #65728b;
+    --error-bg: #f3f5f9;
+    --error-border: #e3e8f0;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body.error-page {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--error-bg);
+    color: var(--error-text);
+    font: 400 15px/1.65 "Be Vietnam Pro", Arial, sans-serif;
+}
+.error-header { background: #fff; border-bottom: 1px solid var(--error-border); }
+.error-header-inner {
+    max-width: 1140px; margin: auto; padding: 14px 22px;
+    min-height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 18px;
+}
+.error-logo { display: inline-flex; align-items: center; min-width: 0; }
+.error-logo img { display: block; width: 150px; max-width: 100%; height: auto; }
+.error-header-link { font-size: 13px; font-weight: 700; color: var(--error-green-dark); text-decoration: none; }
+.error-header-link:hover, .error-header-link:focus-visible { text-decoration: underline; }
+.error-main {
+    flex: 1; width: 100%; display: flex; align-items: center;
+    justify-content: center; padding: 48px 20px 60px;
+}
+.error-card {
+    width: 100%; max-width: 840px; background: #fff; border: 1px solid var(--error-border);
+    border-radius: 22px; box-shadow: 0 14px 35px rgba(20,37,60,.055);
+    padding: 45px 44px 49px; text-align: center;
+}
+.error-visual { position: relative; height: 186px; display: flex; align-items: center; justify-content: center; margin-bottom: 9px; }
+.error-halo { width: 184px; height: 184px; border-radius: 50%; background: #e9f8f0; display: block; position: absolute; }
+.error-halo::after { content: ""; display: block; position: absolute; inset: 19px; border-radius: 50%; border: 2px dashed #c0e8d0; }
+.error-picture { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; height: 98px; width: 98px; border-radius: 25px; background: #fff; color: var(--error-green); box-shadow: 0 8px 22px rgba(0,130,65,.08); font-size: 52px; }
+.error-symbol { font-size: 74px; line-height: 1; font-weight: 800; font-family: Arial, sans-serif; }
+.error-code { font-weight: 800; color: var(--error-green-dark); font-size: 14px; letter-spacing: 3px; }
+.error-kicker { display: inline-flex; align-items: center; gap: 7px; border-radius: 50px; padding: 5px 13px; background: #edf9f2; color: var(--error-green-dark); font-size: 12px; font-weight: 700; margin: 5px auto 13px; }
+.error-title { font-size: clamp(22px, 3.2vw, 32px); font-weight: 800; line-height: 1.38; letter-spacing: -.5px; margin: 0 0 13px; }
+.error-description { max-width: 555px; font-size: 14px; line-height: 1.85; margin: 0 auto 28px; color: var(--error-muted); }
+.error-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; }
+.error-button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 45px; padding: 10px 22px; border-radius: 11px; font-size: 13px; font-weight: 700; text-decoration: none; transition: background .18s ease, border-color .18s ease; }
+.error-button-primary { background: var(--error-green); color: #fff; border: 1px solid var(--error-green); }
+.error-button-primary:hover, .error-button-primary:focus-visible { background: var(--error-green-dark); color: #fff; }
+.error-button-secondary { background: #fff; color: var(--error-text); border: 1px solid #d5dde8; }
+.error-button-secondary:hover, .error-button-secondary:focus-visible { background: #f4f7fb; border-color: #bac6d7; color: var(--error-text); }
+.error-divider { border: 0; border-top: 1px solid var(--error-border); margin: 31px 0 19px; }
+.error-note { font-size: 12px; color: #8a95a9; margin: 0; }
+.error-footer { padding: 0 20px 22px; text-align: center; color: #8992a5; font-size: 12px; }
+@media (max-width: 600px) {
+    .error-header-inner { min-height: 67px; padding: 12px 16px; }
+    .error-logo img { width: 118px; }
+    .error-main { padding: 25px 13px 32px; }
+    .error-card { padding: 28px 18px 31px; border-radius: 16px; }
+    .error-visual { height: 150px; }
+    .error-halo { width: 146px; height: 146px; }
+    .error-halo::after { inset: 15px; }
+    .error-picture { width: 82px; height: 82px; font-size: 42px; border-radius: 19px; }
+    .error-symbol { font-size: 61px; }
+    .error-actions { flex-direction: column; align-items: stretch; }
+    .error-button { width: 100%; }
+    .error-description { font-size: 13px; }
+    .error-header-link { font-size: 12px; }
+    .error-footer { padding-bottom: 16px; }
+}
