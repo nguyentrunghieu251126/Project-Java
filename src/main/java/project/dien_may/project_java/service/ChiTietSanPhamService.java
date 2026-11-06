@@ -6,7 +6,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.dien_may.project_java.dto.DanhGiaHienThi;
-import project.dien_may.project_java.entity.DanhGia;
 import project.dien_may.project_java.entity.SanPham;
 import project.dien_may.project_java.entity.ThongSoKyThuat;
 import project.dien_may.project_java.repository.DanhGiaRepository;
@@ -15,7 +14,6 @@ import project.dien_may.project_java.repository.ThongSoKyThuatRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -74,13 +72,12 @@ public class ChiTietSanPhamService {
             Map.entry("920-011558", "/images/sanpham/phu-kien/ban-phim-logitech-mx-keys-s.png"),
             Map.entry("910-006561", "/images/sanpham/phu-kien/chuot-logitech-mx-master-3s.png"),
             Map.entry("A1263", "/images/sanpham/phu-kien/pin-sac-du-phong-anker-10000mah.png"),
-            Map.entry("EP-TA800N", "/images/sanpham/phu-kien/cu-sac-nhanh-samsung-25w.png")
-    );
+            Map.entry("EP-TA800N", "/images/sanpham/phu-kien/cu-sac-nhanh-samsung-25w.png"));
 
     public ChiTietSanPhamService(SanPhamService sanPhamService,
-                                 SanPhamRepository sanPhamRepository,
-                                 ThongSoKyThuatRepository thongSoKyThuatRepository,
-                                 DanhGiaRepository danhGiaRepository) {
+            SanPhamRepository sanPhamRepository,
+            ThongSoKyThuatRepository thongSoKyThuatRepository,
+            DanhGiaRepository danhGiaRepository) {
         this.sanPhamService = sanPhamService;
         this.sanPhamRepository = sanPhamRepository;
         this.thongSoKyThuatRepository = thongSoKyThuatRepository;
@@ -101,7 +98,8 @@ public class ChiTietSanPhamService {
 
     @Transactional(readOnly = true)
     public List<SanPham> laySanPhamTuongTu(SanPham sanPham) {
-        if (sanPham.getDanhMuc() == null) return List.of();
+        if (sanPham.getDanhMuc() == null)
+            return List.of();
         return sanPhamRepository.findTop6ByDanhMuc_MaDanhMucAndDangKinhDoanhTrueAndMaSanPhamNotOrderByMaSanPhamAsc(
                 sanPham.getDanhMuc().getMaDanhMuc(), sanPham.getMaSanPham());
     }
@@ -116,12 +114,13 @@ public class ChiTietSanPhamService {
     }
 
     private String anTenNguoiDanhGia(String hoTen) {
-        if (hoTen == null || hoTen.isBlank()) return "Khách hàng PDMJV";
+        if (hoTen == null || hoTen.isBlank())
+            return "Khách hàng PDMJV";
         String[] phan = hoTen.trim().split("\\s+");
-        if (phan.length == 1) return phan[0].substring(0, 1) + "***";
+        if (phan.length == 1)
+            return phan[0].substring(0, 1) + "***";
         return phan[0] + " " + phan[phan.length - 1].substring(0, 1) + "***";
     }
-
 
     public List<String> layDanhSachAnh(SanPham sanPham) {
         Set<String> danhSach = new LinkedHashSet<>();
@@ -134,7 +133,8 @@ public class ChiTietSanPhamService {
             String phanMoRong = anhChinh.substring(viTriDuoi);
             for (int i = 2; i <= 4; i++) {
                 String anhPhu = tenGoc + "-" + i + phanMoRong;
-                if (anhTonTai(anhPhu)) danhSach.add(anhPhu);
+                if (anhTonTai(anhPhu))
+                    danhSach.add(anhPhu);
             }
         }
         if (maModel != null && maModel.matches("[a-zA-Z0-9_-]+")) {
@@ -145,10 +145,12 @@ public class ChiTietSanPhamService {
                 List<String> tenAnh = new ArrayList<>();
                 for (Resource resource : resources) {
                     String ten = resource.getFilename();
-                    if (resource.isReadable() && ten != null && laAnhHopLe(ten)) tenAnh.add(ten);
+                    if (resource.isReadable() && ten != null && laAnhHopLe(ten))
+                        tenAnh.add(ten);
                 }
                 tenAnh.sort(String.CASE_INSENSITIVE_ORDER);
-                for (String ten : tenAnh) danhSach.add(thuMuc + ten);
+                for (String ten : tenAnh)
+                    danhSach.add(thuMuc + ten);
             } catch (IOException ignored) {
             }
         }
@@ -163,22 +165,28 @@ public class ChiTietSanPhamService {
         List<String> anh = layDanhSachAnh(sanPham);
         return anh.isEmpty() ? null : anh.get(0);
     }
-//    lam moi anh
+
+    // lam moi anh
     @Transactional(readOnly = true)
     public Map<Integer, String> layAnhSanPhamDaXem(List<Integer> maSanPham) {
         Map<Integer, String> ketQua = new java.util.LinkedHashMap<>();
-        if (maSanPham == null) return ketQua;
+        if (maSanPham == null)
+            return ketQua;
         Set<Integer> maHopLe = new LinkedHashSet<>();
         for (Integer ma : maSanPham) {
-            if (ma != null && ma > 0 && maHopLe.size() < 4) maHopLe.add(ma);
+            if (ma != null && ma > 0 && maHopLe.size() < 4)
+                maHopLe.add(ma);
         }
         for (SanPham sp : sanPhamRepository.findAllById(maHopLe)) {
-            if (!sp.isDangKinhDoanh()) continue;
+            if (!sp.isDangKinhDoanh())
+                continue;
             String anh = layAnhDaiDien(sp);
-            if (anh != null) ketQua.put(sp.getMaSanPham(), anh);
+            if (anh != null)
+                ketQua.put(sp.getMaSanPham(), anh);
         }
         return ketQua;
     }
+
     private boolean anhTonTai(String duongDan) {
         return duongDan != null && duongDan.startsWith("/images/")
                 && !duongDan.contains("..")
