@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout(${form.maKhuyenMai == null ? 'Thêm khuyến mãi' : 'Sửa khuyến mãi'}, 'khuyen-mai', ~{::main})}">
+<body>
+<main>
+    <form class="the" method="post" th:object="${form}" novalidate
+          th:action="${form.maKhuyenMai == null} ? @{/admin/khuyen-mai/them} : @{/admin/khuyen-mai/{ma}/sua(ma=${form.maKhuyenMai})}">
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label" for="tenKhuyenMai">Tên khuyến mãi *</label>
+                <input class="form-control" th:field="*{tenKhuyenMai}" th:errorclass="is-invalid" maxlength="200">
+                <div class="invalid-feedback" th:errors="*{tenKhuyenMai}"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="maGiamGia">Mã giảm giá *</label>
+                <input class="form-control text-uppercase" th:field="*{maGiamGia}" th:errorclass="is-invalid" maxlength="30">
+                <div class="invalid-feedback" th:errors="*{maGiamGia}"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="loaiGiamGia">Loại giảm giá *</label>
+                <select class="form-select" th:field="*{loaiGiamGia}" th:errorclass="is-invalid">
+                    <option th:each="l : ${dsLoai}" th:value="${l.name()}" th:text="${l.nhan}"></option>
+                </select>
+                <div class="invalid-feedback" th:errors="*{loaiGiamGia}"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="giaTriGiam">Giá trị giảm *</label>
+                <div class="input-group has-validation">
+                    <input type="number" min="1" class="form-control" th:field="*{giaTriGiam}" th:errorclass="is-invalid">
+                    <span class="input-group-text" id="donViGiam">%</span>
+                    <div class="invalid-feedback" th:errors="*{giaTriGiam}"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="soLuotToiDa">Số lượt tối đa</label>
+                <input type="number" min="1" class="form-control" th:field="*{soLuotToiDa}" th:errorclass="is-invalid"
+                       placeholder="Không giới hạn">
+                <div class="invalid-feedback" th:errors="*{soLuotToiDa}"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="ngayBatDau">Ngày bắt đầu *</label>
+                <input type="date" class="form-control" th:field="*{ngayBatDau}" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:errors="*{ngayBatDau}"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="ngayKetThuc">Ngày kết thúc *</label>
+                <input type="date" class="form-control" th:field="*{ngayKetThuc}" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:errors="*{ngayKetThuc}"></div>
+            </div>
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-chinh" type="submit">Lưu</button>
+            <a class="btn btn-outline-secondary" th:href="@{/admin/khuyen-mai}">Hủy</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

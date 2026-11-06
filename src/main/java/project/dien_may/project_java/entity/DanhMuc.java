@@ -1,15 +1,13 @@
-
 package project.dien_may.project_java.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "DanhMuc", schema = "dbo")
+@Getter
+@Setter
 public class DanhMuc {
 
     @Id
@@ -22,31 +20,4 @@ public class DanhMuc {
 
     @Column(name = "MoTa", length = 500)
     private String moTa;
-
-    public DanhMuc() {
-    }
-
-    public Integer getMaDanhMuc() {
-        return maDanhMuc;
-    }
-
-    public void setMaDanhMuc(Integer maDanhMuc) {
-        this.maDanhMuc = maDanhMuc;
-    }
-
-    public String getTenDanhMuc() {
-        return tenDanhMuc;
-    }
-
-    public void setTenDanhMuc(String tenDanhMuc) {
-        this.tenDanhMuc = tenDanhMuc;
-    }
-
-    public String getMoTa() {
-        return moTa;
-    }
-
-    public void setMoTa(String moTa) {
-        this.moTa = moTa;
-    }
 }

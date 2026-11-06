@@ -1589,6 +1589,42 @@ a {
   border-color: #e8edf2;
 }
 
+/* Nút về khu quản trị, cùng dáng với nút giỏ hàng */
+.header .navbar .admin-link {
+  background: #f1f5f9;
+  border-radius: 50px;
+  padding: 8px 16px;
+  white-space: nowrap;
+  transition: background 0.25s ease;
+}
+.header .navbar .admin-link:hover {
+  background: #e2e8f0;
+}
+
+/* Máy tính: rê chuột là mở menu tài khoản. Điện thoại và bàn phím vẫn mở bằng cách bấm. */
+@media (hover: hover) and (min-width: 992px) {
+  .header .account-menu:hover > .account-dropdown {
+    display: block;
+    top: 100%;
+    right: 0;
+    left: auto;
+    animation: accountMenuShow 0.25s ease-out both;
+  }
+  /* Lấp khoảng trống giữa icon và menu để menu không tắt khi rê chuột xuống */
+  .header .account-dropdown::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    right: 0;
+    left: 0;
+    height: 12px;
+  }
+  .header .navbar .account-menu:hover .account-link {
+    background: #e6f7ec;
+    color: #008b39;
+  }
+}
+
 /* ===== KH07: THẺ SẢN PHẨM TRONG DANH SÁCH (CHỈ #product-list) ===== */
 #product-list {
   --tv2-green: #07963b;

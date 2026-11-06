@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout('Báo cáo tồn kho', 'bc-ton-kho', ~{::main})}">
+<body>
+<main>
+    <div class="luoi-so-lieu">
+        <div class="o-so-lieu"><div class="nhan-so">Sản phẩm đang kinh doanh</div>
+            <div class="gia-tri" th:text="${baoCao.tongSanPham}"></div></div>
+        <div class="o-so-lieu"><div class="nhan-so">Tổng số lượng tồn</div>
+            <div class="gia-tri" th:text="${#numbers.formatInteger(baoCao.tongSoLuong, 1, 'POINT')}"></div></div>
+        <div class="o-so-lieu"><div class="nhan-so">Giá trị tồn theo giá bán</div>
+            <div class="gia-tri" th:text="|${#numbers.formatInteger(baoCao.tongGiaTri, 1, 'POINT')} ₫|"></div></div>
+        <div class="o-so-lieu"><div class="nhan-so">Cần nhập thêm</div>
+            <div class="gia-tri" th:text="${baoCao.soHetHang + baoCao.soSapHet}"></div>
+            <div class="chu-thich" th:text="|${baoCao.soHetHang} hết hàng, ${baoCao.soSapHet} sắp hết|"></div></div>
+    </div>
+
+    <section class="the">
+        <div class="the-tieu-de"><h2>Sản phẩm cần nhập thêm</h2>
+            <span class="chu-thich">Tồn thấp hơn mức tối thiểu của từng sản phẩm</span></div>
+        <div class="table-responsive" th:if="${!baoCao.dsCanNhap.isEmpty()}">
+            <table class="table bang">
+                <thead><tr><th>Sản phẩm</th><th>Danh mục</th><th class="so">Tồn</th><th class="so">Mức tối thiểu</th><th>Tình trạng</th></tr></thead>
+                <tbody>
+                <tr th:each="s : ${baoCao.dsCanNhap}">
+                    <td><span class="ten-chinh" th:text="${s.tenSanPham}"></span>
+                        <span class="ten-phu" th:text="${s.maModel}"></span></td>
+                    <td th:text="${s.danhMuc.tenDanhMuc}"></td>
+                    <td class="so" th:text="${s.soLuong}"></td>
+                    <td class="so" th:text="${s.mucTonToiThieu}"></td>
+                    <td><span th:replace="~{admin/fragments :: nhan(${s.tinhTrangTonKho})}"></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="bang-trong" th:if="${baoCao.dsCanNhap.isEmpty()}">Tất cả sản phẩm đều đủ hàng.</p>
+    </section>
+
+    <section class="the">
+        <div class="the-tieu-de"><h2>Tồn kho theo danh mục</h2></div>
+        <div class="table-responsive">
+            <table class="table bang">
+                <thead><tr><th>Danh mục</th><th class="so">Số sản phẩm</th><th class="so">Số lượng tồn</th>
+                    <th class="so">Cần nhập</th><th class="so">Giá trị tồn</th></tr></thead>
+                <tbody>
+                <tr th:each="d : ${baoCao.theoDanhMuc}">
+                    <td th:text="${d.tenDanhMuc}"></td>
+                    <td class="so" th:text="${d.soSanPham}"></td>
+                    <td class="so" th:text="${#numbers.formatInteger(d.soLuong, 1, 'POINT')}"></td>
+                    <td class="so" th:text="${d.soCanNhap}"></td>
+                    <td class="so" th:text="|${#numbers.formatInteger(d.giaTri, 1, 'POINT')} ₫|"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

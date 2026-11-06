@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout(${form.maSanPham == null ? 'Thêm sản phẩm' : 'Sửa sản phẩm'}, 'san-pham', ~{::main})}">
+<body>
+<main>
+    <form class="the" method="post" th:object="${form}" novalidate
+          th:action="${form.maSanPham == null} ? @{/admin/san-pham/them} : @{/admin/san-pham/{ma}/sua(ma=${form.maSanPham})}">
+        <input type="hidden" th:field="*{phienBan}">
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label" for="tenSanPham">Tên sản phẩm *</label>
+                <input class="form-control" th:field="*{tenSanPham}" th:errorclass="is-invalid" maxlength="200">
+                <div class="invalid-feedback" th:errors="*{tenSanPham}"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="maModel">Mã model *</label>
+                <input class="form-control" th:field="*{maModel}" th:errorclass="is-invalid" maxlength="50">
+                <div class="invalid-feedback" th:errors="*{maModel}"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="maDanhMuc">Danh mục *</label>
+                <select class="form-select" th:field="*{maDanhMuc}" th:errorclass="is-invalid">
+                    <option value="">Chọn danh mục</option>
+                    <option th:each="d : ${dsDanhMuc}" th:value="${d.maDanhMuc}" th:text="${d.tenDanhMuc}"></option>
+                </select>
+                <div class="invalid-feedback" th:errors="*{maDanhMuc}"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="thuongHieu">Thương hiệu *</label>
+                <input class="form-control" th:field="*{thuongHieu}" th:errorclass="is-invalid" maxlength="50">
+                <div class="invalid-feedback" th:errors="*{thuongHieu}"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="donGia">Đơn giá (₫) *</label>
+                <input type="number" min="0" step="1000" class="form-control" th:field="*{donGia}" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:errors="*{donGia}"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="soLuong">Số lượng tồn</label>
+                <input type="number" min="0" class="form-control" th:field="*{soLuong}" th:errorclass="is-invalid"
+                       th:readonly="${form.maSanPham != null}">
+                <div class="invalid-feedback" th:errors="*{soLuong}"></div>
+                <div class="form-text" th:if="${form.maSanPham != null}">Tồn kho chỉ thay đổi qua phiếu nhập, phiếu xuất.</div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="mucTonToiThieu">Mức tồn tối thiểu</label>
+                <input type="number" min="0" class="form-control" th:field="*{mucTonToiThieu}" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:errors="*{mucTonToiThieu}"></div>
+                <div class="form-text">Tồn dưới mức này sẽ báo sắp hết hàng.</div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="thoiGianBaoHanh">Bảo hành (tháng)</label>
+                <input type="number" min="0" class="form-control" th:field="*{thoiGianBaoHanh}" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:errors="*{thoiGianBaoHanh}"></div>
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="hinhAnh">Đường dẫn ảnh</label>
+                <input class="form-control" th:field="*{hinhAnh}" th:errorclass="is-invalid" maxlength="255"
+                       placeholder="/images/products/ten-anh.jpg">
+                <div class="invalid-feedback" th:errors="*{hinhAnh}"></div>
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="moTa">Mô tả</label>
+                <textarea class="form-control" rows="4" th:field="*{moTa}" th:errorclass="is-invalid" maxlength="4000"></textarea>
+                <div class="invalid-feedback" th:errors="*{moTa}"></div>
+            </div>
+            <div class="col-12">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" th:field="*{dangKinhDoanh}">
+                    <label class="form-check-label" th:for="${#ids.prev('dangKinhDoanh')}">Đang kinh doanh (tắt để ẩn khỏi trang khách)</label>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-chinh" type="submit">Lưu</button>
+            <a class="btn btn-outline-secondary" th:href="@{/admin/san-pham}">Hủy</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

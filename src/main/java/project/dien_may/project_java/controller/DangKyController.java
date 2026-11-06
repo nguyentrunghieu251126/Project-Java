@@ -14,15 +14,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import project.dien_may.project_java.dto.DangKyForm;
 import project.dien_may.project_java.service.TaiKhoanService;
 
 @Controller
+@RequestMapping("/dang-ky")
 public class DangKyController {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(DangKyController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DangKyController.class);
 
     private final TaiKhoanService taiKhoanService;
 
@@ -32,15 +33,16 @@ public class DangKyController {
         this.taiKhoanService = taiKhoanService;
     }
 
-    @GetMapping("/dang-ky")
+    @GetMapping
     public String hienThiTrangDangKy(Model model) {
 
         model.addAttribute("dangKyForm", new DangKyForm());
         return "auth/DangKy";
     }
 
-    @PostMapping("/dang-ky")
-    public String xuLyDangKy(@Valid @ModelAttribute("dangKyForm") DangKyForm form, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    @PostMapping
+    public String xuLyDangKy(@Valid @ModelAttribute("dangKyForm") DangKyForm form, BindingResult bindingResult,
+            Model model, RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             return "auth/DangKy";
@@ -65,11 +67,11 @@ public class DangKyController {
             return "auth/DangKy";
         } catch (DataIntegrityViolationException e) {
             logger.warn("Dang ky that bai do rang buoc du lieu", e);
-            model.addAttribute("thongBaoLoi", "Thông tin đăng ký bị trùng hoặc không hợp lệ. " + "Vui lòng kiểm tra lại.");
+            model.addAttribute("thongBaoLoi",
+                    "Thông tin đăng ký bị trùng hoặc không hợp lệ. " + "Vui lòng kiểm tra lại.");
             return "auth/DangKy";
 
         } catch (DataAccessException e) {
-
 
             logger.error("Loi SQL Server khi dang ky tai khoan", e);
 

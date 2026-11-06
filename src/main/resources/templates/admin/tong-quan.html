@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{admin/layout :: layout('Tổng quan', 'tong-quan', ~{::main})}">
+<body>
+<main class="trang-day">
+    <div class="luoi-so-lieu" sec:authorize="hasAuthority('BAOCAO_DOANHTHU')">
+        <a th:href="@{/admin/bao-cao/doanh-thu}" class="o-so-lieu">
+            <div class="nhan-so"><i class="bi bi-cash-stack" aria-hidden="true"></i> Doanh thu cả năm</div>
+            <div class="gia-tri" th:text="|${#numbers.formatInteger(tomTat.caNam, 1, 'POINT')} ₫|"></div>
+            <div class="chu-thich" th:text="|Năm ${bieuDo.nam}|"></div>
+        </a>
+        <a th:href="@{/admin/bao-cao/doanh-thu}" class="o-so-lieu">
+            <div class="nhan-so"><i class="bi bi-calendar-check" aria-hidden="true"></i> Doanh thu tháng hiện tại</div>
+            <div class="gia-tri" th:text="|${#numbers.formatInteger(tomTat.thangHienTai.doanhThu, 1, 'POINT')} ₫|"></div>
+            <div class="chu-thich" th:text="|Tháng ${tomTat.thangHienTai.thang}/${bieuDo.nam}|"></div>
+        </a>
+        <a th:href="@{/admin/bao-cao/doanh-thu}" class="o-so-lieu" th:with="cao=${tomTat.thangCaoNhat}">
+            <div class="nhan-so"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i> Doanh thu tháng cao nhất</div>
+            <div class="gia-tri" th:text="${cao != null} ? |${#numbers.formatInteger(cao.doanhThu, 1, 'POINT')} ₫| : '—'"></div>
+            <div class="chu-thich" th:text="${cao != null} ? |Tháng ${cao.thang}/${bieuDo.nam}| : 'Chưa có dữ liệu'"></div>
+        </a>
+        <a th:href="@{/admin/bao-cao/doanh-thu}" class="o-so-lieu" th:with="thap=${tomTat.thangThapNhat}">
+            <div class="nhan-so"><i class="bi bi-graph-down-arrow" aria-hidden="true"></i> Doanh thu tháng thấp nhất</div>
+            <div class="gia-tri" th:text="${thap != null} ? |${#numbers.formatInteger(thap.doanhThu, 1, 'POINT')} ₫| : '—'"></div>
+            <div class="chu-thich" th:text="${thap != null} ? |Tháng ${thap.thang}/${bieuDo.nam}| : 'Chưa có dữ liệu'"></div>
+        </a>
+    </div>
+
+    <section class="the the-bieu-do" sec:authorize="hasAuthority('BAOCAO_DOANHTHU')">
+        <div class="the-tieu-de">
+            <h2 th:text="|Doanh thu năm ${bieuDo.nam}|"></h2>
+            <a th:href="@{/admin/bao-cao/doanh-thu}">Xem báo cáo</a>
+        </div>
+        <div th:replace="~{admin/fragments :: bieu-do-duong(${bieuDo})}"></div>
+    </section>
+</main>
+</body>
+</html>

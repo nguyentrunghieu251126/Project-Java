@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -30,7 +30,8 @@
       <h1 class="error-title" id="error-title">Không tìm thấy trang</h1>
       <p class="error-description">Trang bạn đang tìm không tồn tại, đã được chuyển đi hoặc địa chỉ vừa nhập chưa chính xác. Hãy quay về trang chủ hoặc xem danh sách sản phẩm.</p>
       <div class="error-actions">
-        <a class="error-button error-button-primary" th:href="@{/}" href="/"><i class="bi bi-house-door-fill" aria-hidden="true"></i> Về trang chủ</a>
+        <a sec:authorize="hasRole('QUAN_TRI')" class="error-button error-button-primary" th:href="@{/admin}" href="/admin"><i class="bi bi-speedometer2" aria-hidden="true"></i> Về trang quản trị</a>
+        <a sec:authorize="!hasRole('QUAN_TRI')" class="error-button error-button-primary" th:href="@{/}" href="/"><i class="bi bi-house-door-fill" aria-hidden="true"></i> Về trang chủ</a>
         <a class="error-button error-button-secondary" th:href="@{/#product-list}" href="/#product-list"><i class="bi bi-arrow-left" aria-hidden="true"></i> Xem danh sách sản phẩm</a>
       </div>
       <hr class="error-divider" />

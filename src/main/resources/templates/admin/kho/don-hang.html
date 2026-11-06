@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout('Đơn hàng', 'don-hang', ~{::main})}">
+<body>
+<main>
+    <section class="the">
+        <div class="tien-trinh mb-3">
+            <a class="chip-loc" th:classappend="${trangThai == null} ? 'active'" th:href="@{/admin/kho/don-hang}">Tất cả</a>
+            <a class="chip-loc" th:each="e : ${soDonTheoTrangThai}" th:classappend="${trangThai == e.key} ? 'active'"
+               th:href="@{/admin/kho/don-hang(trangThai=${e.key.name()})}">
+                <span th:text="${e.key.nhan}"></span> <strong th:text="${e.value}"></strong>
+            </a>
+        </div>
+
+        <form class="bo-loc" method="get" th:action="@{/admin/kho/don-hang}">
+            <input type="hidden" name="trangThai" th:if="${trangThai != null}" th:value="${trangThai.name()}">
+            <div class="o-loc-rong"><label for="tuKhoa">Tìm kiếm</label>
+                <input class="form-control form-control-sm" id="tuKhoa" name="tuKhoa" th:value="${tuKhoa}"
+                       placeholder="Mã đơn, tên hoặc số điện thoại người nhận"></div>
+            <div class="o-loc"><label for="tuNgay">Đặt từ ngày</label>
+                <input type="date" class="form-control form-control-sm" id="tuNgay" name="tuNgay" th:value="${tuNgay}"></div>
+            <div class="o-loc"><label for="denNgay">Đến ngày</label>
+                <input type="date" class="form-control form-control-sm" id="denNgay" name="denNgay" th:value="${denNgay}"></div>
+            <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-funnel" aria-hidden="true"></i> Lọc</button>
+            <a class="btn btn-sm btn-link" th:href="@{/admin/kho/don-hang}">Xóa lọc</a>
+        </form>
+
+        <div class="table-responsive" th:if="${trang.hasContent()}">
+            <table class="table table-hover bang">
+                <thead><tr><th>Mã đơn</th><th>Ngày đặt</th><th>Người nhận</th><th class="so">Tổng tiền</th><th>Trạng thái</th></tr></thead>
+                <tbody>
+                <tr th:each="d : ${trang.content}">
+                    <td><a th:href="@{/admin/kho/don-hang/{ma}(ma=${d.maDonHang})}" th:text="|#${d.maDonHang}|"></a></td>
+                    <td th:text="${#temporals.format(d.ngayDat, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td><span class="ten-chinh" th:text="${d.hoTenNguoiNhan}"></span>
+                        <span class="ten-phu" th:text="${d.soDienThoaiNguoiNhan}"></span></td>
+                    <td class="so" th:text="|${#numbers.formatInteger(d.tongTien, 1, 'POINT')} ₫|"></td>
+                    <td><span th:replace="~{admin/fragments :: nhan(${d.trangThai})}"></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="bang-trong" th:unless="${trang.hasContent()}">Không tìm thấy đơn hàng phù hợp.</p>
+        <nav th:replace="~{admin/fragments :: phan-trang(${trang})}"></nav>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout('Báo cáo doanh thu', 'bc-doanh-thu', ~{::main})}">
+<body>
+<main>
+    <ul class="nav nav-tabs tab-bao-cao mb-3">
+        <li class="nav-item">
+            <a class="nav-link" th:classappend="${tab == 'nam'} ? 'active'"
+               th:href="@{/admin/bao-cao/doanh-thu(tab='nam', nam=${nam})}">Theo năm</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" th:classappend="${tab == 'thang'} ? 'active'"
+               th:href="@{/admin/bao-cao/doanh-thu(tab='thang', nam=${nam})}">Theo tháng</a>
+        </li>
+    </ul>
+
+    <form class="bo-loc align-items-center" method="get" th:action="@{/admin/bao-cao/doanh-thu}">
+        <input type="hidden" name="tab" th:value="${tab}">
+        <th:block th:if="${tab == 'thang'}">
+            <label class="mb-0" for="thang">Tháng</label>
+            <select class="form-select form-select-sm w-auto" id="thang" name="thang" onchange="this.form.submit()">
+                <option th:each="t : ${#numbers.sequence(1, thangToiDa)}" th:value="${t}" th:text="|Tháng ${t}|"
+                        th:selected="${t == thang}"></option>
+            </select>
+        </th:block>
+        <label class="mb-0" for="nam">Năm</label>
+        <select class="form-select form-select-sm w-auto" id="nam" name="nam" onchange="this.form.submit()">
+            <option th:each="n : ${dsNam}" th:value="${n}" th:text="${n}" th:selected="${n == nam}"></option>
+        </select>
+        <button type="button" class="btn btn-sm btn-chinh ms-auto"
+                th:data-in-bao-cao="${tab == 'thang'} ? |Bao-cao-doanh-thu-thang-${thang}-${nam}| : |Bao-cao-doanh-thu-nam-${nam}|">
+            <i class="bi bi-printer" aria-hidden="true"></i> In báo cáo
+        </button>
+    </form>
+
+    <!-- Chỉ hiện trên bản in, thay cho phần đầu trang bị ẩn khi in -->
+    <header class="dau-ban-in">
+        <img th:src="@{/images/header-banner/logo-header.png}" alt="PDMJV">
+        <div>
+            <h2 th:text="${tab == 'thang'} ? |Báo cáo doanh thu tháng ${thang}/${nam}| : |Báo cáo doanh thu năm ${nam}|"></h2>
+            <p th:text="|In lúc ${#temporals.format(#temporals.createNow(), 'HH:mm dd/MM/yyyy')} bởi ${hoTenNguoiDung}|"></p>
+        </div>
+    </header>
+
+    <!-- Tab theo năm -->
+    <th:block th:if="${tab == 'nam'}">
+        <div class="luoi-so-lieu">
+            <div class="o-so-lieu"><div class="nhan-so" th:text="|Doanh thu năm ${nam}|"></div>
+                <div class="gia-tri" th:text="|${#numbers.formatInteger(baoCaoNam.tongDoanhThu, 1, 'POINT')} ₫|"></div></div>
+            <div class="o-so-lieu"><div class="nhan-so">Đơn đã giao</div>
+                <div class="gia-tri" th:text="${baoCaoNam.soDon}"></div></div>
+            <div class="o-so-lieu"><div class="nhan-so">Giá trị trung bình mỗi đơn</div>
+                <div class="gia-tri" th:text="|${#numbers.formatInteger(baoCaoNam.giaTriDonTrungBinh, 1, 'POINT')} ₫|"></div></div>
+            <div class="o-so-lieu"><div class="nhan-so">Tổng tiền đã giảm</div>
+                <div class="gia-tri" th:text="|${#numbers.formatInteger(baoCaoNam.tongTienGiam, 1, 'POINT')} ₫|"></div></div>
+        </div>
+
+        <section class="the">
+            <div class="the-tieu-de">
+                <h2 th:text="|Doanh thu 12 tháng năm ${nam}|"></h2>
+                <span class="chu-thich">Chỉ tính đơn đã giao, theo ngày đặt, sau giảm giá</span>
+            </div>
+            <div th:replace="~{admin/fragments :: bieu-do-duong(${baoCaoNam.bieuDo})}"></div>
+        </section>
+
+        <section class="the">
+            <div class="the-tieu-de"><h2>Số liệu từng tháng</h2></div>
+            <div class="table-responsive">
+                <table class="table bang">
+                    <thead><tr><th>Tháng</th><th class="so">Số đơn</th><th class="so">Tiền giảm</th><th class="so">Doanh thu</th></tr></thead>
+                    <tbody>
+                    <tr th:each="k : ${baoCaoNam.dsThang}">
+                        <th:block th:unless="${k.chuaToi}">
+                            <td><a th:href="@{/admin/bao-cao/doanh-thu(tab='thang', nam=${nam}, thang=${k.thang})}"
+                                   th:text="|Tháng ${k.thang}|"></a></td>
+                            <td class="so" th:text="${k.soDon}"></td>
+                            <td class="so" th:text="|${#numbers.formatInteger(k.tienGiam, 1, 'POINT')} ₫|"></td>
+                            <td class="so" th:text="|${#numbers.formatInteger(k.doanhThu, 1, 'POINT')} ₫|"></td>
+                        </th:block>
+                        <th:block th:if="${k.chuaToi}">
+                            <td class="chu-thich" th:text="|Tháng ${k.thang}|"></td>
+                            <td class="so chu-thich" colspan="3">Chưa tới</td>
+                        </th:block>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td>Tổng</td>
+                        <td class="so" th:text="${baoCaoNam.soDon}"></td>
+                        <td class="so" th:text="|${#numbers.formatInteger(baoCaoNam.tongTienGiam, 1, 'POINT')} ₫|"></td>
+                        <td class="so" th:text="|${#numbers.formatInteger(baoCaoNam.tongDoanhThu, 1, 'POINT')} ₫|"></td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </section>
+    </th:block>
+
+    <!-- Tab theo tháng -->
+    <th:block th:if="${tab == 'thang'}">
+        <div class="luoi-so-lieu">
+            <div class="o-so-lieu"><div class="nhan-so" th:text="|Doanh thu tháng ${thang}/${nam}|"></div>
+                <div class="gia-tri" th:text="|${#numbers.formatInteger(baoCaoThang.doanhThu, 1, 'POINT')} ₫|"></div></div>
+            <div class="o-so-lieu"><div class="nhan-so">Tổng số lượng đã bán</div>
+                <div class="gia-tri" th:text="${baoCaoThang.tongSoLuongBan}"></div></div>
+            <div class="o-so-lieu"><div class="nhan-so">Đơn đã giao</div>
+                <div class="gia-tri" th:text="${baoCaoThang.soDon}"></div></div>
+            <div class="o-so-lieu"><div class="nhan-so">Tổng tiền đã giảm</div>
+                <div class="gia-tri" th:text="|${#numbers.formatInteger(baoCaoThang.tienGiam, 1, 'POINT')} ₫|"></div></div>
+        </div>
+
+        <section class="the">
+            <div class="the-tieu-de">
+                <h2 th:text="|Số lượng bán theo mặt hàng, tháng ${thang}/${nam}|"></h2>
+                <span class="chu-thich">Chỉ tính đơn đã giao</span>
+            </div>
+            <th:block th:if="${!baoCaoThang.bieuDo.cot.isEmpty()}">
+                <div th:replace="~{admin/fragments :: bieu-do-san-pham(${baoCaoThang.bieuDo})}"></div>
+            </th:block>
+            <p class="bang-trong" th:if="${baoCaoThang.bieuDo.cot.isEmpty()}"
+               th:text="|Chưa có đơn đã giao nào trong tháng ${thang}/${nam}.|"></p>
+        </section>
+
+        <section class="the" th:if="${!baoCaoThang.bieuDo.cot.isEmpty()}">
+            <div class="the-tieu-de">
+                <h2>Chi tiết mặt hàng</h2>
+                <span class="chu-thich">Doanh số là giá bán trước giảm giá đơn hàng</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table bang">
+                    <thead><tr><th>Sản phẩm</th><th>Danh mục</th><th class="so">Số lượng bán</th><th class="so">Doanh số</th></tr></thead>
+                    <tbody>
+                    <tr th:each="c : ${baoCaoThang.bieuDo.cot}">
+                        <td><span class="ten-chinh" th:text="${c.sanPham.tenSanPham}"></span>
+                            <span class="ten-phu" th:text="${c.sanPham.maModel}"></span></td>
+                        <td th:text="${c.sanPham.tenDanhMuc}"></td>
+                        <td class="so" th:text="${c.sanPham.soLuongBan}"></td>
+                        <td class="so" th:text="|${#numbers.formatInteger(c.sanPham.doanhSo, 1, 'POINT')} ₫|"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </th:block>
+</main>
+</body>
+</html>

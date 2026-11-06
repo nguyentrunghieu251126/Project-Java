@@ -1,11 +1,15 @@
-
 package project.dien_may.project_java.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "SanPham", schema = "dbo")
+@Getter
+@Setter
 public class SanPham {
 
     @Id
@@ -47,113 +51,19 @@ public class SanPham {
     @Column(name = "DangKinhDoanh", nullable = false)
     private boolean dangKinhDoanh = true;
 
+    // Để null khi tạo mới: Spring Data dựa vào version null để nhận biết bản ghi mới.
+    @Version
     @Column(name = "PhienBan", nullable = false)
-    private Integer phienBan = 0;
+    private Integer phienBan;
 
-    public SanPham() {
+    public BigDecimal getGiaTriTon() {
+        return donGia.multiply(BigDecimal.valueOf(soLuong));
     }
 
-    public Integer getMaSanPham() {
-        return maSanPham;
-    }
-
-    public void setMaSanPham(Integer maSanPham) {
-        this.maSanPham = maSanPham;
-    }
-
-    public String getMaModel() {
-        return maModel;
-    }
-
-    public void setMaModel(String maModel) {
-        this.maModel = maModel;
-    }
-
-    public String getTenSanPham() {
-        return tenSanPham;
-    }
-
-    public void setTenSanPham(String tenSanPham) {
-        this.tenSanPham = tenSanPham;
-    }
-
-    public String getThuongHieu() {
-        return thuongHieu;
-    }
-
-    public void setThuongHieu(String thuongHieu) {
-        this.thuongHieu = thuongHieu;
-    }
-
-    public BigDecimal getDonGia() {
-        return donGia;
-    }
-
-    public void setDonGia(BigDecimal donGia) {
-        this.donGia = donGia;
-    }
-
-    public Integer getSoLuong() {
-        return soLuong;
-    }
-
-    public void setSoLuong(Integer soLuong) {
-        this.soLuong = soLuong;
-    }
-
-    public String getMoTa() {
-        return moTa;
-    }
-
-    public void setMoTa(String moTa) {
-        this.moTa = moTa;
-    }
-
-    public String getHinhAnh() {
-        return hinhAnh;
-    }
-
-    public void setHinhAnh(String hinhAnh) {
-        this.hinhAnh = hinhAnh;
-    }
-
-    public Integer getThoiGianBaoHanh() {
-        return thoiGianBaoHanh;
-    }
-
-    public void setThoiGianBaoHanh(Integer thoiGianBaoHanh) {
-        this.thoiGianBaoHanh = thoiGianBaoHanh;
-    }
-
-    public DanhMuc getDanhMuc() {
-        return danhMuc;
-    }
-
-    public void setDanhMuc(DanhMuc danhMuc) {
-        this.danhMuc = danhMuc;
-    }
-
-    public Integer getMucTonToiThieu() {
-        return mucTonToiThieu;
-    }
-
-    public void setMucTonToiThieu(Integer mucTonToiThieu) {
-        this.mucTonToiThieu = mucTonToiThieu;
-    }
-
-    public boolean isDangKinhDoanh() {
-        return dangKinhDoanh;
-    }
-
-    public void setDangKinhDoanh(boolean dangKinhDoanh) {
-        this.dangKinhDoanh = dangKinhDoanh;
-    }
-
-    public Integer getPhienBan() {
-        return phienBan;
-    }
-
-    public void setPhienBan(Integer phienBan) {
-        this.phienBan = phienBan;
+    public TinhTrangTonKho getTinhTrangTonKho() {
+        if (soLuong == 0) {
+            return TinhTrangTonKho.HET;
+        }
+        return soLuong < mucTonToiThieu ? TinhTrangTonKho.SAP_HET : TinhTrangTonKho.DU;
     }
 }

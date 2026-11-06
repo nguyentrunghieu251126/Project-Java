@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{admin/layout :: layout('Quản lý tài khoản', 'tai-khoan', ~{::main})}">
+<body>
+<main>
+    <section class="the">
+        <form class="bo-loc" method="get" th:action="@{/admin/tai-khoan}">
+            <div class="o-loc-rong"><label for="tuKhoa">Tìm kiếm</label>
+                <input class="form-control form-control-sm" id="tuKhoa" name="tuKhoa" th:value="${tuKhoa}"
+                       placeholder="Họ tên, email hoặc số điện thoại"></div>
+            <div class="o-loc"><label for="maVaiTro">Vai trò</label>
+                <select class="form-select form-select-sm" id="maVaiTro" name="maVaiTro">
+                    <option value="">Tất cả</option>
+                    <option th:each="v : ${dsVaiTro}" th:value="${v.maVaiTro}" th:text="${v.tenHienThi}"
+                            th:selected="${maVaiTro == v.maVaiTro}"></option>
+                </select></div>
+            <div class="o-loc"><label for="trangThai">Trạng thái</label>
+                <select class="form-select form-select-sm" id="trangThai" name="trangThai">
+                    <option value="">Tất cả</option>
+                    <option value="true" th:selected="${trangThai == true}">Hoạt động</option>
+                    <option value="false" th:selected="${trangThai == false}">Đã khóa</option>
+                </select></div>
+            <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-funnel" aria-hidden="true"></i> Lọc</button>
+            <a class="btn btn-sm btn-link" th:href="@{/admin/tai-khoan}">Xóa lọc</a>
+            <a sec:authorize="hasAuthority('TAIKHOAN_THEM')" class="btn btn-sm btn-chinh ms-auto" th:href="@{/admin/tai-khoan/them}">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i> Thêm tài khoản</a>
+        </form>
+
+        <div class="table-responsive" th:if="${trang.hasContent()}">
+            <table class="table table-hover bang">
+                <thead><tr><th>Họ tên</th><th>Điện thoại</th><th>Vai trò</th><th>Ngày tạo</th><th>Trạng thái</th>
+                    <th class="so">Thao tác</th></tr></thead>
+                <tbody>
+                <tr th:each="t : ${trang.content}" th:with="laToi=${#strings.equalsIgnoreCase(t.email, emailHienTai)}">
+                    <td><span class="ten-chinh" th:text="${t.hoTen}"></span>
+                        <span class="nhan nhan-xu-ly" th:if="${laToi}">Bạn</span>
+                        <span class="ten-phu" th:text="${t.email}"></span></td>
+                    <td th:text="${t.soDienThoai} ?: '–'"></td>
+                    <td th:text="${t.vaiTro.tenHienThi}"></td>
+                    <td th:text="${#temporals.format(t.ngayTao, 'dd/MM/yyyy')}"></td>
+                    <td>
+                        <span class="nhan nhan-tot" th:if="${t.trangThai}"><i class="bi bi-check2-circle" aria-hidden="true"></i> Hoạt động</span>
+                        <span class="nhan nhan-xau" th:unless="${t.trangThai}"><i class="bi bi-lock" aria-hidden="true"></i> Đã khóa</span>
+                    </td>
+                    <td>
+                        <div class="nhom-nut">
+                            <form sec:authorize="hasAuthority('TAIKHOAN_SUA')" method="post" th:unless="${laToi}"
+                                  th:action="@{/admin/tai-khoan/{ma}/khoa(ma=${t.maTaiKhoan})}"
+                                  th:data-xac-nhan="|${t.trangThai ? 'Khóa' : 'Mở khóa'} tài khoản ${t.email}?|">
+                                <button class="btn btn-sm btn-outline-secondary" type="submit"
+                                        th:title="${t.trangThai} ? 'Khóa' : 'Mở khóa'"
+                                        th:aria-label="|${t.trangThai ? 'Khóa' : 'Mở khóa'} ${t.email}|">
+                                    <i class="bi" th:classappend="${t.trangThai} ? 'bi-lock' : 'bi-unlock'" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                            <a sec:authorize="hasAuthority('TAIKHOAN_SUA')" class="btn btn-sm btn-outline-secondary"
+                               th:href="@{/admin/tai-khoan/{ma}/sua(ma=${t.maTaiKhoan})}"
+                               th:aria-label="|Sửa ${t.email}|"><i class="bi bi-pencil" aria-hidden="true"></i></a>
+                            <form sec:authorize="hasAuthority('TAIKHOAN_XOA')" method="post" th:unless="${laToi}"
+                                  th:action="@{/admin/tai-khoan/{ma}/xoa(ma=${t.maTaiKhoan})}"
+                                  th:data-xac-nhan="|Xóa tài khoản ${t.email}? Thao tác này không hoàn tác được.|">
+                                <button class="btn btn-sm btn-outline-danger" type="submit"
+                                        th:aria-label="|Xóa ${t.email}|"><i class="bi bi-trash" aria-hidden="true"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="bang-trong" th:unless="${trang.hasContent()}">Không tìm thấy tài khoản phù hợp.</p>
+        <nav th:replace="~{admin/fragments :: phan-trang(${trang})}"></nav>
+    </section>
+</main>
+</body>
+</html>

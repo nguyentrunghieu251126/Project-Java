@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{admin/layout :: layout('Quản lý khuyến mãi', 'khuyen-mai', ~{::main})}">
+<body>
+<main>
+    <section class="the">
+        <form class="bo-loc" method="get" th:action="@{/admin/khuyen-mai}">
+            <div class="o-loc-rong"><label for="tuKhoa">Tìm kiếm</label>
+                <input class="form-control form-control-sm" id="tuKhoa" name="tuKhoa" th:value="${tuKhoa}"
+                       placeholder="Tên khuyến mãi hoặc mã giảm giá"></div>
+            <div class="o-loc"><label for="tinhTrang">Tình trạng</label>
+                <select class="form-select form-select-sm" id="tinhTrang" name="tinhTrang">
+                    <option value="">Tất cả</option>
+                    <option th:each="t : ${dsTinhTrang}" th:value="${t.name()}" th:text="${t.nhan}"
+                            th:selected="${tinhTrang == t}"></option>
+                </select></div>
+            <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-funnel" aria-hidden="true"></i> Lọc</button>
+            <a class="btn btn-sm btn-link" th:href="@{/admin/khuyen-mai}">Xóa lọc</a>
+            <a sec:authorize="hasAuthority('KHUYENMAI_THEM')" class="btn btn-sm btn-chinh ms-auto" th:href="@{/admin/khuyen-mai/them}">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i> Thêm khuyến mãi</a>
+        </form>
+
+        <div class="table-responsive" th:if="${trang.hasContent()}">
+            <table class="table table-hover bang">
+                <thead><tr><th>Khuyến mãi</th><th class="so">Mức giảm</th><th>Thời gian</th><th class="so">Đã dùng</th>
+                    <th>Tình trạng</th><th class="so">Thao tác</th></tr></thead>
+                <tbody>
+                <tr th:each="k : ${trang.content}">
+                    <td><span class="ten-chinh" th:text="${k.tenKhuyenMai}"></span>
+                        <span class="ten-phu" th:text="${k.maGiamGia}"></span></td>
+                    <td class="so" th:text="${k.loaiGiamGia.name() == 'PHAN_TRAM'} ? |${k.giaTriGiam}%| : |${#numbers.formatInteger(k.giaTriGiam, 1, 'POINT')} ₫|"></td>
+                    <td th:text="|${#temporals.format(k.ngayBatDau, 'dd/MM/yyyy')} – ${#temporals.format(k.ngayKetThuc, 'dd/MM/yyyy')}|"></td>
+                    <td class="so" th:text="${k.soLuotToiDa == null} ? ${k.soLuotDaDung} : |${k.soLuotDaDung}/${k.soLuotToiDa}|"></td>
+                    <td><span th:replace="~{admin/fragments :: nhan(${k.tinhTrang})}"></span></td>
+                    <td>
+                        <div class="nhom-nut">
+                            <form sec:authorize="hasAuthority('KHUYENMAI_BATTAT')" method="post"
+                                  th:action="@{/admin/khuyen-mai/{ma}/bat-tat(ma=${k.maKhuyenMai})}">
+                                <button class="btn btn-sm btn-outline-secondary" type="submit"
+                                        th:title="${k.trangThai} ? 'Tạm dừng' : 'Kích hoạt lại'"
+                                        th:aria-label="|${k.trangThai ? 'Tạm dừng' : 'Kích hoạt lại'} ${k.maGiamGia}|">
+                                    <i class="bi" th:classappend="${k.trangThai} ? 'bi-pause-fill' : 'bi-play-fill'" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                            <a sec:authorize="hasAuthority('KHUYENMAI_SUA')" class="btn btn-sm btn-outline-secondary"
+                               th:href="@{/admin/khuyen-mai/{ma}/sua(ma=${k.maKhuyenMai})}"
+                               th:aria-label="|Sửa ${k.maGiamGia}|"><i class="bi bi-pencil" aria-hidden="true"></i></a>
+                            <form sec:authorize="hasAuthority('KHUYENMAI_XOA')" method="post"
+                                  th:action="@{/admin/khuyen-mai/{ma}/xoa(ma=${k.maKhuyenMai})}"
+                                  th:data-xac-nhan="|Xóa khuyến mãi ${k.tenKhuyenMai} (${k.maGiamGia})?|">
+                                <button class="btn btn-sm btn-outline-danger" type="submit"
+                                        th:aria-label="|Xóa ${k.maGiamGia}|"><i class="bi bi-trash" aria-hidden="true"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="bang-trong" th:unless="${trang.hasContent()}">Không tìm thấy khuyến mãi phù hợp.</p>
+        <nav th:replace="~{admin/fragments :: phan-trang(${trang})}"></nav>
+    </section>
+</main>
+</body>
+</html>

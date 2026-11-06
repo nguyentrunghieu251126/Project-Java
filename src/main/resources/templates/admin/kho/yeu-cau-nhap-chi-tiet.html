@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout(${'Yêu cầu nhập hàng #' + yeuCau.maYeuCauNhap}, 'yeu-cau-nhap', ~{::main})}">
+<body>
+<main>
+    <div class="thanh-hanh-dong">
+        <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/kho/yeu-cau-nhap}">
+            <i class="bi bi-arrow-left" aria-hidden="true"></i> Danh sách yêu cầu</a>
+        <span th:replace="~{admin/fragments :: nhan(${yeuCau.trangThai})}"></span>
+    </div>
+
+    <section class="the">
+        <dl class="bang-thong-tin">
+            <dt>Người gửi</dt><dd th:text="${yeuCau.taiKhoan.hoTen}"></dd>
+            <dt>Ngày yêu cầu</dt><dd th:text="${#temporals.format(yeuCau.ngayYeuCau, 'dd/MM/yyyy HH:mm')}"></dd>
+            <th:block th:if="${yeuCau.nguoiDuyet != null}">
+                <dt>Người xử lý</dt><dd th:text="${yeuCau.nguoiDuyet.hoTen}"></dd>
+                <dt>Ngày xử lý</dt><dd th:text="${#temporals.format(yeuCau.ngayDuyet, 'dd/MM/yyyy HH:mm')}"></dd>
+            </th:block>
+            <th:block th:if="${yeuCau.lyDoTuChoi != null}">
+                <dt>Lý do từ chối</dt><dd th:text="${yeuCau.lyDoTuChoi}"></dd>
+            </th:block>
+        </dl>
+    </section>
+
+    <section class="the">
+        <div class="the-tieu-de"><h2>Mặt hàng yêu cầu nhập</h2></div>
+        <div class="table-responsive">
+            <table class="table bang">
+                <thead><tr><th>Sản phẩm</th><th class="so">Tồn hiện tại</th><th class="so">Mức tối thiểu</th>
+                    <th class="so">Yêu cầu nhập</th><th>Tình trạng</th></tr></thead>
+                <tbody>
+                <tr th:each="c : ${yeuCau.chiTiet}">
+                    <td><span class="ten-chinh" th:text="${c.sanPham.tenSanPham}"></span>
+                        <span class="ten-phu" th:text="${c.sanPham.maModel}"></span></td>
+                    <td class="so" th:text="${c.sanPham.soLuong}"></td>
+                    <td class="so" th:text="${c.sanPham.mucTonToiThieu}"></td>
+                    <td class="so" th:text="${c.soLuongYeuCau}"></td>
+                    <td><span th:replace="~{admin/fragments :: nhan(${c.sanPham.tinhTrangTonKho})}"></span></td>
+                </tr>
+                </tbody>
+                <tfoot><tr><td colspan="3" class="so">Tổng số lượng</td>
+                    <td class="so" th:text="${yeuCau.tongSoLuong}"></td><td></td></tr></tfoot>
+            </table>
+        </div>
+
+        <div class="d-flex gap-2 mt-3" th:if="${yeuCau.trangThai.name() == 'CHO_DUYET'}">
+            <form method="post" th:action="@{/admin/kho/yeu-cau-nhap/{ma}/duyet(ma=${yeuCau.maYeuCauNhap})}"
+                  th:data-xac-nhan="|Duyệt yêu cầu nhập hàng #${yeuCau.maYeuCauNhap}?|">
+                <button class="btn btn-chinh" type="submit"><i class="bi bi-check2" aria-hidden="true"></i> Duyệt</button>
+            </form>
+            <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#hopTuChoi">
+                <i class="bi bi-x-lg" aria-hidden="true"></i> Từ chối</button>
+        </div>
+    </section>
+
+    <div class="modal fade" id="hopTuChoi" tabindex="-1" aria-labelledby="hopTuChoiTieuDe" aria-hidden="true"
+         th:if="${yeuCau.trangThai.name() == 'CHO_DUYET'}">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" method="post"
+                  th:action="@{/admin/kho/yeu-cau-nhap/{ma}/tu-choi(ma=${yeuCau.maYeuCauNhap})}">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="hopTuChoiTieuDe">Từ chối yêu cầu nhập hàng</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label" for="lyDo">Lý do từ chối *</label>
+                    <textarea class="form-control" id="lyDo" name="lyDo" rows="3" maxlength="500" required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Từ chối</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

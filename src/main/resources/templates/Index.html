@@ -45,6 +45,12 @@
           <button class="btn" type="submit"><i class="bi bi-search"></i></button>
         </form>
         <ul class="navbar-nav align-items-lg-center gap-lg-2">
+          <!-- Quản trị viên đang xem cửa hàng: nút quay lại khu quản trị -->
+          <li class="nav-item" sec:authorize="hasRole('QUAN_TRI')">
+            <a class="nav-link admin-link" th:href="@{/admin}">
+              <i class="bi bi-speedometer2" aria-hidden="true"></i> Trang quản trị
+            </a>
+          </li>
           <!-- Tài khoản (chưa đăng nhập): icon người, bấm để sang trang đăng nhập -->
           <li class="nav-item" th:if="${#authorization.expression('isAnonymous()')}">
             <a class="nav-link account-link" th:href="@{/dang-nhap}" title="Đăng nhập" aria-label="Đăng nhập">
