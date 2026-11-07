@@ -28,6 +28,7 @@ public class AdminPhanQuyenController {
         model.addAttribute("dsVaiTro", phanQuyenService.dsVaiTro());
         model.addAttribute("quyenTheoNhom", phanQuyenService.quyenTheoNhom());
         model.addAttribute("daCap", phanQuyenService.quyenDaCap());
+        model.addAttribute("oBiKhoa", phanQuyenService.oBiKhoa());
         model.addAttribute("vaiTroQuanTri", PhanQuyenService.VAI_TRO_QUAN_TRI);
         model.addAttribute("quyenKhongTheGo", PhanQuyenService.QUYEN_KHONG_THE_GO);
         return "admin/phan-quyen";

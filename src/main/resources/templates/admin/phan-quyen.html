@@ -6,6 +6,7 @@
     <form class="the" method="post" th:action="@{/admin/phan-quyen}">
         <p class="chu-thich">Tick để cấp chức năng cho vai trò. Thay đổi áp dụng ngay cho cả người đang đăng nhập:
             menu tự ẩn và URL của chức năng bị thu hồi sẽ bị chặn.</p>
+        <p class="chu-thich">Ô xám là quyền không áp dụng cho vai trò đó.</p>
         <table class="table bang bang-quyen">
             <thead>
             <tr>
@@ -19,12 +20,13 @@
                 <td><span th:text="${q.tenQuyen}"></span>
                     <span class="ten-phu" th:text="${q.maChucNang}"></span></td>
                 <td class="o-chon" th:each="v : ${dsVaiTro}"
-                    th:with="khoa=${v.tenVaiTro == vaiTroQuanTri and q.maChucNang == quyenKhongTheGo}">
+                    th:with="luonGiu=${v.tenVaiTro == vaiTroQuanTri and q.maChucNang == quyenKhongTheGo},
+                             lyDoKhoa=${oBiKhoa[v.maVaiTro][q.maQuyen]}">
                     <input class="form-check-input" type="checkbox" name="cap"
                            th:value="|${v.maVaiTro}:${q.maQuyen}|"
-                           th:checked="${khoa or daCap[v.maVaiTro].contains(q.maQuyen)}"
-                           th:disabled="${khoa}"
-                           th:title="${khoa} ? 'Quản trị viên luôn giữ quyền này' : ''"
+                           th:checked="${luonGiu or (lyDoKhoa == null and daCap[v.maVaiTro].contains(q.maQuyen))}"
+                           th:disabled="${luonGiu or lyDoKhoa != null}"
+                           th:title="${luonGiu} ? 'Quản trị viên luôn giữ quyền này' : ${lyDoKhoa}"
                            th:aria-label="|${q.tenQuyen} cho ${v.tenHienThi}|">
                 </td>
             </tr>
