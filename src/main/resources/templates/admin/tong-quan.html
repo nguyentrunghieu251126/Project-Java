@@ -3,6 +3,11 @@
       th:replace="~{admin/layout :: layout('Tổng quan', 'tong-quan', ~{::main})}">
 <body>
 <main class="trang-day">
+    <section class="the" sec:authorize="!hasAuthority('BAOCAO_DOANHTHU')">
+        <h2 th:text="|Xin chào, ${hoTenNguoiDung}.|"></h2>
+        <p class="mb-0">Chọn chức năng ở menu bên trái.</p>
+    </section>
+
     <div class="luoi-so-lieu" sec:authorize="hasAuthority('BAOCAO_DOANHTHU')">
         <a th:href="@{/admin/bao-cao/doanh-thu}" class="o-so-lieu">
             <div class="nhan-so"><i class="bi bi-cash-stack" aria-hidden="true"></i> Doanh thu cả năm</div>
