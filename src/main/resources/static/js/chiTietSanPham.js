@@ -222,18 +222,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const price = document.createElement('strong');
             price.className = 'detail-related-price';
             price.textContent = item.price;
+
+            const actions = document.createElement('div');
+            actions.className = 'product-actions';
+
+            const buyButton = document.createElement('button');
+            buyButton.type = 'button';
+            buyButton.className = 'buy-now-button';
+            buyButton.textContent = 'Mua ngay';
+            buyButton.disabled = true;
             const cartButton = document.createElement('button');
-            cartButton.className = 'btn btn-buy detail-related-button tv2-cart-trigger';
             cartButton.type = 'button';
-            cartButton.dataset.maSanPham = String(item.id);
-            cartButton.dataset.tenSanPham = item.name;
-            cartButton.disabled = item.inStock === false;
+            cartButton.className = 'add-to-cart-button';
+            cartButton.disabled = true;
+            cartButton.title = 'Thêm vào giỏ hàng';
             cartButton.setAttribute('aria-label', `Thêm ${item.name} vào giỏ hàng`);
             const cartIcon = document.createElement('i');
             cartIcon.className = 'bi bi-cart-plus';
             cartIcon.setAttribute('aria-hidden', 'true');
-            cartButton.append(cartIcon, document.createTextNode(' Thêm vào giỏ'));
-            card.append(imageLink, brand, name, price, cartButton);
+            cartButton.appendChild(cartIcon);
+            actions.append(buyButton, cartButton);
+            card.append(imageLink, name, brand, price, actions);
             grid.appendChild(card);
         });
         section.hidden = recent.length === 0;

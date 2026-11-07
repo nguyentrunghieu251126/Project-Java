@@ -285,18 +285,13 @@
             <div><dt>Danh mục</dt><dd th:text="${sanPham.danhMuc.tenDanhMuc}">Danh mục</dd></div>
             <div><dt>Bảo hành</dt><dd th:text="${sanPham.thoiGianBaoHanh != null ? sanPham.thoiGianBaoHanh + ' tháng' : 'Đang cập nhật'}">Bảo hành</dd></div>
           </dl>
-          <div class="detail-action-row" aria-label="Thao tác sản phẩm">
-            <button class="detail-button detail-button-cart tv2-cart-trigger" type="button"
-                    th:attr="data-ma-san-pham=${sanPham.maSanPham},data-ten-san-pham=${sanPham.tenSanPham}"
-                    th:disabled="${sanPham.soLuong == null or sanPham.soLuong <= 0}"
-                    title="Xem trước giao diện giỏ hàng; TV3 tích hợp lưu dữ liệu">
-              <i class="bi bi-cart-plus" aria-hidden="true"></i><span>Thêm vào giỏ</span>
+          <div class="detail-action-row product-actions" aria-label="Thao tác sản phẩm">
+            <button type="button" class="buy-now-button" disabled>Mua ngay</button>
+            <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+              <i class="bi bi-cart-plus" aria-hidden="true"></i>
             </button>
-            <button class="detail-button detail-button-buy" type="button" disabled
-                    title="Chức năng đặt mua đang chờ TV3 tích hợp">Mua ngay</button>
           </div>
-          <p class="detail-integration-note"><i class="bi bi-info-circle" aria-hidden="true"></i>
-            Nút giỏ hàng đang ở chế độ demo; TV3 sẽ tích hợp lưu giỏ hàng và đặt mua.</p>
+          <p class="detail-integration-note"><i class="bi bi-info-circle" aria-hidden="true"></i>Chức năng mua hàng và giỏ hàng đang được cập nhật.</p>
           <!-- KH10 – So sánh: chức năng TV2, đặt sau thao tác mua hàng -->
           <div class="detail-compare-panel">
             <span class="detail-compare-hint">Cần lựa chọn giữa các sản phẩm?</span>
@@ -436,12 +431,13 @@
              th:text="${sp.tenSanPham}">Tên sản phẩm</a>
           <strong class="detail-related-price"
                   th:text="${#numbers.formatDecimal(sp.donGia, 1, 'POINT', 0, 'COMMA') + '₫'}">Giá bán</strong>
-          <button class="btn btn-buy detail-related-button tv2-cart-trigger" type="button"
-                  th:attr="data-ma-san-pham=${sp.maSanPham},data-ten-san-pham=${sp.tenSanPham}"
-                  th:disabled="${sp.soLuong == null or sp.soLuong <= 0}"
-                  th:aria-label="'Thêm ' + ${sp.tenSanPham} + ' vào giỏ hàng'">
-            <i class="bi bi-cart-plus" aria-hidden="true"></i> Thêm vào giỏ
-          </button>
+          <div class="product-actions">
+            <button type="button" class="buy-now-button" disabled>Mua ngay
+            </button>
+            <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+              <i class="bi bi-cart-plus" aria-hidden="true"></i>
+            </button>
+          </div>
         </article>
       </div>
     </section>
@@ -462,11 +458,13 @@
         <strong th:text="${sanPham.tenSanPham}">Tên sản phẩm</strong>
         <span th:text="${#numbers.formatDecimal(sanPham.donGia, 1, 'POINT', 0, 'COMMA') + '₫'}">0₫</span>
       </div>
-      <button class="tv2-cart-trigger" type="button"
-              th:attr="data-ma-san-pham=${sanPham.maSanPham},data-ten-san-pham=${sanPham.tenSanPham}"
-              th:disabled="${sanPham.soLuong == null or sanPham.soLuong <= 0}"
-              title="Giỏ hàng demo, chờ TV3 tích hợp"><i class="bi bi-cart-plus" aria-hidden="true"></i> Thêm vào giỏ</button>
-      <button type="button" disabled title="Chờ tích hợp mua hàng từ TV3">Mua ngay</button>
+      <div class="product-actions">
+        <button type="button" class="buy-now-button" disabled>Mua ngay
+        </button>
+        <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+          <i class="bi bi-cart-plus" aria-hidden="true"></i>
+        </button>
+      </div>
     </div>
   </div>
 
