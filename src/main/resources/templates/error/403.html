@@ -30,8 +30,8 @@
       <h1 class="error-title" id="error-title">Bạn không có quyền truy cập</h1>
       <p class="error-description">Tài khoản hiện tại không có quyền truy cập trang này. Vui lòng quay về trang chủ hoặc sử dụng tài khoản có quyền phù hợp.</p>
       <div class="error-actions">
-        <a sec:authorize="hasRole('QUAN_TRI')" class="error-button error-button-primary" th:href="@{/admin}" href="/admin"><i class="bi bi-speedometer2" aria-hidden="true"></i> Về trang quản trị</a>
-        <a sec:authorize="!hasRole('QUAN_TRI')" class="error-button error-button-primary" th:href="@{/}" href="/"><i class="bi bi-house-door-fill" aria-hidden="true"></i> Về trang chủ</a>
+        <a sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO')" class="error-button error-button-primary" th:href="@{/admin}" href="/admin"><i class="bi bi-speedometer2" aria-hidden="true"></i> Về trang quản trị</a>
+        <a sec:authorize="!hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO')" class="error-button error-button-primary" th:href="@{/}" href="/"><i class="bi bi-house-door-fill" aria-hidden="true"></i> Về trang chủ</a>
         <a class="error-button error-button-secondary" th:href="@{/#product-list}" href="/#product-list"><i class="bi bi-arrow-left" aria-hidden="true"></i> Xem sản phẩm</a>
       </div>
       <hr class="error-divider" />
