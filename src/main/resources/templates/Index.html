@@ -415,28 +415,28 @@
       <div class="row row-cols-4 row-cols-md-4 row-cols-lg-8 g-3 text-center">
         <div class="col">
           <a th:href="@{/(maDanhMuc=4)} + '#product-list'" class="category">
-            <span><i class="bi bi-tv"></i></span>Tivi</a>
+            <span class="category-image"><img th:src="@{/images/sanpham/tivi/tivi-lg-oled-evo-55.png}" alt="" loading="lazy"></span>Tivi</a>
         </div>
         <div class="col">
-          <a th:href="@{/(maDanhMuc=5)} + '#product-list'" class="category"><span><i class="bi bi-snow"></i></span>Tủ lạnh</a>
+          <a th:href="@{/(maDanhMuc=5)} + '#product-list'" class="category"><span class="category-image"><img th:src="@{/images/sanpham/tu-lanh/tu-lanh-lg-inverter-335-lit.png}" alt="" loading="lazy"></span>Tủ lạnh</a>
         </div>
         <div class="col">
-          <a th:href="@{/(maDanhMuc=6)} + '#product-list'" class="category"><span><i class="bi bi-water"></i></span>Máy giặt</a>
+          <a th:href="@{/(maDanhMuc=6)} + '#product-list'" class="category"><span class="category-image"><img th:src="@{/images/sanpham/may-giat/may-giat-electrolux-inverter-9kg.png}" alt="" loading="lazy"></span>Máy giặt</a>
         </div>
         <div class="col">
-          <a th:href="@{/(maDanhMuc=7)} + '#product-list'" class="category"><span><i class="bi bi-wind"></i></span>Điều hòa</a>
+          <a th:href="@{/(maDanhMuc=7)} + '#product-list'" class="category"><span class="category-image"><img th:src="@{/images/sanpham/dieu-hoa/dieu-hoa-daikin-ftkb25wavmv.png}" alt="" loading="lazy"></span>Điều hòa</a>
         </div>
         <div class="col">
-          <a th:href="@{/(maDanhMuc=1)} + '#product-list'" class="category"><span><i class="bi bi-phone"></i></span>Điện thoại</a>
+          <a th:href="@{/(maDanhMuc=1)} + '#product-list'" class="category"><span class="category-image"><img th:src="@{/images/sanpham/dien-thoai/dien-thoai-iphone-15-pro-max.png}" alt="" loading="lazy"></span>Điện thoại</a>
         </div>
         <div class="col">
-          <a th:href="@{/(maDanhMuc=3)} + '#product-list'" class="category"><span><i class="bi bi-laptop"></i></span>Laptop</a>
+          <a th:href="@{/(maDanhMuc=3)} + '#product-list'" class="category"><span class="category-image"><img th:src="@{/images/sanpham/laptop/laptop-asus-vivobook-15.png}" alt="" loading="lazy"></span>Laptop</a>
         </div>
         <div class="col">
-          <a th:href="@{/(maDanhMuc=14)} + '#product-list'" class="category"><span><i class="bi bi-speaker"></i></span>Loa</a>
+          <a th:href="@{/(maDanhMuc=14)} + '#product-list'" class="category"><span class="category-image"><img th:src="@{/images/sanpham/loa/loa-jbl-charge-5.png}" alt="" loading="lazy"></span>Loa</a>
         </div>
         <div class="col">
-          <a th:href="@{/(maDanhMuc=12)} + '#product-list'" class="category"><span><i class="bi bi-fan"></i></span>Quạt</a>
+          <a th:href="@{/(maDanhMuc=12)} + '#product-list'" class="category"><span class="category-image"><img th:src="@{/images/sanpham/dieu-hoa/quat-dieu-hoa-kangaroo-kg50s30.png}" alt="" loading="lazy"></span>Quạt</a>
         </div>
       </div>
     </div>
@@ -469,6 +469,7 @@
               </a>
             </div>
             <h6><a class="text-reset text-decoration-none" th:href="@{/san-pham/{id}(id=${sp.maSanPham})}" th:text="${sp.tenSanPham}">Tên sản phẩm</a></h6>
+            <small class="product-brand" th:text="${sp.thuongHieu}">Thương hiệu</small>
             <div class="price" th:text="${#numbers.formatDecimal(sp.donGia, 1, 'POINT', 0, 'COMMA') + '₫'}">0₫</div>
             <div class="old-price"
                  th:text="${#numbers.formatDecimal((sp.giaGoc != null ? sp.giaGoc : giaGocMau), 1, 'POINT', 0, 'COMMA') + '₫'}"
@@ -481,9 +482,12 @@
             <div class="rating" th:unless="${sp.soLuotDanhGia > 0}">
               <i class="bi bi-star" aria-hidden="true"></i> Chưa có đánh giá
             </div>
-            <button class="btn btn-buy add-cart" type="button" th:attr="data-ma-san-pham=${sp.maSanPham}" th:disabled="${sp.soLuong <= 0}">
-              <i class="bi bi-cart-plus"></i> Thêm vào giỏ
-            </button>
+            <div class="product-actions">
+              <button type="button" class="buy-now-button" disabled>Mua ngay</button>
+              <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+                <i class="bi bi-cart-plus" aria-hidden="true"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -521,8 +525,8 @@
                 </span>
               </a>
             </div>
-            <h6><a class="text-reset text-decoration-none" th:href="@{/san-pham/{id}(id=${sp.maSanPham})}"
-                   th:text="${sp.tenSanPham}">Tên sản phẩm</a></h6>
+            <h6><a class="text-reset text-decoration-none" th:href="@{/san-pham/{id}(id=${sp.maSanPham})}" th:text="${sp.tenSanPham}">Tên sản phẩm</a></h6>
+            <small class="product-brand" th:text="${sp.thuongHieu}">Thương hiệu</small>
             <div class="price" th:text="${#numbers.formatDecimal(sp.donGia, 1, 'POINT', 0, 'COMMA') + '₫'}">0₫</div>
             <!-- Giá gốc GIAO DIỆN MẪU, không tác động giá thanh toán từ SQL. -->
             <div class="old-price"
@@ -536,10 +540,12 @@
             <div class="rating" th:unless="${sp.soLuotDanhGia > 0}">
               <i class="bi bi-star" aria-hidden="true"></i> Chưa có đánh giá
             </div>
-            <button class="btn btn-buy add-cart" type="button"
-                    th:attr="data-ma-san-pham=${sp.maSanPham}" th:disabled="${sp.soLuong <= 0}">
-              <i class="bi bi-cart-plus"></i> Thêm vào giỏ
-            </button>
+            <div class="product-actions">
+              <button type="button" class="buy-now-button" disabled>Mua ngay</button>
+              <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+                <i class="bi bi-cart-plus" aria-hidden="true"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -698,9 +704,13 @@
                   </small>
                 </div>
                 <div class="product-card-actions tv2-product-actions mt-auto">
-                  <button class="btn btn-buy add-cart w-100 tv2-product-cart" type="button" th:attr="data-ma-san-pham=${sp.maSanPham}" th:disabled="${sp.soLuong == null or sp.soLuong <= 0}" th:aria-label="'Thêm ' + ${sp.tenSanPham} + ' vào giỏ hàng'">
-                    <i class="bi bi-cart-plus" aria-hidden="true"></i> Thêm vào giỏ
-                  </button>
+                  <div class="product-actions">
+                    <button type="button" class="buy-now-button" disabled>Mua ngay
+                    </button>
+                    <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus" aria-hidden="true"></i>
+                    </button>
+                  </div>
                 </div>
               </article>
             </div>
