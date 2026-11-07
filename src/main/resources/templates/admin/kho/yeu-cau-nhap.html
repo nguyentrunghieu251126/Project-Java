@@ -26,10 +26,11 @@
                     <td class="so" th:text="${y.tongSoLuong}"></td>
                     <td th:text="${y.nguoiDuyet != null} ? ${y.nguoiDuyet.hoTen} : '–'"></td>
                     <td><span th:replace="~{admin/fragments :: nhan(${y.trangThai})}"></span></td>
-                    <td class="so">
-                        <a class="btn btn-sm" th:classappend="${y.trangThai.name() == 'CHO_DUYET'} ? 'btn-chinh' : 'btn-outline-secondary'"
+                    <td class="so"
+                        th:with="canDuyet=${y.trangThai.name() == 'CHO_DUYET' and #authorization.expression('hasAuthority(''KHO_DUYET_NHAP'')')}">
+                        <a class="btn btn-sm" th:classappend="${canDuyet} ? 'btn-chinh' : 'btn-outline-secondary'"
                            th:href="@{/admin/kho/yeu-cau-nhap/{ma}(ma=${y.maYeuCauNhap})}"
-                           th:text="${y.trangThai.name() == 'CHO_DUYET'} ? 'Xem và duyệt' : 'Xem'"></a>
+                           th:text="${canDuyet} ? 'Xem và duyệt' : 'Xem'"></a>
                     </td>
                 </tr>
                 </tbody>
