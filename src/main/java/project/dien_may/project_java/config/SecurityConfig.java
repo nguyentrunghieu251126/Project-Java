@@ -57,6 +57,8 @@ public class SecurityConfig {
                         .requestMatchers("/admin/kho/don-hang", "/admin/kho/don-hang/*")
                         .access(quyen("DONHANG_XEM_TATCA"))
                         .requestMatchers("/admin/kho/ton-kho").access(quyen("KHO_XEM_TONKHO"))
+                        .requestMatchers(HttpMethod.POST, "/admin/kho/ton-kho/*/yeu-cau-nhap")
+                        .access(quyen("KHO_YEUCAU_NHAP"))
                         // Người gửi yêu cầu được xem, chỉ người có quyền duyệt mới duyệt hoặc từ chối được
                         .requestMatchers(HttpMethod.POST, "/admin/kho/yeu-cau-nhap/*/duyet",
                                 "/admin/kho/yeu-cau-nhap/*/tu-choi")
@@ -70,7 +72,9 @@ public class SecurityConfig {
                         .access(quyen("TAIKHOAN_SUA"))
                         .requestMatchers("/admin/tai-khoan/*/xoa").access(quyen("TAIKHOAN_XOA"))
 
-                        .requestMatchers("/admin/phan-quyen").access(quyen("PHANQUYEN_QUANLY"))
+                        .requestMatchers("/admin/phan-quyen", "/admin/phan-quyen/nhan-vien",
+                                "/admin/phan-quyen/nhan-vien/*")
+                        .access(quyen("PHANQUYEN_QUANLY"))
                         // URL khu quản lý chưa khai báo quyền ở trên thì chặn hết, tránh quên bảo vệ
                         .requestMatchers("/admin/**").denyAll()
                         // 3. Chỉ nhân viên kho
@@ -86,11 +90,15 @@ public class SecurityConfig {
                         .loginProcessingUrl("/dang-nhap")
                         .usernameParameter("username")
                         .passwordParameter("password")
-                        // Quản trị viên và nhân viên kho vào thẳng khu quản lý, khách hàng về trang chủ kèm thông báo
+                        // Quản trị viên và nhân viên kho mở thẳng tab đầu tiên được phép trong khu quản lý
+                        // (chưa được cấp tab nào thì về trang chào ở /admin); khách hàng về trang chủ kèm thông báo
                         .successHandler((request, response, authentication) -> {
                             boolean vaoKhuQuanLy = authentication.getAuthorities().stream()
                                     .anyMatch(a -> ROLE_KHU_QUAN_LY.contains(a.getAuthority()));
-                            response.sendRedirect(request.getContextPath() + (vaoKhuQuanLy ? "/admin" : "/?dangnhap"));
+                            String dich = vaoKhuQuanLy
+                                    ? TabKhuQuanLy.tabDauTien(authentication.getAuthorities()).orElse(TabKhuQuanLy.TONG_QUAN)
+                                    : "/?dangnhap";
+                            response.sendRedirect(request.getContextPath() + dich);
                         })
                         .failureUrl("/dang-nhap?error")
                         .permitAll()

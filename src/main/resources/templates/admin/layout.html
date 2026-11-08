@@ -23,7 +23,8 @@
 
     <!-- Mỗi mục chỉ hiện khi tài khoản có đúng quyền của trang đó -->
     <nav class="sidebar-menu">
-        <a th:href="@{/admin}" th:classappend="${menu == 'tong-quan'} ? 'active'">
+        <a sec:authorize="hasAuthority('TONGQUAN_XEM')" th:href="@{/admin}"
+           th:classappend="${menu == 'tong-quan'} ? 'active'">
             <i class="bi bi-speedometer2" aria-hidden="true"></i> Tổng quan
         </a>
 

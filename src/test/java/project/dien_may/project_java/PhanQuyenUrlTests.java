@@ -1,6 +1,5 @@
 package project.dien_may.project_java;
 
-import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -14,15 +13,23 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import org.springframework.transaction.annotation.Transactional;
+import project.dien_may.project_java.config.TabKhuQuanLy;
+import project.dien_may.project_java.entity.ChiTietDonHang;
+import project.dien_may.project_java.entity.ChiTietYeuCauNhapHang;
+import project.dien_may.project_java.repository.ChiTietYeuCauNhapHangRepository;
+import project.dien_may.project_java.entity.SanPham;
+import project.dien_may.project_java.repository.ChiTietDonHangRepository;
 import project.dien_may.project_java.entity.TrangThaiYeuCauNhap;
 import project.dien_may.project_java.entity.YeuCauNhapHang;
+import project.dien_may.project_java.repository.SanPhamRepository;
+import project.dien_may.project_java.repository.TaiKhoanRepository;
 import project.dien_may.project_java.repository.YeuCauNhapHangRepository;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Mockito.doReturn;
@@ -53,6 +60,18 @@ class PhanQuyenUrlTests {
     @Autowired
     private YeuCauNhapHangRepository yeuCauRepository;
 
+    @Autowired
+    private TaiKhoanRepository taiKhoanRepository;
+
+    @Autowired
+    private SanPhamRepository sanPhamRepository;
+
+    @Autowired
+    private ChiTietDonHangRepository chiTietDonHangRepository;
+
+    @Autowired
+    private ChiTietYeuCauNhapHangRepository chiTietYeuCauNhapRepository;
+
     @MockitoSpyBean
     private UserDetailsService userDetailsService;
 
@@ -68,6 +87,16 @@ class PhanQuyenUrlTests {
         return user(nguoiDung);
     }
 
+    /**
+     * Cho một sản phẩm hết hàng để màn hình có dòng cảnh báo, không phụ thuộc dữ liệu hiện có.
+     * Chỉ dùng trong test có @Transactional nên được rollback.
+     */
+    private void taoSanPhamCanhBao() {
+        SanPham sanPham = sanPhamRepository.findByDangKinhDoanhTrue().get(0);
+        sanPham.setSoLuong(0); // hết hàng nên luôn đứng đầu danh sách xếp theo tồn tăng dần
+        sanPhamRepository.saveAndFlush(sanPham);
+    }
+
     private YeuCauNhapHang yeuCauChoDuyet() {
         List<YeuCauNhapHang> ds = yeuCauRepository
                 .timKiem(TrangThaiYeuCauNhap.CHO_DUYET, PageRequest.of(0, 1)).getContent();
@@ -78,7 +107,7 @@ class PhanQuyenUrlTests {
     @ParameterizedTest
     @ValueSource(strings = {"/admin", "/admin/bao-cao/doanh-thu", "/admin/bao-cao/ban-chay", "/admin/bao-cao/ton-kho",
             "/admin/san-pham", "/admin/san-pham/them", "/admin/khuyen-mai", "/admin/kho/don-hang", "/admin/kho/ton-kho",
-            "/admin/kho/yeu-cau-nhap", "/admin/tai-khoan", "/admin/phan-quyen"})
+            "/admin/kho/yeu-cau-nhap", "/admin/tai-khoan", "/admin/phan-quyen", "/admin/phan-quyen/nhan-vien"})
     void quanTriVaoDuocMoiTrang(String url) throws Exception {
         mockMvc.perform(get(url).with(user(QUAN_TRI))).andExpect(status().isOk());
     }
@@ -97,14 +126,47 @@ class PhanQuyenUrlTests {
 
     @ParameterizedTest
     @ValueSource(strings = {"/admin/tai-khoan", "/admin/phan-quyen"})
-    void nhanVienKhoKhongVaoDuocChucNangChiQuanTri(String url) throws Exception {
+    void nhanVienKhoChuaDuocCapQuyenThiBiChan(String url) throws Exception {
         mockMvc.perform(get(url).with(user(NHAN_VIEN_KHO))).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void nhanVienKhoDuocCapQuyenHeThongThiVaoDuoc() throws Exception {
+        RequestPostProcessor nhanVien = nguoiDung("NHAN_VIEN_KHO", "PHANQUYEN_QUANLY", "TAIKHOAN_XEM");
+        mockMvc.perform(get("/admin/phan-quyen").with(nhanVien)).andExpect(status().isOk());
+        mockMvc.perform(get("/admin/tai-khoan").with(nhanVien)).andExpect(status().isOk());
+    }
+
+    @Test
+    @Transactional
+    void cotLapPhieuChiHienKhiCoQuyenVaChiChoSanPhamCanhBao() throws Exception {
+        taoSanPhamCanhBao();
+        mockMvc.perform(get("/admin/kho/ton-kho").with(nguoiDung("NHAN_VIEN_KHO", "KHO_XEM_TONKHO")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(not(containsString("Lập phiếu"))));
+        mockMvc.perform(get("/admin/kho/ton-kho?tinhTrang=DU")
+                        .with(nguoiDung("NHAN_VIEN_KHO", "KHO_XEM_TONKHO", "KHO_YEUCAU_NHAP")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(">Thao tác</th>")))
+                .andExpect(content().string(not(containsString("name=\"soLuong\""))));
+        // Danh sách xếp theo tồn tăng dần nên trang đầu có sản phẩm cảnh báo
+        mockMvc.perform(get("/admin/kho/ton-kho")
+                        .with(nguoiDung("NHAN_VIEN_KHO", "KHO_XEM_TONKHO", "KHO_YEUCAU_NHAP")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("name=\"soLuong\"")))
+                .andExpect(content().string(containsString("name=\"_csrf\"")));
+    }
+
+    @Test
+    void lapPhieuPhaiCoQuyenYeuCauNhap() throws Exception {
+        mockMvc.perform(post("/admin/kho/ton-kho/1/yeu-cau-nhap").param("soLuong", "5")
+                        .with(nguoiDung("NHAN_VIEN_KHO", "KHO_XEM_TONKHO")).with(csrf()))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void nhanVienKhoVaoDuocTrangCoQuyen() throws Exception {
         RequestPostProcessor nhanVien = nguoiDung("NHAN_VIEN_KHO", "SANPHAM_XEM");
-        mockMvc.perform(get("/admin").with(nhanVien)).andExpect(status().isOk());
         mockMvc.perform(get("/admin/san-pham").with(nhanVien)).andExpect(status().isOk());
     }
 
@@ -126,7 +188,7 @@ class PhanQuyenUrlTests {
 
     @Test
     void menuNhanVienKhoChiCoMucDuocCap() throws Exception {
-        mockMvc.perform(get("/admin").with(nguoiDung("NHAN_VIEN_KHO", "SANPHAM_XEM", "KHO_XEM_TONKHO", "KHO_YEUCAU_NHAP")))
+        mockMvc.perform(get("/admin/san-pham").with(nguoiDung("NHAN_VIEN_KHO", "SANPHAM_XEM", "KHO_XEM_TONKHO", "KHO_YEUCAU_NHAP")))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("href=\"/admin/san-pham\"")))
                 .andExpect(content().string(containsString("href=\"/admin/kho/ton-kho\"")))
@@ -137,12 +199,13 @@ class PhanQuyenUrlTests {
     }
 
     @Test
-    void tongQuanKhongCoDoanhThuThiHienLoiChao() throws Exception {
-        mockMvc.perform(get("/admin").with(user(NHAN_VIEN_KHO)))
+    void khongDuocCapTabNaoThiHienLoiChao() throws Exception {
+        // SANPHAM_THEM không mở được tab nào trên menu nên không có chỗ để chuyển tới
+        mockMvc.perform(get("/admin").with(nguoiDung("NHAN_VIEN_KHO", "SANPHAM_THEM")))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeDoesNotExist("tomTat", "bieuDo"))
                 .andExpect(content().string(containsString("Xin chào")))
-                .andExpect(content().string(containsString("(Nhân viên kho)")))
+                .andExpect(content().string(containsString("Trang quản lý")))
                 .andExpect(content().string(not(containsString("Doanh thu cả năm"))));
     }
 
@@ -180,35 +243,102 @@ class PhanQuyenUrlTests {
     }
 
     @Test
-    void manHinhPhanQuyenKhoaOKhongHopLe() throws Exception {
+    void manHinhPhanQuyenCoHaiTabVaKhongKhoaO() throws Exception {
         mockMvc.perform(get("/admin/phan-quyen").with(user(QUAN_TRI)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Ô xám là quyền không áp dụng")))
-                .andExpect(content().string(oCheckbox("2:18", "Chỉ quản trị viên", "disabled=\"disabled\"")))
-                .andExpect(content().string(oCheckbox("2:21", "Chỉ quản trị viên", "disabled=\"disabled\"")))
-                .andExpect(content().string(oCheckbox("1:29", "Chỉ dành cho khách hàng", "disabled=\"disabled\"")))
-                .andExpect(content().string(oCheckbox("3:1", "Chỉ dành cho khu quản lý", "disabled=\"disabled\"")))
-                .andExpect(content().string(oCheckbox("1:18", "Quản trị viên luôn giữ quyền này",
-                        "checked=\"checked\" disabled=\"disabled\"")));
+                .andExpect(content().string(containsString("Toàn thể nhân viên")))
+                .andExpect(content().string(containsString("Từng nhân viên")))
+                .andExpect(content().string(containsString("name=\"quyen\"")))
+                .andExpect(content().string(not(containsString("disabled=\"disabled\""))))
+                .andExpect(content().string(not(containsString("Khách hàng</th>"))));
     }
 
-    /** Thymeleaf đưa checked, disabled xuống cuối thẻ, nên phần cuối thẻ cho biết chính xác trạng thái của ô. */
-    private static Matcher<String> oCheckbox(String giaTri, String title, String cuoiThe) {
-        return matchesPattern("(?s).*value=\"" + giaTri + "\"\\s+title=\"" + title
-                + "\"\\s+aria-label=\"[^\"]*\" " + cuoiThe + ">.*");
+    @Test
+    void tabTungNhanVienChiLietKeNhanVien() throws Exception {
+        mockMvc.perform(get("/admin/phan-quyen/nhan-vien").with(user(QUAN_TRI)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(NHAN_VIEN_KHO)))
+                .andExpect(content().string(containsString("Xem quyền")))
+                .andExpect(content().string(not(containsString(">" + QUAN_TRI + "<"))))
+                .andExpect(content().string(not(containsString(">" + KHACH_HANG + "<"))));
+    }
+
+    @Test
+    void xemQuyenCuaMotNhanVien() throws Exception {
+        Integer ma = taiKhoanRepository.findByEmailIgnoreCase(NHAN_VIEN_KHO).orElseThrow().getMaTaiKhoan();
+        mockMvc.perform(get("/admin/phan-quyen/nhan-vien/" + ma).with(user(QUAN_TRI)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Lưu quyền của nhân viên")));
+    }
+
+    @Test
+    void khongMoQuyenRiengChoTaiKhoanKhongPhaiNhanVien() throws Exception {
+        Integer ma = taiKhoanRepository.findByEmailIgnoreCase(KHACH_HANG).orElseThrow().getMaTaiKhoan();
+        mockMvc.perform(get("/admin/phan-quyen/nhan-vien/" + ma).with(user(QUAN_TRI)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void phanQuyenTungNhanVienCanQuyenPhanQuyen() throws Exception {
+        RequestPostProcessor nhanVien = nguoiDung("NHAN_VIEN_KHO", "SANPHAM_XEM");
+        mockMvc.perform(get("/admin/phan-quyen/nhan-vien").with(nhanVien)).andExpect(status().isForbidden());
+        mockMvc.perform(post("/admin/phan-quyen/nhan-vien/1").param("quyen", "1").with(nhanVien).with(csrf()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void tongQuanLaMotChucNangRieng() throws Exception {
+        mockMvc.perform(get("/admin").with(nguoiDung("NHAN_VIEN_KHO", "TONGQUAN_XEM")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("bi-speedometer2")))
+                .andExpect(content().string(containsString("Doanh thu cả năm")))
+                .andExpect(content().string(containsString("khong-bam")))
+                .andExpect(content().string(not(containsString("Xem báo cáo"))));
+        mockMvc.perform(get("/admin/bao-cao/doanh-thu").with(nguoiDung("NHAN_VIEN_KHO", "BAOCAO_DOANHTHU")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(not(containsString("bi-speedometer2"))));
+    }
+
+    @Test
+    void khongCoQuyenTongQuanThiMoTabDauTienDuocPhep() throws Exception {
+        mockMvc.perform(get("/admin").with(nguoiDung("NHAN_VIEN_KHO", "SANPHAM_XEM", "BAOCAO_DOANHTHU")))
+                .andExpect(redirectedUrl("/admin/bao-cao/doanh-thu"));
+        mockMvc.perform(get("/admin").with(nguoiDung("NHAN_VIEN_KHO", "PHANQUYEN_QUANLY", "KHO_YEUCAU_NHAP")))
+                .andExpect(redirectedUrl("/admin/kho/yeu-cau-nhap"));
+        mockMvc.perform(get("/admin").with(nguoiDung("NHAN_VIEN_KHO", "SANPHAM_XEM", "TONGQUAN_XEM")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @Transactional
+    void baoCaoTonKhoCoCotNhapHangVaTinhTrangDanhMuc() throws Exception {
+        taoSanPhamCanhBao();
+        mockMvc.perform(get("/admin/bao-cao/ton-kho").with(user(QUAN_TRI)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(">Nhập hàng</th>")))
+                .andExpect(content().string(not(containsString("<th class=\"so\">Cần nhập</th>"))))
+                .andExpect(content().string(containsString("Tình trạng</th></tr>")));
+        // Chỉ được xem báo cáo thì không có cột nhập hàng
+        mockMvc.perform(get("/admin/bao-cao/ton-kho").with(nguoiDung("NHAN_VIEN_KHO", "BAOCAO_TONKHO")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(not(containsString(">Nhập hàng</th>"))))
+                .andExpect(content().string(not(containsString("name=\"quayVe\""))));
     }
 
     @Test
     void guiQuyenKhongHopLeLenServerBiTuChoi() throws Exception {
-        mockMvc.perform(post("/admin/phan-quyen").param("cap", "2:18").with(user(QUAN_TRI)).with(csrf()))
+        mockMvc.perform(post("/admin/phan-quyen").param("quyen", "999999").with(user(QUAN_TRI)).with(csrf()))
                 .andExpect(redirectedUrl("/admin/phan-quyen"))
-                .andExpect(flash().attribute("loi", containsString("Không thể cấp quyền")));
+                .andExpect(flash().attribute("loi", containsString("không hợp lệ")));
     }
 
     @Test
     void dangNhapDuaVeDungKhuVuc() throws Exception {
+        // Nhân viên kho mở tab đầu tiên theo quyền đang có trong CSDL
+        String tabNhanVien = TabKhuQuanLy.tabDauTien(
+                userDetailsService.loadUserByUsername(NHAN_VIEN_KHO).getAuthorities()).orElse("/admin");
         mockMvc.perform(formLogin("/dang-nhap").user(NHAN_VIEN_KHO).password("123456"))
-                .andExpect(redirectedUrl("/admin"));
+                .andExpect(redirectedUrl(tabNhanVien));
         mockMvc.perform(formLogin("/dang-nhap").user(QUAN_TRI).password("123456"))
                 .andExpect(redirectedUrl("/admin"));
         mockMvc.perform(formLogin("/dang-nhap").user(KHACH_HANG).password("123456"))
@@ -260,6 +390,24 @@ class PhanQuyenUrlTests {
                     .andExpect(content().string(containsString("admin-link")))
                     .andExpect(content().string(not(containsString("Tổng quan tài khoản"))));
         }
+    }
+
+    @Test
+    @Transactional
+    void chiTietYeuCauNhapCoAnhSanPham() throws Exception {
+        ChiTietYeuCauNhapHang chiTiet = chiTietYeuCauNhapRepository.findAll().get(0);
+        mockMvc.perform(get("/admin/kho/yeu-cau-nhap/" + chiTiet.getYeuCau().getMaYeuCauNhap()).with(user(QUAN_TRI)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("src=\"" + chiTiet.getSanPham().getHinhAnh() + "\"")));
+    }
+
+    @Test
+    @Transactional
+    void chiTietDonHangCoAnhSanPham() throws Exception {
+        ChiTietDonHang chiTiet = chiTietDonHangRepository.findAll().get(0);
+        mockMvc.perform(get("/admin/kho/don-hang/" + chiTiet.getDonHang().getMaDonHang()).with(user(QUAN_TRI)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("src=\"" + chiTiet.getSanPham().getHinhAnh() + "\"")));
     }
 
     @Test

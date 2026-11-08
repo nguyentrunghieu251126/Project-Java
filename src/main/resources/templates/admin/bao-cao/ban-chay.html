@@ -28,11 +28,14 @@
             <span class="chu-thich">Chỉ tính đơn đã giao; doanh số là giá bán trước giảm giá đơn hàng</span>
         </div>
         <div class="table-responsive" th:if="${!dsBanChay.isEmpty()}">
-            <table class="table bang">
-                <thead><tr><th>#</th><th>Sản phẩm</th><th>Danh mục</th><th>Số lượng bán</th><th class="so">Doanh số</th></tr></thead>
+            <table class="table bang bang-ban-chay">
+                <colgroup><col class="c-hang"><col class="c-ten"><col class="c-danh-muc"><col class="c-so-luong"><col class="c-doanh-so"></colgroup>
+                <thead><tr><th class="giua">#</th><th>Sản phẩm</th><th>Danh mục</th><th>Số lượng bán</th><th class="giua">Doanh số</th></tr></thead>
                 <tbody>
                 <tr th:each="d, st : ${dsBanChay}">
-                    <td th:text="${st.count}"></td>
+                    <!-- Ba vị trí đầu được tô nổi bật -->
+                    <td class="giua"><span class="hang" th:classappend="${st.count <= 3} ? |hang-${st.count}|"
+                                           th:text="${st.count}"></span></td>
                     <td><span class="ten-chinh" th:text="${d.sanPham.tenSanPham}"></span>
                         <span class="ten-phu" th:text="${d.sanPham.maModel}"></span></td>
                     <td th:text="${d.sanPham.tenDanhMuc}"></td>
@@ -41,10 +44,10 @@
                             <div class="thanh-so-ray">
                                 <div class="thanh-so-than" th:style="'width:' + ${d.phanTram} + '%'"></div>
                             </div>
-                            <span th:text="${d.sanPham.soLuongBan}"></span>
+                            <span class="thanh-so-gia-tri" th:text="${d.sanPham.soLuongBan}"></span>
                         </div>
                     </td>
-                    <td class="so" th:text="|${#numbers.formatInteger(d.sanPham.doanhSo, 1, 'POINT')} ₫|"></td>
+                    <td class="giua so-lieu" th:text="|${#numbers.formatInteger(d.sanPham.doanhSo, 1, 'POINT')} ₫|"></td>
                 </tr>
                 </tbody>
             </table>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{admin/layout :: layout('Phân quyền', 'phan-quyen', ~{::main})}">
+<body>
+<main>
+    <ul th:replace="~{admin/fragments :: tab-phan-quyen('nhan-vien')}"></ul>
+    <section class="the">
+        <div class="the-tieu-de">
+            <div>
+                <h2>Quyền của từng nhân viên</h2>
+                <p class="chu-thich mb-0">Cấp thêm hoặc thu hồi quyền của một nhân viên. Người chưa chỉnh riêng dùng
+                    quyền ở tab Toàn thể nhân viên.</p>
+            </div>
+            <a sec:authorize="hasAuthority('TAIKHOAN_THEM')" class="btn btn-sm btn-outline-secondary"
+               th:href="@{/admin/tai-khoan/them}">
+                <i class="bi bi-person-plus" aria-hidden="true"></i> Tạo tài khoản nhân viên</a>
+        </div>
+
+        <div class="table-responsive" th:unless="${dsNhanVien.isEmpty()}">
+            <table class="table table-hover bang">
+                <thead><tr><th>Họ tên</th><th>Email</th><th>Số điện thoại</th><th>Vai trò</th>
+                    <th class="so">Phân quyền</th></tr></thead>
+                <tbody>
+                <tr th:each="t : ${dsNhanVien}">
+                    <td>
+                        <span class="o-ten-nhan-vien">
+                            <span class="chu-viet-tat" aria-hidden="true" th:text="${t.chuVietTat}"></span>
+                            <span class="ten-chinh" th:text="${t.hoTen}"></span>
+                        </span>
+                    </td>
+                    <td th:text="${t.email}"></td>
+                    <td th:text="${t.soDienThoai} ?: '–'"></td>
+                    <td><span class="nhan nhan-cho" th:text="${t.vaiTro.tenHienThi}"></span></td>
+                    <td class="so">
+                        <a class="btn btn-sm btn-outline-secondary text-nowrap"
+                           th:href="@{/admin/phan-quyen/nhan-vien/{ma}(ma=${t.maTaiKhoan})}">
+                            <i class="bi bi-key" aria-hidden="true"></i> Xem quyền</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="bang-trong" th:if="${dsNhanVien.isEmpty()}">Chưa có nhân viên nào.</p>
+    </section>
+</main>
+</body>
+</html>

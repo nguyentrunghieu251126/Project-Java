@@ -254,6 +254,150 @@ aside.sidebar {
   white-space: nowrap;
 }
 
+.bang .giua {
+  text-align: center;
+}
+
+.bang .giua .nhom-nut {
+  justify-content: center;
+}
+
+/* Tiền căn trái nhưng chữ số vẫn đều cột để dễ so sánh */
+.bang .gia,
+.bang .so-lieu {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bang .gia {
+  text-align: left;
+}
+
+/* Danh sách sản phẩm: độ rộng cột cố định để khoảng cách đều, màn hẹp thì cuộn ngang */
+.bang-san-pham {
+  table-layout: fixed;
+  min-width: 920px;
+}
+
+.bang-san-pham .c-anh { width: 72px; }
+.bang-san-pham .c-ten { width: 32%; }
+.bang-san-pham .c-danh-muc { width: 17%; }
+.bang-san-pham .c-gia { width: 14%; }
+.bang-san-pham .c-ton { width: 8%; }
+.bang-san-pham .c-tinh-trang { width: 15%; }
+.bang-san-pham .c-thao-tac { width: 14%; }
+
+/* Tồn kho theo danh mục: cột tên rộng hơn, bốn cột số liệu chia đều phần còn lại */
+.bang-danh-muc {
+  table-layout: fixed;
+  min-width: 720px;
+}
+
+.bang-danh-muc .c-ten { width: 28%; }
+
+/* Các bảng danh sách còn lại: độ rộng cột cố định để khoảng cách đều, màn hẹp thì cuộn ngang */
+.bang-ban-chay,
+.bang-khuyen-mai,
+.bang-don-hang,
+.bang-ton-kho {
+  table-layout: fixed;
+}
+
+.bang-ban-chay { min-width: 820px; }
+.bang-ban-chay .c-hang { width: 64px; }
+.bang-ban-chay .c-ten { width: 34%; }
+.bang-ban-chay .c-danh-muc { width: 18%; }
+.bang-ban-chay .c-so-luong { width: 28%; }
+.bang-ban-chay .c-doanh-so { width: 20%; }
+
+.bang-khuyen-mai { min-width: 960px; }
+.bang-khuyen-mai .c-ten { width: 24%; }
+.bang-khuyen-mai .c-muc-giam { width: 12%; }
+.bang-khuyen-mai .c-thoi-gian { width: 22%; }
+.bang-khuyen-mai .c-da-dung { width: 10%; }
+.bang-khuyen-mai .c-tinh-trang { width: 15%; }
+.bang-khuyen-mai .c-thao-tac { width: 17%; }
+
+.bang-don-hang { min-width: 820px; }
+.bang-don-hang .c-ma { width: 10%; }
+.bang-don-hang .c-ngay { width: 15%; }
+.bang-don-hang .c-nguoi-nhan { width: 29%; }
+.bang-don-hang .c-tong-tien { width: 18%; }
+.bang-don-hang .c-trang-thai { width: 20%; }
+.bang-don-hang .c-xem { width: 64px; }
+
+.bang-ton-kho { min-width: 1040px; }
+.bang-ton-kho .c-ten { width: 25%; }
+.bang-ton-kho .c-danh-muc { width: 13%; }
+.bang-ton-kho .c-ton { width: 7%; }
+.bang-ton-kho .c-muc { width: 10%; }
+.bang-ton-kho .c-gia-tri { width: 13%; }
+.bang-ton-kho .c-tinh-trang { width: 12%; }
+.bang-ton-kho .c-thao-tac { width: 20%; }
+
+/* Hạng trong bảng bán chạy: ba vị trí đầu có màu huy chương */
+.hang {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: var(--chu-phu);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.hang-1 { background: #fef3c7; color: #92400e; }
+.hang-2 { background: #e2e8f0; color: #334155; }
+.hang-3 { background: #fde4cf; color: #9a3412; }
+
+.thanh-so-gia-tri {
+  min-width: 2ch;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Mã giảm giá dạng nhãn chữ đều để dễ đọc và chép */
+.ma-code {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 1px 7px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: var(--chu-phu);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.02em;
+}
+
+.muc-giam {
+  color: var(--chinh);
+  font-weight: 700;
+}
+
+.ma-don {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.ma-don:hover {
+  text-decoration: underline;
+}
+
+/* Nút chỉ có icon, cao bằng khối nhập hàng bên cạnh */
+.nut-vuong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
 .bang tfoot td {
   font-weight: 700;
   border-top: 2px solid var(--vien);
@@ -287,10 +431,30 @@ aside.sidebar {
   color: #94a3b8;
 }
 
+/* Ảnh và tên sản phẩm nằm cùng một ô */
+.sp-dong {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sp-dong .anh-nho {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+}
+
+/* Ảnh sản phẩm hiện trọn, không bị cắt; nền trắng khớp với nền của ảnh */
+.anh-nho:has(img:not([hidden])) {
+  background: #fff;
+  border: 1px solid var(--vien);
+}
+
 .anh-nho img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  padding: 3px;
+  object-fit: contain;
 }
 
 .nhom-nut {
@@ -301,6 +465,51 @@ aside.sidebar {
 
 .nhom-nut form {
   margin: 0;
+}
+
+/* Ô số lượng và nút nhập hàng ghép liền một khối, nằm gọn ở cột cuối bảng */
+.bang .cot-nhap {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.o-nhap-hang {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  width: auto;
+  margin: 0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.o-nhap-hang .form-control {
+  flex: 0 0 4.25rem;
+  width: 4.25rem;
+  height: 32px;
+  border-color: var(--vien);
+  border-radius: 8px 0 0 8px;
+  text-align: center;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.o-nhap-hang .form-control:focus {
+  position: relative;
+  z-index: 3;
+  border-color: var(--chinh);
+  box-shadow: 0 0 0 3px rgba(10, 143, 60, 0.15);
+}
+
+.o-nhap-hang .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
 .btn-chinh {
@@ -711,6 +920,31 @@ a.o-so-lieu:hover {
 .bang-quyen .o-chon {
   width: 130px;
   text-align: center;
+}
+
+.o-ten-nhan-vien {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chu-viet-tat {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #2f6fb0;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Thẻ số liệu tổng quan khi người xem không có quyền mở báo cáo doanh thu */
+.khong-bam a {
+  pointer-events: none;
 }
 
 .thanh-luu {

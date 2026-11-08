@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import project.dien_may.project_java.entity.TaiKhoan;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TaiKhoanRepository
@@ -17,6 +18,9 @@ public interface TaiKhoanRepository
 
     // Tim tai khoan theo email, khong phan biet chu hoa/thuong
     Optional<TaiKhoan> findByEmailIgnoreCase(String email);
+
+    @EntityGraph(attributePaths = "vaiTro")
+    List<TaiKhoan> findByVaiTroTenVaiTroOrderByHoTenAsc(String tenVaiTro);
 
     // Kiem tra email da ton tai khi dang ky tai khoan.
     @Query("""

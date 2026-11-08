@@ -6,6 +6,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import project.dien_may.project_java.entity.TrangThaiYeuCauNhap;
+import project.dien_may.project_java.repository.ChiTietYeuCauNhapHangRepository;
 import project.dien_may.project_java.repository.DanhMucRepository;
 import project.dien_may.project_java.service.admin.BaoCaoService;
 
@@ -19,10 +21,13 @@ public class AdminBaoCaoController {
 
     private final BaoCaoService baoCaoService;
     private final DanhMucRepository danhMucRepository;
+    private final ChiTietYeuCauNhapHangRepository chiTietYeuCauRepository;
 
-    public AdminBaoCaoController(BaoCaoService baoCaoService, DanhMucRepository danhMucRepository) {
+    public AdminBaoCaoController(BaoCaoService baoCaoService, DanhMucRepository danhMucRepository,
+                                 ChiTietYeuCauNhapHangRepository chiTietYeuCauRepository) {
         this.baoCaoService = baoCaoService;
         this.danhMucRepository = danhMucRepository;
+        this.chiTietYeuCauRepository = chiTietYeuCauRepository;
     }
 
     @GetMapping("/doanh-thu")
@@ -72,6 +77,8 @@ public class AdminBaoCaoController {
     @GetMapping("/ton-kho")
     public String tonKho(Model model) {
         model.addAttribute("baoCao", baoCaoService.tonKho());
+        // Sản phẩm đã có phiếu chờ duyệt thì không lập thêm phiếu, chỉ báo đang chờ
+        model.addAttribute("dangChoDuyet", chiTietYeuCauRepository.maSanPhamTheoTrangThai(TrangThaiYeuCauNhap.CHO_DUYET));
         return "admin/bao-cao/ton-kho";
     }
 

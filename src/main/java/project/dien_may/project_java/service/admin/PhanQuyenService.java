@@ -1,16 +1,21 @@
 package project.dien_may.project_java.service.admin;
 
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.dien_may.project_java.config.NhomQuyen;
+import org.springframework.web.server.ResponseStatusException;
 import project.dien_may.project_java.entity.Quyen;
+import project.dien_may.project_java.entity.TaiKhoan;
+import project.dien_may.project_java.entity.TaiKhoanQuyen;
 import project.dien_may.project_java.entity.VaiTro;
 import project.dien_may.project_java.repository.QuyenRepository;
+import project.dien_may.project_java.repository.TaiKhoanQuyenRepository;
+import project.dien_may.project_java.repository.TaiKhoanRepository;
 import project.dien_may.project_java.repository.VaiTroRepository;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,106 +24,135 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Quản trị viên mặc nhiên có mọi quyền. Nhân viên kho nhận quyền của vai trò (áp dụng cho toàn thể nhân viên),
+ * sau đó từng người có thể được cấp thêm hoặc thu hồi riêng. Quyền của khách hàng không chỉnh ở đây.
+ */
 @Service
 public class PhanQuyenService {
 
-    public static final String VAI_TRO_QUAN_TRI = NhomQuyen.QUAN_TRI;
-
-    /** Quản trị viên luôn giữ quyền này, nếu không sẽ không ai cấp lại quyền được nữa. */
-    public static final String QUYEN_KHONG_THE_GO = "PHANQUYEN_QUANLY";
+    private static final String VAI_TRO_QUAN_TRI = "QUAN_TRI";
+    private static final String VAI_TRO_NHAN_VIEN = "NHAN_VIEN_KHO";
+    private static final String QUYEN_TONG_QUAN = "TONGQUAN_XEM";
 
     private final VaiTroRepository vaiTroRepository;
     private final QuyenRepository quyenRepository;
+    private final TaiKhoanRepository taiKhoanRepository;
+    private final TaiKhoanQuyenRepository taiKhoanQuyenRepository;
 
-    public PhanQuyenService(VaiTroRepository vaiTroRepository, QuyenRepository quyenRepository) {
+    public PhanQuyenService(VaiTroRepository vaiTroRepository, QuyenRepository quyenRepository,
+                            TaiKhoanRepository taiKhoanRepository, TaiKhoanQuyenRepository taiKhoanQuyenRepository) {
         this.vaiTroRepository = vaiTroRepository;
         this.quyenRepository = quyenRepository;
+        this.taiKhoanRepository = taiKhoanRepository;
+        this.taiKhoanQuyenRepository = taiKhoanQuyenRepository;
     }
 
-    @Transactional(readOnly = true)
-    public List<VaiTro> dsVaiTro() {
-        return vaiTroRepository.findAll(Sort.by("maVaiTro"));
-    }
-
-    /** Quyền gom theo nhóm chức năng, giữ thứ tự xuất hiện theo MaQuyen. */
+    /** Quyền gom theo nhóm chức năng, theo thứ tự MaQuyen; Tổng quan đứng đầu như trên menu. */
     @Transactional(readOnly = true)
     public Map<String, List<Quyen>> quyenTheoNhom() {
         return quyenRepository.findAll(Sort.by("maQuyen")).stream()
+                .sorted(Comparator.comparing((Quyen q) -> !QUYEN_TONG_QUAN.equals(q.getMaChucNang())))
                 .collect(Collectors.groupingBy(Quyen::getNhomChucNang, LinkedHashMap::new, Collectors.toList()));
     }
 
-    /** Mã vai trò -> tập mã quyền đang được cấp. */
+    /** Mã chức năng tài khoản này thực sự được dùng, sau khi áp dụng phần chỉnh riêng. */
     @Transactional(readOnly = true)
-    public Map<Integer, Set<Integer>> quyenDaCap() {
-        Map<Integer, Set<Integer>> ketQua = new HashMap<>();
-        for (VaiTro vaiTro : vaiTroRepository.findAll()) {
-            ketQua.put(vaiTro.getMaVaiTro(),
-                    vaiTro.getDsQuyen().stream().map(Quyen::getMaQuyen).collect(Collectors.toSet()));
+    public Set<String> quyenHieuLuc(TaiKhoan taiKhoan) {
+        String tenVaiTro = taiKhoan.getVaiTro().getTenVaiTro();
+        if (VAI_TRO_QUAN_TRI.equals(tenVaiTro)) {
+            return maChucNang(quyenRepository.findAll());
         }
-        return ketQua;
-    }
-
-    /** Mã vai trò -> (mã quyền không được gán -> lý do), để khóa ô tương ứng trên màn hình. */
-    @Transactional(readOnly = true)
-    public Map<Integer, Map<Integer, String>> oBiKhoa() {
-        List<Quyen> dsQuyen = quyenRepository.findAll();
-        Map<Integer, Map<Integer, String>> ketQua = new HashMap<>();
-        for (VaiTro vaiTro : vaiTroRepository.findAll()) {
-            Map<Integer, String> lyDoTheoQuyen = new HashMap<>();
-            for (Quyen quyen : dsQuyen) {
-                String lyDo = NhomQuyen.lyDoKhoa(vaiTro.getTenVaiTro(), quyen.getMaChucNang());
-                if (lyDo != null) {
-                    lyDoTheoQuyen.put(quyen.getMaQuyen(), lyDo);
+        Set<String> ketQua = maChucNang(taiKhoan.getVaiTro().getDsQuyen());
+        if (VAI_TRO_NHAN_VIEN.equals(tenVaiTro)) {
+            for (TaiKhoanQuyen rieng : taiKhoanQuyenRepository.findByTaiKhoanMaTaiKhoan(taiKhoan.getMaTaiKhoan())) {
+                if (rieng.isDuocCap()) {
+                    ketQua.add(rieng.getQuyen().getMaChucNang());
+                } else {
+                    ketQua.remove(rieng.getQuyen().getMaChucNang());
                 }
             }
-            ketQua.put(vaiTro.getMaVaiTro(), lyDoTheoQuyen);
         }
         return ketQua;
     }
 
-    /** @param dsCap các cặp "maVaiTro:maQuyen" được tick trên màn hình */
+    @Transactional(readOnly = true)
+    public Set<String> quyenToanTheNhanVien() {
+        return maChucNang(vaiTroNhanVien().getDsQuyen());
+    }
+
+    /** @param dsMaQuyen các quyền được tick; thay đổi có hiệu lực với mọi nhân viên, trừ phần đã chỉnh riêng */
     @Transactional
-    public void capNhat(Collection<String> dsCap) {
-        Map<Integer, Quyen> quyenTheoMa = quyenRepository.findAll().stream()
-                .collect(Collectors.toMap(Quyen::getMaQuyen, Function.identity()));
-        List<VaiTro> dsVaiTro = vaiTroRepository.findAll();
-        Map<Integer, VaiTro> vaiTroTheoMa = dsVaiTro.stream()
-                .collect(Collectors.toMap(VaiTro::getMaVaiTro, Function.identity()));
+    public void capNhatToanTheNhanVien(Collection<Integer> dsMaQuyen) {
+        Set<Quyen> moi = layQuyen(dsMaQuyen);
+        Set<Quyen> dsQuyen = vaiTroNhanVien().getDsQuyen();
+        dsQuyen.retainAll(moi);
+        dsQuyen.addAll(moi);
+    }
 
-        // Kiểm tra hết các cặp trước khi đổi dữ liệu, một cặp sai thì không lưu gì
-        Map<Integer, Set<Quyen>> moi = new HashMap<>();
-        dsVaiTro.forEach(vt -> moi.put(vt.getMaVaiTro(), new HashSet<>()));
-        for (String cap : dsCap) {
-            String[] phan = cap.split(":");
-            VaiTro vaiTro = phan.length == 2 ? vaiTroTheoMa.get(soNguyen(phan[0])) : null;
-            Quyen quyen = phan.length == 2 ? quyenTheoMa.get(soNguyen(phan[1])) : null;
-            if (vaiTro == null || quyen == null) {
-                throw new NghiepVuException("Dữ liệu phân quyền không hợp lệ.");
-            }
-            if (!NhomQuyen.choPhepGan(vaiTro.getTenVaiTro(), quyen.getMaChucNang())) {
-                throw new NghiepVuException("Không thể cấp quyền " + quyen.getTenQuyen()
-                        + " cho vai trò " + vaiTro.getTenHienThi() + ".");
-            }
-            moi.get(vaiTro.getMaVaiTro()).add(quyen);
-        }
+    @Transactional(readOnly = true)
+    public List<TaiKhoan> dsNhanVien() {
+        return taiKhoanRepository.findByVaiTroTenVaiTroOrderByHoTenAsc(VAI_TRO_NHAN_VIEN);
+    }
 
-        for (VaiTro vaiTro : dsVaiTro) {
-            Set<Quyen> quyenMoi = moi.get(vaiTro.getMaVaiTro());
-            if (VAI_TRO_QUAN_TRI.equals(vaiTro.getTenVaiTro())) {
-                quyenTheoMa.values().stream()
-                        .filter(q -> QUYEN_KHONG_THE_GO.equals(q.getMaChucNang()))
-                        .forEach(quyenMoi::add);
+    /** Chỉ nhân viên kho mới có phân quyền riêng; tài khoản khác coi như không tồn tại ở màn hình này. */
+    @Transactional(readOnly = true)
+    public TaiKhoan nhanVien(Integer maTaiKhoan) {
+        return taiKhoanRepository.findById(maTaiKhoan)
+                .filter(t -> VAI_TRO_NHAN_VIEN.equals(t.getVaiTro().getTenVaiTro()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    /** Mã chức năng đang khác với quyền của toàn thể nhân viên. */
+    @Transactional(readOnly = true)
+    public Set<String> quyenChinhRieng(Integer maTaiKhoan) {
+        return taiKhoanQuyenRepository.findByTaiKhoanMaTaiKhoan(maTaiKhoan).stream()
+                .map(rieng -> rieng.getQuyen().getMaChucNang())
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Chỉ lưu phần khác với quyền của vai trò, nên ô nào tick giống toàn thể thì người đó tiếp tục theo toàn thể.
+     *
+     * @param dsMaQuyen các quyền được tick cho nhân viên này
+     */
+    @Transactional
+    public void capNhatNhanVien(Integer maTaiKhoan, Collection<Integer> dsMaQuyen) {
+        TaiKhoan nhanVien = nhanVien(maTaiKhoan);
+        Set<Quyen> duocChon = layQuyen(dsMaQuyen);
+        Set<String> theoVaiTro = maChucNang(nhanVien.getVaiTro().getDsQuyen());
+        Set<String> daChon = maChucNang(duocChon);
+
+        taiKhoanQuyenRepository.xoaTheoTaiKhoan(maTaiKhoan);
+        for (Quyen quyen : quyenRepository.findAll()) {
+            boolean chon = daChon.contains(quyen.getMaChucNang());
+            if (chon != theoVaiTro.contains(quyen.getMaChucNang())) {
+                taiKhoanQuyenRepository.save(new TaiKhoanQuyen(nhanVien, quyen, chon));
             }
-            vaiTro.getDsQuyen().retainAll(quyenMoi);
-            vaiTro.getDsQuyen().addAll(quyenMoi);
         }
     }
 
-    private Integer soNguyen(String s) {
-        try {
-            return Integer.valueOf(s);
-        } catch (NumberFormatException e) {
-            return null;
+    private VaiTro vaiTroNhanVien() {
+        return vaiTroRepository.findAll().stream()
+                .filter(v -> VAI_TRO_NHAN_VIEN.equals(v.getTenVaiTro()))
+                .findFirst().orElseThrow();
+    }
+
+    private Set<Quyen> layQuyen(Collection<Integer> dsMaQuyen) {
+        Map<Integer, Quyen> quyenTheoMa = quyenRepository.findAll().stream()
+                .collect(Collectors.toMap(Quyen::getMaQuyen, Function.identity()));
+        Set<Quyen> ketQua = new HashSet<>();
+        for (Integer ma : dsMaQuyen) {
+            Quyen quyen = quyenTheoMa.get(ma);
+            if (quyen == null) {
+                throw new NghiepVuException("Dữ liệu phân quyền không hợp lệ.");
+            }
+            ketQua.add(quyen);
         }
+        return ketQua;
+    }
+
+    private Set<String> maChucNang(Collection<Quyen> dsQuyen) {
+        return dsQuyen.stream().map(Quyen::getMaChucNang).collect(Collectors.toCollection(HashSet::new));
     }
 }

@@ -25,21 +25,41 @@
         </form>
 
         <div class="table-responsive" th:if="${trang.hasContent()}">
-            <table class="table table-hover bang">
-                <thead><tr><th>Sản phẩm</th><th>Danh mục</th><th class="so">Tồn</th><th class="so">Mức tối thiểu</th>
-                    <th class="so">Giá trị tồn</th><th>Tình trạng</th><th></th></tr></thead>
+            <table class="table table-hover bang bang-ton-kho">
+                <colgroup><col class="c-ten"><col class="c-danh-muc"><col class="c-ton"><col class="c-muc"><col class="c-gia-tri">
+                    <col class="c-tinh-trang"><col sec:authorize="hasAnyAuthority('SANPHAM_SUA','KHO_YEUCAU_NHAP')" class="c-thao-tac"></colgroup>
+                <thead><tr><th>Sản phẩm</th><th>Danh mục</th><th class="giua">Tồn</th><th class="giua">Mức tối thiểu</th>
+                    <th class="giua">Giá trị tồn</th><th class="giua">Tình trạng</th>
+                    <th class="giua" sec:authorize="hasAnyAuthority('SANPHAM_SUA','KHO_YEUCAU_NHAP')">Thao tác</th></tr></thead>
                 <tbody>
                 <tr th:each="s : ${trang.content}">
                     <td><span class="ten-chinh" th:text="${s.tenSanPham}"></span>
                         <span class="ten-phu" th:text="${s.maModel}"></span></td>
                     <td th:text="${s.danhMuc.tenDanhMuc}"></td>
-                    <td class="so" th:text="${s.soLuong}"></td>
-                    <td class="so" th:text="${s.mucTonToiThieu}"></td>
-                    <td class="so" th:text="|${#numbers.formatInteger(s.giaTriTon, 1, 'POINT')} ₫|"></td>
-                    <td><span th:replace="~{admin/fragments :: nhan(${s.tinhTrangTonKho})}"></span></td>
-                    <td class="so">
-                        <a sec:authorize="hasAuthority('SANPHAM_SUA')" class="btn btn-sm btn-outline-secondary"
-                           th:href="@{/admin/san-pham/{ma}/sua(ma=${s.maSanPham})}">Sửa mức tồn</a>
+                    <td class="giua so-lieu ten-chinh" th:text="${s.soLuong}"></td>
+                    <td class="giua so-lieu" th:text="${s.mucTonToiThieu}"></td>
+                    <td class="giua so-lieu" th:text="|${#numbers.formatInteger(s.giaTriTon, 1, 'POINT')} ₫|"></td>
+                    <td class="giua"><span th:replace="~{admin/fragments :: nhan(${s.tinhTrangTonKho})}"></span></td>
+                    <!-- Sản phẩm cảnh báo có ô nhập hàng; quản trị viên nhập thẳng vào kho, nhân viên kho lập phiếu chờ duyệt -->
+                    <td class="giua" sec:authorize="hasAnyAuthority('SANPHAM_SUA','KHO_YEUCAU_NHAP')">
+                        <div class="nhom-nut">
+                            <form sec:authorize="hasAuthority('KHO_YEUCAU_NHAP')" th:if="${s.tinhTrangTonKho.name() != 'DU'}"
+                                  class="o-nhap-hang input-group" method="post"
+                                  th:action="@{/admin/kho/ton-kho/{ma}/yeu-cau-nhap(ma=${s.maSanPham})}"
+                                  th:attr="data-xac-nhan=${#authorization.expression('hasRole(''QUAN_TRI'')')}
+                                      ? |Nhập hàng ${s.tenSanPham} vào kho ngay, không qua duyệt?| : null">
+                                <input class="form-control" type="number" name="soLuong" min="1" required
+                                       th:aria-label="|Số lượng cần nhập của ${s.tenSanPham}|"
+                                       th:value="${s.mucTonToiThieu > s.soLuong} ? ${s.mucTonToiThieu - s.soLuong} : 1">
+                                <button class="btn btn-chinh text-nowrap" type="submit">
+                                    <i class="bi bi-box-arrow-in-down" aria-hidden="true"></i>
+                                    <span th:text="${#authorization.expression('hasRole(''QUAN_TRI'')')} ? 'Nhập hàng' : 'Lập phiếu'">Lập phiếu</span>
+                                </button>
+                            </form>
+                            <a sec:authorize="hasAuthority('SANPHAM_SUA')" class="btn btn-sm btn-outline-secondary nut-vuong"
+                               th:href="@{/admin/san-pham/{ma}/sua(ma=${s.maSanPham})}" title="Sửa mức tồn tối thiểu"
+                               th:aria-label="|Sửa mức tồn của ${s.tenSanPham}|"><i class="bi bi-sliders" aria-hidden="true"></i></a>
+                        </div>
                     </td>
                 </tr>
                 </tbody>

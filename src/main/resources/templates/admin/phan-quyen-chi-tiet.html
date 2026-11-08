@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout(${'Quyền của ' + nhanVien.hoTen}, 'phan-quyen', ~{::main})}">
+<body>
+<main>
+    <div class="thanh-hanh-dong">
+        <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/phan-quyen/nhan-vien}">
+            <i class="bi bi-arrow-left" aria-hidden="true"></i> Danh sách nhân viên</a>
+    </div>
+
+    <form class="the" method="post" th:action="@{/admin/phan-quyen/nhan-vien/{ma}(ma=${nhanVien.maTaiKhoan})}">
+        <p class="chu-thich">Ô đang tick là quyền nhân viên này thực sự có. Quyền khác với toàn thể nhân viên được gắn nhãn
+            Chỉnh riêng; tick lại giống toàn thể thì nhãn tự mất.</p>
+        <table th:replace="~{admin/fragments :: bang-chon-quyen(${quyenTheoNhom}, ${daChon}, ${chinhRieng})}"></table>
+        <div class="thanh-luu">
+            <span></span>
+            <button class="btn btn-chinh" type="submit">Lưu quyền của nhân viên</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

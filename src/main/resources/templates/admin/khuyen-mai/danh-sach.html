@@ -21,18 +21,21 @@
         </form>
 
         <div class="table-responsive" th:if="${trang.hasContent()}">
-            <table class="table table-hover bang">
-                <thead><tr><th>Khuyến mãi</th><th class="so">Mức giảm</th><th>Thời gian</th><th class="so">Đã dùng</th>
-                    <th>Tình trạng</th><th class="so">Thao tác</th></tr></thead>
+            <table class="table table-hover bang bang-khuyen-mai">
+                <colgroup><col class="c-ten"><col class="c-muc-giam"><col class="c-thoi-gian"><col class="c-da-dung">
+                    <col class="c-tinh-trang"><col class="c-thao-tac"></colgroup>
+                <thead><tr><th>Khuyến mãi</th><th class="giua">Mức giảm</th><th class="giua">Thời gian</th><th class="giua">Đã dùng</th>
+                    <th class="giua">Tình trạng</th><th class="giua">Thao tác</th></tr></thead>
                 <tbody>
                 <tr th:each="k : ${trang.content}">
                     <td><span class="ten-chinh" th:text="${k.tenKhuyenMai}"></span>
-                        <span class="ten-phu" th:text="${k.maGiamGia}"></span></td>
-                    <td class="so" th:text="${k.loaiGiamGia.name() == 'PHAN_TRAM'} ? |${k.giaTriGiam}%| : |${#numbers.formatInteger(k.giaTriGiam, 1, 'POINT')} ₫|"></td>
-                    <td th:text="|${#temporals.format(k.ngayBatDau, 'dd/MM/yyyy')} – ${#temporals.format(k.ngayKetThuc, 'dd/MM/yyyy')}|"></td>
-                    <td class="so" th:text="${k.soLuotToiDa == null} ? ${k.soLuotDaDung} : |${k.soLuotDaDung}/${k.soLuotToiDa}|"></td>
-                    <td><span th:replace="~{admin/fragments :: nhan(${k.tinhTrang})}"></span></td>
-                    <td>
+                        <span class="ma-code" th:text="${k.maGiamGia}"></span></td>
+                    <td class="giua so-lieu"><span class="muc-giam"
+                            th:text="${k.loaiGiamGia.name() == 'PHAN_TRAM'} ? |${k.giaTriGiam}%| : |${#numbers.formatInteger(k.giaTriGiam, 1, 'POINT')} ₫|"></span></td>
+                    <td class="giua so-lieu" th:text="|${#temporals.format(k.ngayBatDau, 'dd/MM/yyyy')} – ${#temporals.format(k.ngayKetThuc, 'dd/MM/yyyy')}|"></td>
+                    <td class="giua so-lieu" th:text="${k.soLuotToiDa == null} ? ${k.soLuotDaDung} : |${k.soLuotDaDung}/${k.soLuotToiDa}|"></td>
+                    <td class="giua"><span th:replace="~{admin/fragments :: nhan(${k.tinhTrang})}"></span></td>
+                    <td class="giua">
                         <div class="nhom-nut">
                             <form sec:authorize="hasAuthority('KHUYENMAI_BATTAT')" method="post"
                                   th:action="@{/admin/khuyen-mai/{ma}/bat-tat(ma=${k.maKhuyenMai})}">

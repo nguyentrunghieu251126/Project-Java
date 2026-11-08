@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import project.dien_may.project_java.dto.baocao.TonKhoDanhMuc;
@@ -125,4 +126,9 @@ public interface SanPhamRepository
             ORDER BY s.soLuong ASC, s.tenSanPham ASC
             """)
     List<SanPham> danhSachCanNhap();
+
+    /** Cộng thẳng trên CSDL để hai lần nhập cùng lúc không ghi đè số lượng của nhau. */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("UPDATE SanPham s SET s.soLuong = s.soLuong + :soLuong WHERE s.maSanPham = :maSanPham")
+    int congTonKho(@Param("maSanPham") Integer maSanPham, @Param("soLuong") int soLuong);
 }

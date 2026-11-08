@@ -6,7 +6,10 @@
    Mật khẩu của mọi tài khoản mẫu: 123456 (đã mã hóa BCrypt).
    Phiên bản 2: bổ sung phân quyền theo chức năng (Quyen, VaiTro_Quyen),
    thông số kỹ thuật (ThongSoKyThuat), ngày giao hàng, ngừng kinh doanh,
-   mức tồn tối thiểu. Tổng cộng 23 bảng.
+   mức tồn tối thiểu.
+   Phiên bản 3: bổ sung phân quyền theo từng nhân viên (TaiKhoan_Quyen),
+   quyền xem trang tổng quan. Tổng cộng 24 bảng.
+   Database đã có dữ liệu: chạy CapNhat_PhanQuyenTheoNhanVien.sql thay vì file này.
    ===================================================================== */
 USE master;
 
@@ -71,6 +74,18 @@ CREATE TABLE dbo.VaiTro_Quyen (
     CONSTRAINT PK_VaiTro_Quyen PRIMARY KEY (MaVaiTro, MaQuyen),
     CONSTRAINT FK_VTQ_VaiTro FOREIGN KEY (MaVaiTro) REFERENCES dbo.VaiTro (MaVaiTro) ON DELETE CASCADE,
     CONSTRAINT FK_VTQ_Quyen FOREIGN KEY (MaQuyen) REFERENCES dbo.Quyen (MaQuyen) ON DELETE CASCADE
+);
+
+CREATE TABLE dbo.TaiKhoan_Quyen (
+    -- phần chỉnh riêng cho một nhân viên so với quyền của vai trò
+    MaTaiKhoanQuyen INT IDENTITY (1, 1) NOT NULL,
+    MaTaiKhoan      INT NOT NULL,
+    MaQuyen         INT NOT NULL,
+    DuocCap         BIT NOT NULL, -- 1 = cấp thêm, 0 = thu hồi
+    CONSTRAINT PK_TaiKhoan_Quyen PRIMARY KEY (MaTaiKhoanQuyen),
+    CONSTRAINT UQ_TaiKhoan_Quyen UNIQUE (MaTaiKhoan, MaQuyen),
+    CONSTRAINT FK_TKQ_TaiKhoan FOREIGN KEY (MaTaiKhoan) REFERENCES dbo.TaiKhoan (MaTaiKhoan) ON DELETE CASCADE,
+    CONSTRAINT FK_TKQ_Quyen FOREIGN KEY (MaQuyen) REFERENCES dbo.Quyen (MaQuyen) ON DELETE CASCADE
 );
 
 /* ============================ 2. SẢN PHẨM ============================= */
@@ -391,7 +406,7 @@ SET IDENTITY_INSERT dbo.VaiTro OFF;
 
 
 GO
--- Quyen: 37 bản ghi (mỗi quyền ứng với một chức năng trong đặc tả)
+-- Quyen: 38 bản ghi (mỗi quyền ứng với một chức năng trong đặc tả)
 SET IDENTITY_INSERT dbo.Quyen ON;
 
 INSERT  INTO dbo.Quyen (
@@ -437,7 +452,8 @@ VALUES                 (1, 'SANPHAM_XEM', N'Xem danh sách sản phẩm', N'Sả
                        (34, 'DOITRA_YEUCAU', N'Gửi yêu cầu đổi trả', N'Bảo hành – Đổi trả', N'KH21'),
                        (35, 'DANHGIA_VIET', N'Đánh giá sản phẩm', N'Mua hàng', N'KH22'),
                        (36, 'HOTRO_GUI', N'Gửi yêu cầu hỗ trợ', N'Hỗ trợ', N'KH23'),
-                       (37, 'TAIKHOAN_CANHAN', N'Cập nhật thông tin cá nhân', N'Tài khoản', N'KH04 và mọi vai trò');
+                       (37, 'TAIKHOAN_CANHAN', N'Cập nhật thông tin cá nhân', N'Tài khoản', N'KH04 và mọi vai trò'),
+                       (38, 'TONGQUAN_XEM', N'Xem trang tổng quan', N'Tổng quan', N'QT08');
 
 SET IDENTITY_INSERT dbo.Quyen OFF;
 
@@ -590,50 +606,50 @@ INSERT  INTO dbo.SanPham (
     MaDanhMuc,
     PhienBan
 )
-VALUES                   (1, N'SM-S928B', N'Samsung Galaxy S24 Ultra 256GB', N'Samsung', 29990000, 8, N'Samsung Galaxy S24 Ultra 256GB chính hãng Samsung, bảo hành 12 tháng.', N'/images/sanpham/sm-s928b.jpg', 12, 1, 0),
-                         (2, N'MU793VN-A', N'iPhone 15 Pro Max 256GB', N'Apple', 30990000, 15, N'iPhone 15 Pro Max 256GB chính hãng Apple, bảo hành 12 tháng.', N'/images/sanpham/mu793vn-a.jpg', 12, 1, 0),
-                         (3, N'23129RAA4G', N'Xiaomi Redmi Note 13 8GB/128GB', N'Xiaomi', 4890000, 8, N'Xiaomi Redmi Note 13 8GB/128GB chính hãng Xiaomi, bảo hành 18 tháng.', N'/images/sanpham/23129raa4g.jpg', 18, 1, 0),
-                         (4, N'MUWD3ZA-A', N'iPad Air M2 11 inch WiFi 128GB', N'Apple', 16990000, 25, N'iPad Air M2 11 inch WiFi 128GB chính hãng Apple, bảo hành 12 tháng.', N'/images/sanpham/muwd3za-a.jpg', 12, 2, 0),
-                         (5, N'SM-X510', N'Samsung Galaxy Tab S9 FE WiFi', N'Samsung', 9490000, 15, N'Samsung Galaxy Tab S9 FE WiFi chính hãng Samsung, bảo hành 12 tháng.', N'/images/sanpham/sm-x510.jpg', 12, 2, 0),
-                         (6, N'MRXN3SA-A', N'MacBook Air M3 13 inch 8GB/256GB', N'Apple', 27990000, 25, N'MacBook Air M3 13 inch 8GB/256GB chính hãng Apple, bảo hành 12 tháng.', N'/images/sanpham/mrxn3sa-a.jpg', 12, 3, 0),
-                         (7, N'INS3530-I5', N'Dell Inspiron 15 3530 i5', N'Dell', 16490000, 8, N'Dell Inspiron 15 3530 i5 chính hãng Dell, bảo hành 12 tháng.', N'/images/sanpham/ins3530-i5.jpg', 12, 3, 0),
-                         (8, N'A1505VA-L1114W', N'ASUS Vivobook 15 OLED i5', N'ASUS', 17990000, 40, N'ASUS Vivobook 15 OLED i5 chính hãng ASUS, bảo hành 24 tháng.', N'/images/sanpham/a1505va-l1114w.jpg', 24, 3, 0),
-                         (9, N'UA55AU7700', N'Smart Tivi Samsung 4K 55 inch', N'Samsung', 10990000, 40, N'Smart Tivi Samsung 4K 55 inch chính hãng Samsung, bảo hành 24 tháng.', N'/images/sanpham/ua55au7700.jpg', 24, 4, 0),
-                         (10, N'OLED55C4PSA', N'Smart Tivi LG OLED evo 55 inch', N'LG', 32990000, 30, N'Smart Tivi LG OLED evo 55 inch chính hãng LG, bảo hành 24 tháng.', N'/images/sanpham/oled55c4psa.jpg', 24, 4, 0),
-                         (11, N'K-50S30', N'Google Tivi Sony 4K 50 inch', N'Sony', 13490000, 20, N'Google Tivi Sony 4K 50 inch chính hãng Sony, bảo hành 24 tháng.', N'/images/sanpham/k-50s30.jpg', 24, 4, 0),
-                         (12, N'NR-BC360QKVN', N'Tủ lạnh Panasonic Inverter 322 lít', N'Panasonic', 13990000, 5, N'Tủ lạnh Panasonic Inverter 322 lít chính hãng Panasonic, bảo hành 24 tháng.', N'/images/sanpham/nr-bc360qkvn.jpg', 24, 5, 0),
-                         (13, N'RT22M4032BY', N'Tủ lạnh Samsung Inverter 236 lít', N'Samsung', 6290000, 15, N'Tủ lạnh Samsung Inverter 236 lít chính hãng Samsung, bảo hành 24 tháng.', N'/images/sanpham/rt22m4032by.jpg', 24, 5, 0),
-                         (14, N'GN-D332BL', N'Tủ lạnh LG Inverter 335 lít', N'LG', 9990000, 3, N'Tủ lạnh LG Inverter 335 lít chính hãng LG, bảo hành 24 tháng.', N'/images/sanpham/gn-d332bl.jpg', 24, 5, 0),
-                         (15, N'FV1410S4P', N'Máy giặt LG Inverter 10 kg', N'LG', 9490000, 8, N'Máy giặt LG Inverter 10 kg chính hãng LG, bảo hành 24 tháng.', N'/images/sanpham/fv1410s4p.jpg', 24, 6, 0),
-                         (16, N'EWF9024P5WB', N'Máy giặt Electrolux Inverter 9 kg', N'Electrolux', 8290000, 25, N'Máy giặt Electrolux Inverter 9 kg chính hãng Electrolux, bảo hành 24 tháng.', N'/images/sanpham/ewf9024p5wb.jpg', 24, 6, 0),
-                         (17, N'FTKB25WAVMV', N'Điều hòa Daikin Inverter 1 HP', N'Daikin', 10490000, 5, N'Điều hòa Daikin Inverter 1 HP chính hãng Daikin, bảo hành 12 tháng.', N'/images/sanpham/ftkb25wavmv.jpg', 12, 7, 0),
-                         (18, N'CU-PU12AKH-8', N'Điều hòa Panasonic Inverter 1.5 HP', N'Panasonic', 12690000, 15, N'Điều hòa Panasonic Inverter 1.5 HP chính hãng Panasonic, bảo hành 12 tháng.', N'/images/sanpham/cu-pu12akh-8.jpg', 12, 7, 0),
-                         (19, N'KG10A3', N'Máy lọc nước Kangaroo RO 10 lõi', N'Kangaroo', 4990000, 3, N'Máy lọc nước Kangaroo RO 10 lõi chính hãng Kangaroo, bảo hành 12 tháng.', N'/images/sanpham/kg10a3.jpg', 12, 8, 0),
-                         (20, N'KAQ-U95', N'Máy lọc nước Karofi RO 9 lõi', N'Karofi', 6990000, 5, N'Máy lọc nước Karofi RO 9 lõi chính hãng Karofi, bảo hành 12 tháng.', N'/images/sanpham/kaq-u95.jpg', 12, 8, 0),
-                         (21, N'RC-18NMFVN', N'Nồi cơm điện Toshiba 1.8 lít', N'Toshiba', 1990000, 15, N'Nồi cơm điện Toshiba 1.8 lít chính hãng Toshiba, bảo hành 12 tháng.', N'/images/sanpham/rc-18nmfvn.jpg', 12, 9, 0),
-                         (22, N'CR-1020F', N'Nồi cơm điện Cuckoo 1.8 lít', N'Cuckoo', 2290000, 5, N'Nồi cơm điện Cuckoo 1.8 lít chính hãng Cuckoo, bảo hành 24 tháng.', N'/images/sanpham/cr-1020f.jpg', 24, 9, 0),
-                         (23, N'R-G225VN-BK', N'Lò vi sóng Sharp 20 lít', N'Sharp', 1690000, 12, N'Lò vi sóng Sharp 20 lít chính hãng Sharp, bảo hành 12 tháng.', N'/images/sanpham/r-g225vn-bk.jpg', 12, 10, 0),
-                         (24, N'EMG23D22B', N'Lò vi sóng Electrolux 23 lít', N'Electrolux', 2890000, 5, N'Lò vi sóng Electrolux 23 lít chính hãng Electrolux, bảo hành 24 tháng.', N'/images/sanpham/emg23d22b.jpg', 24, 10, 0),
-                         (25, N'BHR5988EU', N'Robot hút bụi Xiaomi S10', N'Xiaomi', 4990000, 15, N'Robot hút bụi Xiaomi S10 chính hãng Xiaomi, bảo hành 12 tháng.', N'/images/sanpham/bhr5988eu.jpg', 12, 11, 0),
-                         (26, N'SV10K', N'Máy hút bụi Dyson V8 Slim', N'Dyson', 9990000, 5, N'Máy hút bụi Dyson V8 Slim chính hãng Dyson, bảo hành 24 tháng.', N'/images/sanpham/sv10k.jpg', 24, 11, 0),
-                         (27, N'F-409KB', N'Quạt đứng Panasonic F-409K', N'Panasonic', 1590000, 30, N'Quạt đứng Panasonic F-409K chính hãng Panasonic, bảo hành 12 tháng.', N'/images/sanpham/f-409kb.jpg', 12, 12, 0),
-                         (28, N'F-LSA10-H', N'Quạt đứng Toshiba F-LSA10', N'Toshiba', 1890000, 3, N'Quạt đứng Toshiba F-LSA10 chính hãng Toshiba, bảo hành 12 tháng.', N'/images/sanpham/f-lsa10-h.jpg', 12, 12, 0),
-                         (29, N'MTJV3', N'Tai nghe AirPods Pro 2 USB-C', N'Apple', 5990000, 20, N'Tai nghe AirPods Pro 2 USB-C chính hãng Apple, bảo hành 12 tháng.', N'/images/sanpham/mtjv3.jpg', 12, 13, 0),
-                         (30, N'WH-1000XM5', N'Tai nghe Sony WH-1000XM5', N'Sony', 7490000, 40, N'Tai nghe Sony WH-1000XM5 chính hãng Sony, bảo hành 12 tháng.', N'/images/sanpham/wh-1000xm5.jpg', 12, 13, 0),
-                         (31, N'JBLCHARGE5', N'Loa Bluetooth JBL Charge 5', N'JBL', 3490000, 25, N'Loa Bluetooth JBL Charge 5 chính hãng JBL, bảo hành 12 tháng.', N'/images/sanpham/jblcharge5.jpg', 12, 14, 0),
-                         (32, N'EMBERTON-II', N'Loa Bluetooth Marshall Emberton II', N'Marshall', 4290000, 15, N'Loa Bluetooth Marshall Emberton II chính hãng Marshall, bảo hành 12 tháng.', N'/images/sanpham/emberton-ii.jpg', 12, 14, 0),
-                         (33, N'MR8W3', N'Apple Watch Series 9 GPS 41mm', N'Apple', 9490000, 8, N'Apple Watch Series 9 GPS 41mm chính hãng Apple, bảo hành 12 tháng.', N'/images/sanpham/mr8w3.jpg', 12, 15, 0),
-                         (34, N'SM-R930', N'Samsung Galaxy Watch6 40mm', N'Samsung', 5490000, 3, N'Samsung Galaxy Watch6 40mm chính hãng Samsung, bảo hành 12 tháng.', N'/images/sanpham/sm-r930.jpg', 12, 15, 0),
-                         (35, N'EOSR50-KIT', N'Máy ảnh Canon EOS R50 Kit 18-45mm', N'Canon', 18990000, 40, N'Máy ảnh Canon EOS R50 Kit 18-45mm chính hãng Canon, bảo hành 24 tháng.', N'/images/sanpham/eosr50-kit.jpg', 24, 16, 0),
-                         (36, N'ILCE-ZVE10L', N'Máy ảnh Sony ZV-E10 Kit 16-50mm', N'Sony', 16490000, 12, N'Máy ảnh Sony ZV-E10 Kit 16-50mm chính hãng Sony, bảo hành 24 tháng.', N'/images/sanpham/ilce-zve10l.jpg', 24, 16, 0),
-                         (37, N'27GN800-B', N'Màn hình LG UltraGear 27 inch 2K', N'LG', 6490000, 5, N'Màn hình LG UltraGear 27 inch 2K chính hãng LG, bảo hành 24 tháng.', N'/images/sanpham/27gn800-b.jpg', 24, 17, 0),
-                         (38, N'U2424H', N'Màn hình Dell UltraSharp 24 inch', N'Dell', 6990000, 8, N'Màn hình Dell UltraSharp 24 inch chính hãng Dell, bảo hành 36 tháng.', N'/images/sanpham/u2424h.jpg', 36, 17, 0),
-                         (39, N'LBP2900', N'Máy in laser Canon LBP2900', N'Canon', 3290000, 15, N'Máy in laser Canon LBP2900 chính hãng Canon, bảo hành 12 tháng.', N'/images/sanpham/lbp2900.jpg', 12, 18, 0),
-                         (40, N'9YF83A', N'Máy in laser HP M211dw', N'HP', 4590000, 3, N'Máy in laser HP M211dw chính hãng HP, bảo hành 12 tháng.', N'/images/sanpham/9yf83a.jpg', 12, 18, 0),
-                         (41, N'920-011558', N'Bàn phím Logitech MX Keys S', N'Logitech', 2990000, 8, N'Bàn phím Logitech MX Keys S chính hãng Logitech, bảo hành 12 tháng.', N'/images/sanpham/920-011558.jpg', 12, 19, 0),
-                         (42, N'910-006561', N'Chuột Logitech MX Master 3S', N'Logitech', 2490000, 12, N'Chuột Logitech MX Master 3S chính hãng Logitech, bảo hành 12 tháng.', N'/images/sanpham/910-006561.jpg', 12, 19, 0),
-                         (43, N'A1263', N'Pin sạc dự phòng Anker 10000mAh', N'Anker', 590000, 15, N'Pin sạc dự phòng Anker 10000mAh chính hãng Anker, bảo hành 18 tháng.', N'/images/sanpham/a1263.jpg', 18, 20, 0),
-                         (44, N'EP-TA800N', N'Củ sạc nhanh Samsung 25W', N'Samsung', 390000, 15, N'Củ sạc nhanh Samsung 25W chính hãng Samsung, bảo hành 12 tháng.', N'/images/sanpham/ep-ta800n.jpg', 12, 20, 0);
+VALUES                   (1, N'SM-S928B', N'Samsung Galaxy S24 Ultra 256GB', N'Samsung', 29990000, 8, N'Samsung Galaxy S24 Ultra 256GB chính hãng Samsung, bảo hành 12 tháng.', N'/images/sanpham/dien-thoai/dien-thoai-samsung-galaxy-s24-ultra.png', 12, 1, 0),
+                         (2, N'MU793VN-A', N'iPhone 15 Pro Max 256GB', N'Apple', 30990000, 15, N'iPhone 15 Pro Max 256GB chính hãng Apple, bảo hành 12 tháng.', N'/images/sanpham/dien-thoai/dien-thoai-iphone-15-pro-max.png', 12, 1, 0),
+                         (3, N'23129RAA4G', N'Xiaomi Redmi Note 13 8GB/128GB', N'Xiaomi', 4890000, 8, N'Xiaomi Redmi Note 13 8GB/128GB chính hãng Xiaomi, bảo hành 18 tháng.', N'/images/sanpham/dien-thoai/dien-thoai-xiaomi-redmi-note-13.png', 18, 1, 0),
+                         (4, N'MUWD3ZA-A', N'iPad Air M2 11 inch WiFi 128GB', N'Apple', 16990000, 25, N'iPad Air M2 11 inch WiFi 128GB chính hãng Apple, bảo hành 12 tháng.', N'/images/sanpham/dien-thoai/may-tinh-bang-ipad-air-m2-11.png', 12, 2, 0),
+                         (5, N'SM-X510', N'Samsung Galaxy Tab S9 FE WiFi', N'Samsung', 9490000, 15, N'Samsung Galaxy Tab S9 FE WiFi chính hãng Samsung, bảo hành 12 tháng.', N'/images/sanpham/dien-thoai/may-tinh-bang-samsung-tab-s9-fe.png', 12, 2, 0),
+                         (6, N'MRXN3SA-A', N'MacBook Air M3 13 inch 8GB/256GB', N'Apple', 27990000, 25, N'MacBook Air M3 13 inch 8GB/256GB chính hãng Apple, bảo hành 12 tháng.', N'/images/sanpham/laptop/laptop-macbook-air-m3-13.png', 12, 3, 0),
+                         (7, N'INS3530-I5', N'Dell Inspiron 15 3530 i5', N'Dell', 16490000, 8, N'Dell Inspiron 15 3530 i5 chính hãng Dell, bảo hành 12 tháng.', N'/images/sanpham/laptop/laptop-dell-inspiron-15-3530.png', 12, 3, 0),
+                         (8, N'A1505VA-L1114W', N'ASUS Vivobook 15 OLED i5', N'ASUS', 17990000, 40, N'ASUS Vivobook 15 OLED i5 chính hãng ASUS, bảo hành 24 tháng.', N'/images/sanpham/laptop/laptop-asus-vivobook-15.png', 24, 3, 0),
+                         (9, N'UA55AU7700', N'Smart Tivi Samsung 4K 55 inch', N'Samsung', 10990000, 40, N'Smart Tivi Samsung 4K 55 inch chính hãng Samsung, bảo hành 24 tháng.', N'/images/sanpham/tivi/tivi-samsung-ua55.png', 24, 4, 0),
+                         (10, N'OLED55C4PSA', N'Smart Tivi LG OLED evo 55 inch', N'LG', 32990000, 30, N'Smart Tivi LG OLED evo 55 inch chính hãng LG, bảo hành 24 tháng.', N'/images/sanpham/tivi/tivi-lg-oled-evo-55.png', 24, 4, 0),
+                         (11, N'K-50S30', N'Google Tivi Sony 4K 50 inch', N'Sony', 13490000, 20, N'Google Tivi Sony 4K 50 inch chính hãng Sony, bảo hành 24 tháng.', N'/images/sanpham/tivi/tivi-sony-4k-50.png', 24, 4, 0),
+                         (12, N'NR-BC360QKVN', N'Tủ lạnh Panasonic Inverter 322 lít', N'Panasonic', 13990000, 5, N'Tủ lạnh Panasonic Inverter 322 lít chính hãng Panasonic, bảo hành 24 tháng.', N'/images/sanpham/tu-lanh/tu-lanh-panasonic-nr-bc360qkvn.png', 24, 5, 0),
+                         (13, N'RT22M4032BY', N'Tủ lạnh Samsung Inverter 236 lít', N'Samsung', 6290000, 15, N'Tủ lạnh Samsung Inverter 236 lít chính hãng Samsung, bảo hành 24 tháng.', N'/images/sanpham/tu-lanh/tu-lanh-samsung-inverter-236-lit.png', 24, 5, 0),
+                         (14, N'GN-D332BL', N'Tủ lạnh LG Inverter 335 lít', N'LG', 9990000, 3, N'Tủ lạnh LG Inverter 335 lít chính hãng LG, bảo hành 24 tháng.', N'/images/sanpham/tu-lanh/tu-lanh-lg-inverter-335-lit.png', 24, 5, 0),
+                         (15, N'FV1410S4P', N'Máy giặt LG Inverter 10 kg', N'LG', 9490000, 8, N'Máy giặt LG Inverter 10 kg chính hãng LG, bảo hành 24 tháng.', N'/images/sanpham/may-giat/may-giat-lg-fv1410s4p.png', 24, 6, 0),
+                         (16, N'EWF9024P5WB', N'Máy giặt Electrolux Inverter 9 kg', N'Electrolux', 8290000, 25, N'Máy giặt Electrolux Inverter 9 kg chính hãng Electrolux, bảo hành 24 tháng.', N'/images/sanpham/may-giat/may-giat-electrolux-inverter-9kg.png', 24, 6, 0),
+                         (17, N'FTKB25WAVMV', N'Điều hòa Daikin Inverter 1 HP', N'Daikin', 10490000, 5, N'Điều hòa Daikin Inverter 1 HP chính hãng Daikin, bảo hành 12 tháng.', N'/images/sanpham/dieu-hoa/dieu-hoa-daikin-ftkb25wavmv.png', 12, 7, 0),
+                         (18, N'CU-PU12AKH-8', N'Điều hòa Panasonic Inverter 1.5 HP', N'Panasonic', 12690000, 15, N'Điều hòa Panasonic Inverter 1.5 HP chính hãng Panasonic, bảo hành 12 tháng.', N'/images/sanpham/dieu-hoa/dieu-hoa-panasonic-inverter-1-5hp.png', 12, 7, 0),
+                         (19, N'KG10A3', N'Máy lọc nước Kangaroo RO 10 lõi', N'Kangaroo', 4990000, 3, N'Máy lọc nước Kangaroo RO 10 lõi chính hãng Kangaroo, bảo hành 12 tháng.', N'/images/sanpham/gia-dung/may-loc-nuoc-kangaroo-ro-10-loi.png', 12, 8, 0),
+                         (20, N'KAQ-U95', N'Máy lọc nước Karofi RO 9 lõi', N'Karofi', 6990000, 5, N'Máy lọc nước Karofi RO 9 lõi chính hãng Karofi, bảo hành 12 tháng.', N'/images/sanpham/gia-dung/may-loc-nuoc-karofi-ro-9-loi.png', 12, 8, 0),
+                         (21, N'RC-18NMFVN', N'Nồi cơm điện Toshiba 1.8 lít', N'Toshiba', 1990000, 15, N'Nồi cơm điện Toshiba 1.8 lít chính hãng Toshiba, bảo hành 12 tháng.', N'/images/sanpham/gia-dung/noi-com-dien-toshiba-1-8-lit.png', 12, 9, 0),
+                         (22, N'CR-1020F', N'Nồi cơm điện Cuckoo 1.8 lít', N'Cuckoo', 2290000, 5, N'Nồi cơm điện Cuckoo 1.8 lít chính hãng Cuckoo, bảo hành 24 tháng.', N'/images/sanpham/gia-dung/noi-com-dien-cuckoo-1-8-lit.png', 24, 9, 0),
+                         (23, N'R-G225VN-BK', N'Lò vi sóng Sharp 20 lít', N'Sharp', 1690000, 12, N'Lò vi sóng Sharp 20 lít chính hãng Sharp, bảo hành 12 tháng.', N'/images/sanpham/gia-dung/lo-vi-song-sharp-20-lit.png', 12, 10, 0),
+                         (24, N'EMG23D22B', N'Lò vi sóng Electrolux 23 lít', N'Electrolux', 2890000, 5, N'Lò vi sóng Electrolux 23 lít chính hãng Electrolux, bảo hành 24 tháng.', N'/images/sanpham/gia-dung/lo-vi-song-electrolux-23-lit.png', 24, 10, 0),
+                         (25, N'BHR5988EU', N'Robot hút bụi Xiaomi S10', N'Xiaomi', 4990000, 15, N'Robot hút bụi Xiaomi S10 chính hãng Xiaomi, bảo hành 12 tháng.', N'/images/sanpham/gia-dung/robot-hut-bui-xiaomi-s10.png', 12, 11, 0),
+                         (26, N'SV10K', N'Máy hút bụi Dyson V8 Slim', N'Dyson', 9990000, 5, N'Máy hút bụi Dyson V8 Slim chính hãng Dyson, bảo hành 24 tháng.', N'/images/sanpham/gia-dung/may-hut-bui-dyson-v8-slim.png', 24, 11, 0),
+                         (27, N'F-409KB', N'Quạt đứng Panasonic F-409K', N'Panasonic', 1590000, 30, N'Quạt đứng Panasonic F-409K chính hãng Panasonic, bảo hành 12 tháng.', N'/images/sanpham/gia-dung/quat-dung-panasonic-f-409k.png', 12, 12, 0),
+                         (28, N'F-LSA10-H', N'Quạt đứng Toshiba F-LSA10', N'Toshiba', 1890000, 3, N'Quạt đứng Toshiba F-LSA10 chính hãng Toshiba, bảo hành 12 tháng.', N'/images/sanpham/gia-dung/quat-dung-toshiba-f-lsa10.png', 12, 12, 0),
+                         (29, N'MTJV3', N'Tai nghe AirPods Pro 2 USB-C', N'Apple', 5990000, 20, N'Tai nghe AirPods Pro 2 USB-C chính hãng Apple, bảo hành 12 tháng.', N'/images/sanpham/loa/tai-nghe-airpods-pro-2-usbc.png', 12, 13, 0),
+                         (30, N'WH-1000XM5', N'Tai nghe Sony WH-1000XM5', N'Sony', 7490000, 40, N'Tai nghe Sony WH-1000XM5 chính hãng Sony, bảo hành 12 tháng.', N'/images/sanpham/loa/tai-nghe-sony-wh-1000xm5.png', 12, 13, 0),
+                         (31, N'JBLCHARGE5', N'Loa Bluetooth JBL Charge 5', N'JBL', 3490000, 25, N'Loa Bluetooth JBL Charge 5 chính hãng JBL, bảo hành 12 tháng.', N'/images/sanpham/loa/loa-jbl-charge-5.png', 12, 14, 0),
+                         (32, N'EMBERTON-II', N'Loa Bluetooth Marshall Emberton II', N'Marshall', 4290000, 15, N'Loa Bluetooth Marshall Emberton II chính hãng Marshall, bảo hành 12 tháng.', N'/images/sanpham/loa/loa-marshall-emberton-ii.png', 12, 14, 0),
+                         (33, N'MR8W3', N'Apple Watch Series 9 GPS 41mm', N'Apple', 9490000, 8, N'Apple Watch Series 9 GPS 41mm chính hãng Apple, bảo hành 12 tháng.', N'/images/sanpham/phu-kien/dong-ho-apple-watch-series-9-41mm.png', 12, 15, 0),
+                         (34, N'SM-R930', N'Samsung Galaxy Watch6 40mm', N'Samsung', 5490000, 3, N'Samsung Galaxy Watch6 40mm chính hãng Samsung, bảo hành 12 tháng.', N'/images/sanpham/phu-kien/dong-ho-samsung-galaxy-watch6-40mm.png', 12, 15, 0),
+                         (35, N'EOSR50-KIT', N'Máy ảnh Canon EOS R50 Kit 18-45mm', N'Canon', 18990000, 40, N'Máy ảnh Canon EOS R50 Kit 18-45mm chính hãng Canon, bảo hành 24 tháng.', N'/images/sanpham/phu-kien/may-anh-canon-eos-r50-kit.png', 24, 16, 0),
+                         (36, N'ILCE-ZVE10L', N'Máy ảnh Sony ZV-E10 Kit 16-50mm', N'Sony', 16490000, 12, N'Máy ảnh Sony ZV-E10 Kit 16-50mm chính hãng Sony, bảo hành 24 tháng.', N'/images/sanpham/phu-kien/may-anh-sony-zv-e10-kit.png', 24, 16, 0),
+                         (37, N'27GN800-B', N'Màn hình LG UltraGear 27 inch 2K', N'LG', 6490000, 5, N'Màn hình LG UltraGear 27 inch 2K chính hãng LG, bảo hành 24 tháng.', N'/images/sanpham/phu-kien/man-hinh-lg-ultragear-27.png', 24, 17, 0),
+                         (38, N'U2424H', N'Màn hình Dell UltraSharp 24 inch', N'Dell', 6990000, 8, N'Màn hình Dell UltraSharp 24 inch chính hãng Dell, bảo hành 36 tháng.', N'/images/sanpham/phu-kien/man-hinh-dell-ultrasharp-24.png', 36, 17, 0),
+                         (39, N'LBP2900', N'Máy in laser Canon LBP2900', N'Canon', 3290000, 15, N'Máy in laser Canon LBP2900 chính hãng Canon, bảo hành 12 tháng.', N'/images/sanpham/phu-kien/may-in-canon-lbp2900.png', 12, 18, 0),
+                         (40, N'9YF83A', N'Máy in laser HP M211dw', N'HP', 4590000, 3, N'Máy in laser HP M211dw chính hãng HP, bảo hành 12 tháng.', N'/images/sanpham/phu-kien/may-in-hp-m211dw.png', 12, 18, 0),
+                         (41, N'920-011558', N'Bàn phím Logitech MX Keys S', N'Logitech', 2990000, 8, N'Bàn phím Logitech MX Keys S chính hãng Logitech, bảo hành 12 tháng.', N'/images/sanpham/phu-kien/ban-phim-logitech-mx-keys-s.png', 12, 19, 0),
+                         (42, N'910-006561', N'Chuột Logitech MX Master 3S', N'Logitech', 2490000, 12, N'Chuột Logitech MX Master 3S chính hãng Logitech, bảo hành 12 tháng.', N'/images/sanpham/phu-kien/chuot-logitech-mx-master-3s.png', 12, 19, 0),
+                         (43, N'A1263', N'Pin sạc dự phòng Anker 10000mAh', N'Anker', 590000, 15, N'Pin sạc dự phòng Anker 10000mAh chính hãng Anker, bảo hành 18 tháng.', N'/images/sanpham/phu-kien/pin-sac-du-phong-anker-10000mah.png', 18, 20, 0),
+                         (44, N'EP-TA800N', N'Củ sạc nhanh Samsung 25W', N'Samsung', 390000, 15, N'Củ sạc nhanh Samsung 25W chính hãng Samsung, bảo hành 12 tháng.', N'/images/sanpham/phu-kien/cu-sac-nhanh-samsung-25w.png', 12, 20, 0);
 
 SET IDENTITY_INSERT dbo.SanPham OFF;
 
@@ -1659,6 +1675,10 @@ UNION ALL
 SELECT N'VaiTro_Quyen' AS Bang,
        COUNT(*) AS SoBanGhi
 FROM   dbo.VaiTro_Quyen
+UNION ALL
+SELECT N'TaiKhoan_Quyen' AS Bang,
+       COUNT(*) AS SoBanGhi
+FROM   dbo.TaiKhoan_Quyen
 UNION ALL
 SELECT N'DanhMuc' AS Bang,
        COUNT(*) AS SoBanGhi

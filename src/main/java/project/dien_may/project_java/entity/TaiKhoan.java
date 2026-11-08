@@ -44,6 +44,16 @@ public class TaiKhoan {
     public TaiKhoan() {
     }
 
+    /** Chữ cái đầu của hai từ cuối trong họ tên, hiển thị thay ảnh đại diện. */
+    public String getChuVietTat() {
+        String[] tu = hoTen.trim().split("\\s+");
+        String ketQua = tu[tu.length - 1].substring(0, 1);
+        if (tu.length > 1) {
+            ketQua = tu[tu.length - 2].substring(0, 1) + ketQua;
+        }
+        return ketQua.toUpperCase();
+    }
+
     public Integer getMaTaiKhoan() {
         return maTaiKhoan;
     }

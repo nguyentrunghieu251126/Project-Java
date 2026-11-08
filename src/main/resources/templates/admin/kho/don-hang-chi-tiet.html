@@ -42,8 +42,17 @@
                 <thead><tr><th>Sản phẩm</th><th class="so">Đơn giá</th><th class="so">Số lượng</th><th class="so">Thành tiền</th></tr></thead>
                 <tbody>
                 <tr th:each="c : ${dsChiTiet}">
-                    <td><span class="ten-chinh" th:text="${c.sanPham.tenSanPham}"></span>
-                        <span class="ten-phu" th:text="${c.sanPham.maModel}"></span></td>
+                    <td>
+                        <div class="sp-dong">
+                            <!-- Ảnh lỗi hoặc chưa có thì giữ icon thay thế -->
+                            <div class="anh-nho"><i class="bi bi-image" aria-hidden="true"></i>
+                                <img th:if="${c.sanPham.hinhAnh}" th:src="@{${c.sanPham.hinhAnh}}" alt="" hidden
+                                     onload="this.hidden = false; this.previousElementSibling.remove()" onerror="this.remove()">
+                            </div>
+                            <div><span class="ten-chinh" th:text="${c.sanPham.tenSanPham}"></span>
+                                <span class="ten-phu" th:text="${c.sanPham.maModel}"></span></div>
+                        </div>
+                    </td>
                     <td class="so" th:text="|${#numbers.formatInteger(c.donGia, 1, 'POINT')} ₫|"></td>
                     <td class="so" th:text="${c.soLuong}"></td>
                     <td class="so" th:text="|${#numbers.formatInteger(c.thanhTien, 1, 'POINT')} ₫|"></td>
