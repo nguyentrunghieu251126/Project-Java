@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.dien_may.project_java.entity.TaiKhoan;
 import project.dien_may.project_java.entity.VaiTro;
 import project.dien_may.project_java.repository.TaiKhoanRepository;
+import project.dien_may.project_java.service.admin.PhanQuyenService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +21,12 @@ import java.util.List;
 public class TaiKhoanUserDetailsService implements UserDetailsService {
 
     private final TaiKhoanRepository taiKhoanRepository;
+    private final PhanQuyenService phanQuyenService;
 
     public TaiKhoanUserDetailsService(
-            TaiKhoanRepository taiKhoanRepository) {
+            TaiKhoanRepository taiKhoanRepository, PhanQuyenService phanQuyenService) {
         this.taiKhoanRepository = taiKhoanRepository;
+        this.phanQuyenService = phanQuyenService;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class TaiKhoanUserDetailsService implements UserDetailsService {
         // Vai trò dùng cho hasRole, mã chức năng trong bảng Quyen dùng cho hasAuthority
         List<SimpleGrantedAuthority> quyen = new ArrayList<>();
         quyen.add(new SimpleGrantedAuthority("ROLE_" + vaiTro.getTenVaiTro()));
-        vaiTro.getDsQuyen().forEach(q -> quyen.add(new SimpleGrantedAuthority(q.getMaChucNang())));
+        phanQuyenService.quyenHieuLuc(taiKhoan).forEach(ma -> quyen.add(new SimpleGrantedAuthority(ma)));
 
         return User.builder().username(taiKhoan.getEmail()).password(taiKhoan.getMatKhau()).authorities(quyen).disabled(!taiKhoan.isTrangThai()).build();
     }

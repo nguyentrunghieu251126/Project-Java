@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{admin/layout :: layout('Báo cáo tồn kho', 'bc-ton-kho', ~{::main})}">
 <body>
 <main>
@@ -20,7 +20,8 @@
             <span class="chu-thich">Tồn thấp hơn mức tối thiểu của từng sản phẩm</span></div>
         <div class="table-responsive" th:if="${!baoCao.dsCanNhap.isEmpty()}">
             <table class="table bang">
-                <thead><tr><th>Sản phẩm</th><th>Danh mục</th><th class="so">Tồn</th><th class="so">Mức tối thiểu</th><th>Tình trạng</th></tr></thead>
+                <thead><tr><th>Sản phẩm</th><th>Danh mục</th><th class="so">Tồn</th><th class="so">Mức tối thiểu</th><th>Tình trạng</th>
+                    <th class="cot-nhap" sec:authorize="hasAuthority('KHO_YEUCAU_NHAP')">Nhập hàng</th></tr></thead>
                 <tbody>
                 <tr th:each="s : ${baoCao.dsCanNhap}">
                     <td><span class="ten-chinh" th:text="${s.tenSanPham}"></span>
@@ -29,6 +30,27 @@
                     <td class="so" th:text="${s.soLuong}"></td>
                     <td class="so" th:text="${s.mucTonToiThieu}"></td>
                     <td><span th:replace="~{admin/fragments :: nhan(${s.tinhTrangTonKho})}"></span></td>
+                    <!-- Số lượng gợi ý: phần còn thiếu để đạt mức tối thiểu. Quản trị viên nhập thẳng vào kho,
+                         nhân viên kho thì lập phiếu chờ duyệt -->
+                    <td class="cot-nhap" sec:authorize="hasAuthority('KHO_YEUCAU_NHAP')">
+                        <a th:if="${dangChoDuyet.contains(s.maSanPham)}" class="nhan nhan-cho text-decoration-none"
+                           th:href="@{/admin/kho/yeu-cau-nhap(trangThai='CHO_DUYET')}">
+                            <i class="bi bi-hourglass-split" aria-hidden="true"></i> Đang chờ duyệt
+                        </a>
+                        <form th:unless="${dangChoDuyet.contains(s.maSanPham)}" class="o-nhap-hang input-group" method="post"
+                              th:action="@{/admin/kho/ton-kho/{ma}/yeu-cau-nhap(ma=${s.maSanPham})}"
+                              th:attr="data-xac-nhan=${#authorization.expression('hasRole(''QUAN_TRI'')')}
+                                  ? |Nhập hàng ${s.tenSanPham} vào kho ngay, không qua duyệt?| : null">
+                            <input type="hidden" name="quayVe" value="bao-cao">
+                            <input class="form-control" type="number" name="soLuong"
+                                   min="1" required th:value="${s.mucTonToiThieu - s.soLuong}"
+                                   th:aria-label="|Số lượng nhập của ${s.tenSanPham}|">
+                            <button class="btn btn-chinh text-nowrap" type="submit">
+                                <i class="bi bi-box-arrow-in-down" aria-hidden="true"></i>
+                                <span th:text="${#authorization.expression('hasRole(''QUAN_TRI'')')} ? 'Nhập hàng' : 'Lập phiếu'">Nhập hàng</span>
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -39,16 +61,24 @@
     <section class="the">
         <div class="the-tieu-de"><h2>Tồn kho theo danh mục</h2></div>
         <div class="table-responsive">
-            <table class="table bang">
-                <thead><tr><th>Danh mục</th><th class="so">Số sản phẩm</th><th class="so">Số lượng tồn</th>
-                    <th class="so">Cần nhập</th><th class="so">Giá trị tồn</th></tr></thead>
+            <table class="table bang bang-danh-muc">
+                <colgroup><col class="c-ten"><col><col><col><col></colgroup>
+                <thead><tr><th>Danh mục</th><th class="giua">Số sản phẩm</th><th class="giua">Số lượng tồn</th>
+                    <th class="giua">Giá trị tồn</th><th class="giua">Tình trạng</th></tr></thead>
                 <tbody>
                 <tr th:each="d : ${baoCao.theoDanhMuc}">
                     <td th:text="${d.tenDanhMuc}"></td>
-                    <td class="so" th:text="${d.soSanPham}"></td>
-                    <td class="so" th:text="${#numbers.formatInteger(d.soLuong, 1, 'POINT')}"></td>
-                    <td class="so" th:text="${d.soCanNhap}"></td>
-                    <td class="so" th:text="|${#numbers.formatInteger(d.giaTri, 1, 'POINT')} ₫|"></td>
+                    <td class="giua so-lieu" th:text="${d.soSanPham}"></td>
+                    <td class="giua so-lieu" th:text="${#numbers.formatInteger(d.soLuong, 1, 'POINT')}"></td>
+                    <td class="giua so-lieu" th:text="|${#numbers.formatInteger(d.giaTri, 1, 'POINT')} ₫|"></td>
+                    <!-- Còn hàng khi mọi sản phẩm của danh mục đều đạt mức tối thiểu -->
+                    <td class="giua">
+                        <span th:if="${d.soCanNhap == 0}" class="nhan nhan-tot">
+                            <i class="bi bi-check2-circle" aria-hidden="true"></i> Còn hàng</span>
+                        <span th:unless="${d.soCanNhap == 0}" class="nhan nhan-cho">
+                            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                            <span th:text="|${d.soCanNhap} sản phẩm cần nhập|"></span></span>
+                    </td>
                 </tr>
                 </tbody>
             </table>

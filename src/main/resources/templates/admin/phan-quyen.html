@@ -1,37 +1,15 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{admin/layout :: layout('Phân quyền theo chức năng', 'phan-quyen', ~{::main})}">
+      th:replace="~{admin/layout :: layout('Phân quyền', 'phan-quyen', ~{::main})}">
 <body>
 <main>
+    <ul th:replace="~{admin/fragments :: tab-phan-quyen('toan-the')}"></ul>
     <form class="the" method="post" th:action="@{/admin/phan-quyen}">
-        <p class="chu-thich">Tick để cấp chức năng cho vai trò. Thay đổi áp dụng ngay cho cả người đang đăng nhập:
-            menu tự ẩn và URL của chức năng bị thu hồi sẽ bị chặn.</p>
-        <table class="table bang bang-quyen">
-            <thead>
-            <tr>
-                <th>Chức năng</th>
-                <th class="o-chon" th:each="v : ${dsVaiTro}" th:text="${v.tenHienThi}"></th>
-            </tr>
-            </thead>
-            <tbody th:each="nhom : ${quyenTheoNhom}">
-            <tr class="nhom"><td th:colspan="${dsVaiTro.size() + 1}" th:text="${nhom.key}"></td></tr>
-            <tr th:each="q : ${nhom.value}">
-                <td><span th:text="${q.tenQuyen}"></span>
-                    <span class="ten-phu" th:text="${q.maChucNang}"></span></td>
-                <td class="o-chon" th:each="v : ${dsVaiTro}"
-                    th:with="khoa=${v.tenVaiTro == vaiTroQuanTri and q.maChucNang == quyenKhongTheGo}">
-                    <input class="form-check-input" type="checkbox" name="cap"
-                           th:value="|${v.maVaiTro}:${q.maQuyen}|"
-                           th:checked="${khoa or daCap[v.maVaiTro].contains(q.maQuyen)}"
-                           th:disabled="${khoa}"
-                           th:title="${khoa} ? 'Quản trị viên luôn giữ quyền này' : ''"
-                           th:aria-label="|${q.tenQuyen} cho ${v.tenHienThi}|">
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <p class="chu-thich">Quyền chung cho mọi nhân viên. Thay đổi áp dụng ngay cho cả người đang đăng nhập, trừ những
+            quyền đã chỉnh riêng ở tab Từng nhân viên. Quản trị viên mặc nhiên có tất cả các quyền.</p>
+        <table th:replace="~{admin/fragments :: bang-chon-quyen(${quyenTheoNhom}, ${daChon}, ${chinhRieng})}"></table>
         <div class="thanh-luu">
-            <span class="chu-thich">Ô bị khóa: quản trị viên luôn giữ quyền phân quyền để không tự khóa mình khỏi hệ thống.</span>
+            <span></span>
             <button class="btn btn-chinh" type="submit">Lưu phân quyền</button>
         </div>
     </form>

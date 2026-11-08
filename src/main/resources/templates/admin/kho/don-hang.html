@@ -26,16 +26,23 @@
         </form>
 
         <div class="table-responsive" th:if="${trang.hasContent()}">
-            <table class="table table-hover bang">
-                <thead><tr><th>Mã đơn</th><th>Ngày đặt</th><th>Người nhận</th><th class="so">Tổng tiền</th><th>Trạng thái</th></tr></thead>
+            <table class="table table-hover bang bang-don-hang">
+                <colgroup><col class="c-ma"><col class="c-ngay"><col class="c-nguoi-nhan"><col class="c-tong-tien">
+                    <col class="c-trang-thai"><col class="c-xem"></colgroup>
+                <thead><tr><th>Mã đơn</th><th>Ngày đặt</th><th>Người nhận</th><th class="giua">Tổng tiền</th>
+                    <th class="giua">Trạng thái</th><th></th></tr></thead>
                 <tbody>
                 <tr th:each="d : ${trang.content}">
-                    <td><a th:href="@{/admin/kho/don-hang/{ma}(ma=${d.maDonHang})}" th:text="|#${d.maDonHang}|"></a></td>
-                    <td th:text="${#temporals.format(d.ngayDat, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td><a class="ma-don" th:href="@{/admin/kho/don-hang/{ma}(ma=${d.maDonHang})}" th:text="|#${d.maDonHang}|"></a></td>
+                    <td class="so-lieu"><span th:text="${#temporals.format(d.ngayDat, 'dd/MM/yyyy')}"></span>
+                        <span class="ten-phu" th:text="${#temporals.format(d.ngayDat, 'HH:mm')}"></span></td>
                     <td><span class="ten-chinh" th:text="${d.hoTenNguoiNhan}"></span>
                         <span class="ten-phu" th:text="${d.soDienThoaiNguoiNhan}"></span></td>
-                    <td class="so" th:text="|${#numbers.formatInteger(d.tongTien, 1, 'POINT')} ₫|"></td>
-                    <td><span th:replace="~{admin/fragments :: nhan(${d.trangThai})}"></span></td>
+                    <td class="giua so-lieu ten-chinh" th:text="|${#numbers.formatInteger(d.tongTien, 1, 'POINT')} ₫|"></td>
+                    <td class="giua"><span th:replace="~{admin/fragments :: nhan(${d.trangThai})}"></span></td>
+                    <td class="giua"><a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/kho/don-hang/{ma}(ma=${d.maDonHang})}"
+                                        th:aria-label="|Xem đơn hàng #${d.maDonHang}|" title="Xem chi tiết">
+                        <i class="bi bi-chevron-right" aria-hidden="true"></i></a></td>
                 </tr>
                 </tbody>
             </table>

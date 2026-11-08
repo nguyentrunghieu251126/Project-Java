@@ -12,7 +12,7 @@ import project.dien_may.project_java.repository.TaiKhoanRepository;
 
 import java.security.Principal;
 
-/** Phần dùng chung cho mọi trang quản trị. */
+/** Phần dùng chung cho mọi trang khu quản lý. */
 @ControllerAdvice(basePackageClasses = AdminControllerAdvice.class)
 public class AdminControllerAdvice {
 
@@ -32,6 +32,12 @@ public class AdminControllerAdvice {
     public String hoTenNguoiDung(Principal principal) {
         return principal == null ? "" : taiKhoanRepository.findByEmailIgnoreCase(principal.getName())
                 .map(TaiKhoan::getHoTen).orElse(principal.getName());
+    }
+
+    @ModelAttribute("tenVaiTro")
+    public String tenVaiTro(Principal principal) {
+        return principal == null ? "" : taiKhoanRepository.findByEmailIgnoreCase(principal.getName())
+                .map(taiKhoan -> taiKhoan.getVaiTro().getTenHienThi()).orElse("");
     }
 
     /** URL trang hiện tại giữ nguyên bộ lọc, chỉ cần nối thêm số trang vào cuối. */

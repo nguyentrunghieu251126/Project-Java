@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      th:replace="~{admin/layout :: layout('Tổng quan', 'tong-quan', ~{::main})}">
+      th:replace="~{admin/layout :: layout(${tieuDeTrang}, 'tong-quan', ~{::main})}">
 <body>
 <main class="trang-day">
-    <div class="luoi-so-lieu" sec:authorize="hasAuthority('BAOCAO_DOANHTHU')">
+    <section class="the" sec:authorize="!hasAuthority('TONGQUAN_XEM')">
+        <h2 th:text="|Xin chào, ${hoTenNguoiDung}.|"></h2>
+        <p class="mb-0">Chọn chức năng ở menu bên trái.</p>
+    </section>
+
+    <div class="luoi-so-lieu" sec:authorize="hasAuthority('TONGQUAN_XEM')"
+         th:classappend="${#authorization.expression('hasAuthority(''BAOCAO_DOANHTHU'')')} ? '' : 'khong-bam'">
         <a th:href="@{/admin/bao-cao/doanh-thu}" class="o-so-lieu">
             <div class="nhan-so"><i class="bi bi-cash-stack" aria-hidden="true"></i> Doanh thu cả năm</div>
             <div class="gia-tri" th:text="|${#numbers.formatInteger(tomTat.caNam, 1, 'POINT')} ₫|"></div>
@@ -26,10 +32,10 @@
         </a>
     </div>
 
-    <section class="the the-bieu-do" sec:authorize="hasAuthority('BAOCAO_DOANHTHU')">
+    <section class="the the-bieu-do" sec:authorize="hasAuthority('TONGQUAN_XEM')">
         <div class="the-tieu-de">
             <h2 th:text="|Doanh thu năm ${bieuDo.nam}|"></h2>
-            <a th:href="@{/admin/bao-cao/doanh-thu}">Xem báo cáo</a>
+            <a sec:authorize="hasAuthority('BAOCAO_DOANHTHU')" th:href="@{/admin/bao-cao/doanh-thu}">Xem báo cáo</a>
         </div>
         <div th:replace="~{admin/fragments :: bieu-do-duong(${bieuDo})}"></div>
     </section>

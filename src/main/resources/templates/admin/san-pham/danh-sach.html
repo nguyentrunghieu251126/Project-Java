@@ -39,9 +39,11 @@
         </form>
 
         <div class="table-responsive" th:if="${trang.hasContent()}">
-            <table class="table table-hover bang">
-                <thead><tr><th></th><th>Sản phẩm</th><th>Danh mục</th><th class="so">Đơn giá</th><th class="so">Tồn</th>
-                    <th>Tình trạng</th><th class="so">Thao tác</th></tr></thead>
+            <table class="table table-hover bang bang-san-pham">
+                <colgroup><col class="c-anh"><col class="c-ten"><col class="c-danh-muc"><col class="c-gia">
+                    <col class="c-ton"><col class="c-tinh-trang"><col class="c-thao-tac"></colgroup>
+                <thead><tr><th></th><th>Sản phẩm</th><th>Danh mục</th><th class="gia">Đơn giá</th><th class="giua">Tồn</th>
+                    <th class="giua">Tình trạng</th><th class="giua">Thao tác</th></tr></thead>
                 <tbody>
                 <tr th:each="s : ${trang.content}">
                     <td>
@@ -53,16 +55,16 @@
                     <td><span class="ten-chinh" th:text="${s.tenSanPham}"></span>
                         <span class="ten-phu" th:text="|${s.thuongHieu} · ${s.maModel}|"></span></td>
                     <td th:text="${s.danhMuc.tenDanhMuc}"></td>
-                    <td class="so" th:text="|${#numbers.formatInteger(s.donGia, 1, 'POINT')} ₫|"></td>
-                    <td class="so" th:text="${s.soLuong}"></td>
-                    <td>
+                    <td class="gia" th:text="|${#numbers.formatInteger(s.donGia, 1, 'POINT')} ₫|"></td>
+                    <td class="giua so-lieu" th:text="${s.soLuong}"></td>
+                    <td class="giua">
                         <th:block th:if="${s.dangKinhDoanh}">
                             <span th:replace="~{admin/fragments :: nhan(${s.tinhTrangTonKho})}"></span>
                         </th:block>
                         <span th:unless="${s.dangKinhDoanh}" class="nhan nhan-trung-tinh">
                             <i class="bi bi-slash-circle" aria-hidden="true"></i> Ngừng kinh doanh</span>
                     </td>
-                    <td>
+                    <td class="giua">
                         <div class="nhom-nut">
                             <a sec:authorize="hasAuthority('SANPHAM_SUA')" class="btn btn-sm btn-outline-secondary"
                                th:href="@{/admin/san-pham/{ma}/sua(ma=${s.maSanPham})}"

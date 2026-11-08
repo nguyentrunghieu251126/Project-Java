@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{admin/layout :: layout(${'Yêu cầu nhập hàng #' + yeuCau.maYeuCauNhap}, 'yeu-cau-nhap', ~{::main})}">
 <body>
 <main>
@@ -31,8 +31,17 @@
                     <th class="so">Yêu cầu nhập</th><th>Tình trạng</th></tr></thead>
                 <tbody>
                 <tr th:each="c : ${yeuCau.chiTiet}">
-                    <td><span class="ten-chinh" th:text="${c.sanPham.tenSanPham}"></span>
-                        <span class="ten-phu" th:text="${c.sanPham.maModel}"></span></td>
+                    <td>
+                        <div class="sp-dong">
+                            <!-- Ảnh lỗi hoặc chưa có thì giữ icon thay thế -->
+                            <div class="anh-nho"><i class="bi bi-image" aria-hidden="true"></i>
+                                <img th:if="${c.sanPham.hinhAnh}" th:src="@{${c.sanPham.hinhAnh}}" alt="" hidden
+                                     onload="this.hidden = false; this.previousElementSibling.remove()" onerror="this.remove()">
+                            </div>
+                            <div><span class="ten-chinh" th:text="${c.sanPham.tenSanPham}"></span>
+                                <span class="ten-phu" th:text="${c.sanPham.maModel}"></span></div>
+                        </div>
+                    </td>
                     <td class="so" th:text="${c.sanPham.soLuong}"></td>
                     <td class="so" th:text="${c.sanPham.mucTonToiThieu}"></td>
                     <td class="so" th:text="${c.soLuongYeuCau}"></td>
@@ -44,7 +53,8 @@
             </table>
         </div>
 
-        <div class="d-flex gap-2 mt-3" th:if="${yeuCau.trangThai.name() == 'CHO_DUYET'}">
+        <div class="d-flex gap-2 mt-3" sec:authorize="hasAuthority('KHO_DUYET_NHAP')"
+             th:if="${yeuCau.trangThai.name() == 'CHO_DUYET'}">
             <form method="post" th:action="@{/admin/kho/yeu-cau-nhap/{ma}/duyet(ma=${yeuCau.maYeuCauNhap})}"
                   th:data-xac-nhan="|Duyệt yêu cầu nhập hàng #${yeuCau.maYeuCauNhap}?|">
                 <button class="btn btn-chinh" type="submit"><i class="bi bi-check2" aria-hidden="true"></i> Duyệt</button>
@@ -55,7 +65,7 @@
     </section>
 
     <div class="modal fade" id="hopTuChoi" tabindex="-1" aria-labelledby="hopTuChoiTieuDe" aria-hidden="true"
-         th:if="${yeuCau.trangThai.name() == 'CHO_DUYET'}">
+         sec:authorize="hasAuthority('KHO_DUYET_NHAP')" th:if="${yeuCau.trangThai.name() == 'CHO_DUYET'}">
         <div class="modal-dialog modal-dialog-centered">
             <form class="modal-content" method="post"
                   th:action="@{/admin/kho/yeu-cau-nhap/{ma}/tu-choi(ma=${yeuCau.maYeuCauNhap})}">

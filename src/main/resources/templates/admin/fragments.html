@@ -2,6 +2,35 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <body>
 
+<!-- Hai tab của màn hình phân quyền -->
+<ul th:fragment="tab-phan-quyen(tab)" class="nav nav-tabs tab-bao-cao mb-3">
+    <li class="nav-item">
+        <a class="nav-link" th:classappend="${tab == 'toan-the'} ? 'active'" th:href="@{/admin/phan-quyen}">Toàn thể nhân viên</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" th:classappend="${tab == 'nhan-vien'} ? 'active'" th:href="@{/admin/phan-quyen/nhan-vien}">Từng nhân viên</a>
+    </li>
+</ul>
+
+<!-- Bảng tick chức năng; chinhRieng là các mã chức năng cần gắn nhãn "Chỉnh riêng" -->
+<table th:fragment="bang-chon-quyen(quyenTheoNhom, daChon, chinhRieng)" class="table bang bang-quyen">
+    <thead>
+    <tr><th>Chức năng</th><th class="o-chon">Được phép</th></tr>
+    </thead>
+    <tbody th:each="nhom : ${quyenTheoNhom}">
+    <tr class="nhom"><td colspan="2" th:text="${nhom.key}"></td></tr>
+    <tr th:each="q : ${nhom.value}">
+        <td><span th:text="${q.tenQuyen}"></span>
+            <span class="nhan nhan-xu-ly" th:if="${chinhRieng.contains(q.maChucNang)}">Chỉnh riêng</span>
+            <span class="ten-phu" th:text="${q.maChucNang}"></span></td>
+        <td class="o-chon">
+            <input class="form-check-input" type="checkbox" name="quyen" th:value="${q.maQuyen}"
+                   th:checked="${daChon.contains(q.maChucNang)}" th:aria-label="${q.tenQuyen}">
+        </td>
+    </tr>
+    </tbody>
+</table>
+
 <!-- Nhãn trạng thái: luôn có icon và chữ, không chỉ dựa vào màu -->
 <span th:fragment="nhan(t)" class="nhan" th:classappend="'nhan-' + ${t.mau}">
     <i class="bi" th:classappend="${t.icon}" aria-hidden="true"></i> <span th:text="${t.nhan}"></span>

@@ -3,6 +3,7 @@ package project.dien_may.project_java.config;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.authorization.AuthorizationManagers;
@@ -14,10 +15,14 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 
+import java.util.Set;
+
 @Configuration
 public class SecurityConfig {
 
-    private static final String ROLE_QUAN_TRI = "ROLE_QUAN_TRI";
+    /** Vai trò được vào khu quản lý; khách hàng không bao giờ vào được, kể cả khi lỡ được gán quyền. */
+    private static final String[] VAI_TRO_KHU_QUAN_LY = {"QUAN_TRI", "NHAN_VIEN_KHO"};
+    private static final Set<String> ROLE_KHU_QUAN_LY = Set.of("ROLE_QUAN_TRI", "ROLE_NHAN_VIEN_KHO");
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService)
@@ -31,9 +36,9 @@ public class SecurityConfig {
                                 "/so-sanh", "/dang-ky", "/dang-nhap", "/quen-mat-khau", "/error", "/403",
                                 "/css/**", "/js/**", "/images/**")
                         .permitAll()
-                        // 2. Khu quản trị (NFR05): phải là quản trị viên VÀ có đúng quyền chức năng.
+                        // 2. Khu quản lý (NFR05): phải là quản trị viên hoặc nhân viên kho VÀ có đúng quyền chức năng.
                         // Mã quyền lấy từ bảng Quyen, gán theo vai trò ở màn hình phân quyền (QT16).
-                        .requestMatchers("/admin").hasRole("QUAN_TRI")
+                        .requestMatchers("/admin").hasAnyRole(VAI_TRO_KHU_QUAN_LY)
                         .requestMatchers("/admin/bao-cao/doanh-thu").access(quyen("BAOCAO_DOANHTHU"))
                         .requestMatchers("/admin/bao-cao/ban-chay").access(quyen("BAOCAO_BANCHAY"))
                         .requestMatchers("/admin/bao-cao/ton-kho").access(quyen("BAOCAO_TONKHO"))
@@ -52,9 +57,14 @@ public class SecurityConfig {
                         .requestMatchers("/admin/kho/don-hang", "/admin/kho/don-hang/*")
                         .access(quyen("DONHANG_XEM_TATCA"))
                         .requestMatchers("/admin/kho/ton-kho").access(quyen("KHO_XEM_TONKHO"))
-                        .requestMatchers("/admin/kho/yeu-cau-nhap", "/admin/kho/yeu-cau-nhap/*",
-                                "/admin/kho/yeu-cau-nhap/*/duyet", "/admin/kho/yeu-cau-nhap/*/tu-choi")
+                        .requestMatchers(HttpMethod.POST, "/admin/kho/ton-kho/*/yeu-cau-nhap")
+                        .access(quyen("KHO_YEUCAU_NHAP"))
+                        // Người gửi yêu cầu được xem, chỉ người có quyền duyệt mới duyệt hoặc từ chối được
+                        .requestMatchers(HttpMethod.POST, "/admin/kho/yeu-cau-nhap/*/duyet",
+                                "/admin/kho/yeu-cau-nhap/*/tu-choi")
                         .access(quyen("KHO_DUYET_NHAP"))
+                        .requestMatchers(HttpMethod.GET, "/admin/kho/yeu-cau-nhap", "/admin/kho/yeu-cau-nhap/*")
+                        .access(quyen("KHO_DUYET_NHAP", "KHO_YEUCAU_NHAP"))
 
                         .requestMatchers("/admin/tai-khoan").access(quyen("TAIKHOAN_XEM"))
                         .requestMatchers("/admin/tai-khoan/them").access(quyen("TAIKHOAN_THEM"))
@@ -62,8 +72,10 @@ public class SecurityConfig {
                         .access(quyen("TAIKHOAN_SUA"))
                         .requestMatchers("/admin/tai-khoan/*/xoa").access(quyen("TAIKHOAN_XOA"))
 
-                        .requestMatchers("/admin/phan-quyen").access(quyen("PHANQUYEN_QUANLY"))
-                        // URL quản trị chưa khai báo quyền ở trên thì chặn hết, tránh quên bảo vệ
+                        .requestMatchers("/admin/phan-quyen", "/admin/phan-quyen/nhan-vien",
+                                "/admin/phan-quyen/nhan-vien/*")
+                        .access(quyen("PHANQUYEN_QUANLY"))
+                        // URL khu quản lý chưa khai báo quyền ở trên thì chặn hết, tránh quên bảo vệ
                         .requestMatchers("/admin/**").denyAll()
                         // 3. Chỉ nhân viên kho
                         .requestMatchers("/kho/**").hasRole("NHAN_VIEN_KHO")
@@ -78,11 +90,15 @@ public class SecurityConfig {
                         .loginProcessingUrl("/dang-nhap")
                         .usernameParameter("username")
                         .passwordParameter("password")
-                        // Quản trị viên vào thẳng khu quản trị, các vai trò khác về trang chủ kèm thông báo
+                        // Quản trị viên và nhân viên kho mở thẳng tab đầu tiên được phép trong khu quản lý
+                        // (chưa được cấp tab nào thì về trang chào ở /admin); khách hàng về trang chủ kèm thông báo
                         .successHandler((request, response, authentication) -> {
-                            boolean laQuanTri = authentication.getAuthorities().stream()
-                                    .anyMatch(a -> ROLE_QUAN_TRI.equals(a.getAuthority()));
-                            response.sendRedirect(request.getContextPath() + (laQuanTri ? "/admin" : "/?dangnhap"));
+                            boolean vaoKhuQuanLy = authentication.getAuthorities().stream()
+                                    .anyMatch(a -> ROLE_KHU_QUAN_LY.contains(a.getAuthority()));
+                            String dich = vaoKhuQuanLy
+                                    ? TabKhuQuanLy.tabDauTien(authentication.getAuthorities()).orElse(TabKhuQuanLy.TONG_QUAN)
+                                    : "/?dangnhap";
+                            response.sendRedirect(request.getContextPath() + dich);
                         })
                         .failureUrl("/dang-nhap?error")
                         .permitAll()
@@ -101,10 +117,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-    private static AuthorizationManager<RequestAuthorizationContext> quyen(String maChucNang) {
+    /** Thuộc vai trò khu quản lý VÀ có ít nhất một trong các mã chức năng. */
+    private static AuthorizationManager<RequestAuthorizationContext> quyen(String... maChucNang) {
         return AuthorizationManagers.allOf(
-                AuthorityAuthorizationManager.hasAuthority(ROLE_QUAN_TRI),
-                AuthorityAuthorizationManager.hasAuthority(maChucNang));
+                AuthorityAuthorizationManager.hasAnyRole(VAI_TRO_KHU_QUAN_LY),
+                AuthorityAuthorizationManager.hasAnyAuthority(maChucNang));
     }
 
     @Bean

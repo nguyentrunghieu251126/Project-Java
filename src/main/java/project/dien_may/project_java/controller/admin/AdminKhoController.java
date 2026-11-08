@@ -22,6 +22,7 @@ import project.dien_may.project_java.repository.DonHangRepository;
 import project.dien_may.project_java.repository.SanPhamRepository;
 import project.dien_may.project_java.repository.YeuCauNhapHangRepository;
 import project.dien_may.project_java.service.admin.KhoAdminService;
+import project.dien_may.project_java.service.admin.KhoAdminService.KetQuaNhap;
 import project.dien_may.project_java.service.admin.NghiepVuException;
 
 import java.security.Principal;
@@ -98,6 +99,22 @@ public class AdminKhoController {
         model.addAttribute("dsTinhTrang", TinhTrangTonKho.values());
         model.addAttribute("dsDanhMuc", danhMucRepository.findAllByOrderByTenDanhMucAsc());
         return "admin/kho/ton-kho";
+    }
+
+    @PostMapping("/ton-kho/{ma}/yeu-cau-nhap")
+    public String lapYeuCauNhap(@PathVariable Integer ma, @RequestParam(required = false) Integer soLuong,
+                                @RequestParam(required = false) String quayVe,
+                                Principal nguoiDung, RedirectAttributes redirect) {
+        try {
+            KetQuaNhap ketQua = khoService.lapYeuCauNhap(ma, soLuong, nguoiDung.getName());
+            redirect.addFlashAttribute("thongBao", ketQua.daNhapKho()
+                    ? "Đã nhập thêm " + soLuong + " sản phẩm vào kho (phiếu #" + ketQua.maYeuCau() + ")."
+                    : "Đã gửi yêu cầu nhập hàng #" + ketQua.maYeuCau() + ".");
+        } catch (NghiepVuException e) {
+            redirect.addFlashAttribute("loi", e.getMessage());
+        }
+        // Chỉ nhận đúng giá trị đã biết để không bị lợi dụng chuyển hướng sang trang khác
+        return "bao-cao".equals(quayVe) ? "redirect:/admin/bao-cao/ton-kho" : "redirect:/admin/kho/ton-kho";
     }
 
     @GetMapping("/yeu-cau-nhap")
