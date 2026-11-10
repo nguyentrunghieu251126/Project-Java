@@ -27,9 +27,11 @@ public final class TabKhuQuanLy {
             new Tab("/admin/bao-cao/ton-kho", Set.of("BAOCAO_TONKHO")),
             new Tab("/admin/san-pham", Set.of("SANPHAM_XEM")),
             new Tab("/admin/khuyen-mai", Set.of("KHUYENMAI_XEM")),
-            new Tab("/admin/kho/don-hang", Set.of("DONHANG_XEM_TATCA")),
+            new Tab("/admin/kho/don-hang", Set.of("DONHANG_XEM_TATCA", "DONHANG_XULY")),
             new Tab("/admin/kho/ton-kho", Set.of("KHO_XEM_TONKHO")),
             new Tab("/admin/kho/yeu-cau-nhap", Set.of("KHO_DUYET_NHAP", "KHO_YEUCAU_NHAP")),
+            new Tab("/admin/kho/bao-hanh", Set.of("BAOHANH_XULY")),
+            new Tab("/admin/kho/doi-tra", Set.of("DOITRA_XULY")),
             new Tab("/admin/tai-khoan", Set.of("TAIKHOAN_XEM")),
             new Tab("/admin/phan-quyen", Set.of("PHANQUYEN_QUANLY")));
 
