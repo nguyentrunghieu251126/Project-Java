@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="_csrf" th:content="${_csrf != null} ? ${_csrf.token} : ''" />
+  <meta name="_csrf_parameter" th:content="${_csrf != null} ? ${_csrf.parameterName} : '_csrf'" />
+  <title>Chi tiết đơn hàng | PDMJV</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="../../static/css/style-index/style-index.css" th:href="@{/css/style-index/style-index.css}" rel="stylesheet" />
+  <link href="../../static/css/responsive/respon-index.css" th:href="@{/css/responsive/respon-index.css}" rel="stylesheet" />
+  <link href="../../static/css/style-TaiKhoan/TaiKhoan.css" th:href="@{/css/style-TaiKhoan/TaiKhoan.css}" rel="stylesheet" />
+  <link href="../../static/css/style-MuaHang/MuaHang.css" th:href="@{/css/style-MuaHang/MuaHang.css}" rel="stylesheet" />
+</head>
+<body>
+<!-- Thanh trên cùng -->
+<div class="topbar d-none d-md-block">
+  <div class="container d-flex justify-content-between">
+    <span><i class="bi bi-telephone"></i> Hotline: 1800 1234 (miễn phí)</span>
+    <span>
+          <a href="#"><i class="bi bi-geo-alt"></i> Hệ thống cửa hàng</a>
+          <a href="#"><i class="bi bi-truck"></i> Tra cứu đơn hàng</a>
+        </span>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="header sticky-top">
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand logo" th:href="@{/}">
+        <img src="../../static/images/header-banner/logo-header.png" th:src="@{/images/header-banner/logo-header.png}" alt="PDMJV - Điện máy &amp; Công nghệ" class="logo-img" />
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <i class="bi bi-list text-white fs-2"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <form class="search-box mx-lg-4 my-3 my-lg-0 flex-grow-1" role="search"
+              th:action="@{/#product-list}" method="get">
+          <input class="form-control" type="search" name="tuKhoa" maxlength="100"
+                 th:value="${tuKhoa}" aria-label="Tìm kiếm sản phẩm"
+                 placeholder="Bạn tìm gì hôm nay? Tivi, tủ lạnh, máy giặt..." />
+          <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+        </form>
+        <ul class="navbar-nav align-items-lg-center gap-lg-2">
+          <!-- Quản trị viên đang xem cửa hàng: nút quay lại khu quản trị -->
+          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO')">
+            <a class="nav-link admin-link" th:href="@{/admin}">
+              <i class="bi bi-speedometer2" aria-hidden="true"></i> Trang quản trị
+            </a>
+          </li>
+          <!-- Tài khoản (chưa đăng nhập): icon người, bấm để sang trang đăng nhập -->
+          <li class="nav-item" th:if="${#authorization.expression('isAnonymous()')}">
+            <a class="nav-link account-link" th:href="@{/dang-nhap}" title="Đăng nhập" aria-label="Đăng nhập">
+              <i class="bi bi-person-circle"></i>
+            </a>
+          </li>
+          <!-- KH04: menu tài khoản khách hàng, giữ nguyên POST đăng xuất đang có. -->
+          <li class="nav-item dropdown account-menu" sec:authorize="hasRole('KHACH_HANG')">
+            <button class="nav-link account-link account-trigger" type="button" id="customerAccountMenu"
+                    data-bs-toggle="dropdown" aria-expanded="false" title="Tài khoản" aria-label="Mở menu tài khoản">
+              <i class="bi bi-person-circle" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end account-dropdown" aria-labelledby="customerAccountMenu">
+              <li>
+                <a class="dropdown-item account-overview-link" th:href="@{/tai-khoan}">
+                  <i class="bi bi-person-lines-fill" aria-hidden="true"></i> Tổng quan tài khoản
+                </a>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <form th:action="@{/dang-xuat}" method="post" class="m-0">
+                  <button type="submit" class="dropdown-item account-logout">
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Đăng xuất
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </li>
+          <!-- Giu menu dang xuat cu cho vai tro khac, khong sua chuc nang cua nhom. -->
+          <li class="nav-item dropdown account-menu" sec:authorize="isAuthenticated() and !hasRole('KHACH_HANG')">
+            <a class="nav-link account-link" href="#" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false" title="Tài khoản" aria-label="Tài khoản">
+              <i class="bi bi-person-circle"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end account-dropdown">
+              <li>
+                <form th:action="@{/dang-xuat}" method="post" class="m-0">
+                  <button type="submit" class="dropdown-item account-logout">
+                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link cart-link" href="#" th:href="@{/gio-hang}">
+              <i class="bi bi-cart3"></i> Giỏ hàng
+              <span class="badge rounded-pill" id="cartCount" th:text="${soLuongGioHang ?: 0}">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="menu-bar d-none d-lg-block">
+    <div class="container">
+      <ul class="nav justify-content-center">
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=4)} + '#product-list'">
+            <i class="bi bi-tv"></i> Tivi
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=5)} + '#product-list'">
+            <i class="bi bi-snow"></i> Tủ lạnh
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=6)} + '#product-list'">
+            <i class="bi bi-water"></i> Máy giặt
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=7)} + '#product-list'">
+            <i class="bi bi-wind"></i> Điều hòa
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=1)} + '#product-list'">
+            <i class="bi bi-phone"></i> Điện thoại
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=3)} + '#product-list'">
+            <i class="bi bi-laptop"></i> Laptop
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=8)} + '#product-list'">
+            <i class="bi bi-cup-hot"></i> Gia dụng
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=13)} + '#product-list'">
+            <i class="bi bi-headphones"></i> Phụ kiện
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<!--
+  TV3 – KH16 xem đơn/hóa đơn, KH17 theo dõi đơn, KH18 hủy đơn, KH22 đánh giá sản phẩm.
+  Model: hoSo, ct (ChiTietDonHangKhach). Nút "In hóa đơn" dùng window.print(); CSS @media print chỉ giữ phần hóa đơn.
+-->
+<main class="account-page mh-page" id="chi-tiet-don-hang" th:with="d=${ct.donHang()}, maHien=${ct.maHien()}">
+  <div class="container account-shell">
+    <!-- Thông báo sau khi thao tác (flash attribute thongBao / loi) -->
+    <div class="mh-toast-wrap" aria-live="polite">
+      <div th:if="${thongBao}" class="mh-toast mh-toast-ok" role="status"><i class="bi bi-check-circle-fill"></i>
+        <span th:text="${thongBao}">Thao tác thành công.</span>
+        <button type="button" class="btn-close" aria-label="Đóng thông báo"></button></div>
+      <div th:if="${loi}" class="mh-toast mh-toast-err" role="alert"><i class="bi bi-exclamation-circle-fill"></i>
+        <span th:text="${loi}">Có lỗi xảy ra.</span>
+        <button type="button" class="btn-close" aria-label="Đóng thông báo"></button></div>
+    </div>
+
+    <nav class="account-breadcrumb" aria-label="Đường dẫn"><a href="#" th:href="@{/}">Trang chủ</a><i class="bi bi-chevron-right"></i><a href="#" th:href="@{/don-hang}">Đơn hàng của tôi</a><i class="bi bi-chevron-right"></i><span th:text="${'#' + maHien}">#DH000001</span></nav>
+    <div class="account-layout">
+      <aside class="account-sidebar" aria-label="Điều hướng tài khoản">
+        <section class="account-user-card">
+          <div class="account-avatar" aria-hidden="true"><i class="bi bi-person-fill"></i></div>
+          <div class="account-user-text">
+            <span class="account-caption">Tài khoản khách hàng</span>
+            <strong th:text="${hoSo != null ? hoSo.hoTen : 'Khách hàng'}">Bùi Thu Lan</strong>
+            <small th:text="${hoSo != null ? hoSo.email : ''}">lan.bui7@gmail.com</small>
+          </div>
+          <a class="account-profile-shortcut" href="#" th:href="@{/tai-khoan/ho-so}"><i class="bi bi-pencil-square"></i> Xem hồ sơ <i class="bi bi-arrow-right"></i></a>
+        </section>
+        <section class="account-side-links">
+          <a href="#" th:href="@{/tai-khoan}"><i class="bi bi-grid-1x2"></i><span>Tổng quan</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+          <a href="#" th:href="@{/tai-khoan/ho-so}" th:classappend="${menuTaiKhoan == 'ho-so'} ? 'active'"
+             th:attr="aria-current=${menuTaiKhoan == 'ho-so'} ? 'page' : null"><i class="bi bi-person-vcard"></i><span>Hồ sơ cá nhân & địa chỉ</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+          <!-- TV3: KH16 – KH19 -->
+          <a href="#" th:href="@{/don-hang}" th:classappend="${menuTaiKhoan == 'don-hang'} ? 'active'"
+             th:attr="aria-current=${menuTaiKhoan == 'don-hang'} ? 'page' : null"><i class="bi bi-bag-check"></i><span>Đơn hàng của tôi</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+          <a href="#" th:href="@{/gio-hang}"><i class="bi bi-cart3"></i><span>Giỏ hàng</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+          <a href="#" th:href="@{/tai-khoan/ho-tro}" th:classappend="${menuTaiKhoan == 'ho-tro'} ? 'active'"
+             th:attr="aria-current=${menuTaiKhoan == 'ho-tro'} ? 'page' : null"><i class="bi bi-headset"></i><span>Liên hệ hỗ trợ</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+          <a href="#" th:href="@{/tai-khoan/doi-mat-khau}"><i class="bi bi-shield-lock"></i><span>Đổi mật khẩu</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+        </section>
+        <p class="account-sidebar-note"><i class="bi bi-shield-check"></i> Thông tin của bạn được bảo vệ.</p>
+      </aside>
+
+      <div class="account-main">
+        <div class="account-heading mh-detail-heading">
+          <div>
+            <a class="mh-back" href="#" th:href="@{/don-hang}"><i class="bi bi-arrow-left"></i> Đơn hàng của tôi</a>
+            <h1><th:block th:text="${'Đơn hàng #' + maHien}">Đơn hàng</th:block>
+              <span class="mh-badge" th:classappend="${'mh-badge-' + d.trangThai.mau}"><i class="bi" th:classappend="${d.trangThai.icon}"></i>
+                <th:block th:text="${d.trangThai.nhan}">Trạng thái</th:block></span></h1>
+            <p th:text="${'Đặt lúc ' + #temporals.format(d.ngayDat, 'HH:mm, dd/MM/yyyy') + (d.ngayGiao != null ? ' · Giao thành công ' + #temporals.format(d.ngayGiao, 'HH:mm, dd/MM/yyyy') : '')}">Đặt lúc</p>
+          </div>
+          <div class="mh-detail-actions">
+            <button type="button" class="mh-btn-outline" data-in-hoa-don><i class="bi bi-printer"></i> In hóa đơn</button>
+            <form th:if="${ct.duocDanhGia() or ct.daHuy()}" method="post" class="mh-inline-form"
+                  th:action="@{/don-hang/{id}/mua-lai(id=${d.maDonHang})}">
+              <button type="submit" class="mh-btn-outline"><i class="bi bi-arrow-repeat"></i> Mua lại</button>
+            </form>
+            <button type="button" class="mh-btn-danger" th:if="${ct.duocHuy()}" data-bs-toggle="modal" data-bs-target="#modalHuyDon"
+                    th:data-ma-don="${maHien}" th:data-action="@{/don-hang/{id}/huy(id=${d.maDonHang})}"><i class="bi bi-x-circle"></i> Hủy đơn</button>
+          </div>
+        </div>
+
+        <!-- KH17: theo dõi đơn. CSDL lưu ngày đặt và ngày giao; các bước giữa chỉ hiện đã hoàn thành hay chưa. -->
+        <section class="mh-card mh-tracker-panel" id="theo-doi">
+          <h2 class="mh-card-title"><i class="bi bi-geo-alt"></i> Theo dõi đơn hàng</h2>
+          <ol class="mh-tracker" th:unless="${ct.daHuy()}">
+            <li th:each="b : ${ct.cacBuoc()}" th:classappend="${(b.xong() ? 'done' : '') + (b.hienTai() ? ' current' : '')}">
+              <span class="mh-tracker-dot"><i class="bi" th:classappend="${b.icon()}"></i></span>
+              <strong th:text="${b.ten()}">Bước</strong>
+              <small th:text="${b.thoiGian() != null} ? ${#temporals.format(b.thoiGian(), 'HH:mm · dd/MM')} : (${b.xong()} ? 'Hoàn thành' : 'Chờ xử lý')">Thời gian</small>
+            </li>
+          </ol>
+          <div class="mh-cancel-note" th:if="${ct.daHuy()}"><i class="bi bi-x-octagon"></i>
+            <div><strong>Đơn hàng đã bị hủy</strong>
+              <span>Sản phẩm đã được hoàn về kho. Nếu đã thanh toán, tiền sẽ được hoàn trong 3 – 5 ngày làm việc.</span></div></div>
+        </section>
+
+        <!-- Phần hóa đơn: là phần duy nhất được in -->
+        <section class="mh-card mh-invoice" id="hoa-don">
+          <div class="mh-invoice-head">
+            <div>
+              <img class="mh-invoice-logo" src="../../static/images/header-banner/logo-header.png" th:src="@{/images/header-banner/logo-header.png}" alt="PDMJV" />
+              <p>123 Nguyễn Văn Linh, Q.7, TP.HCM · 1800 1234</p>
+            </div>
+            <div class="mh-invoice-no"><span>HÓA ĐƠN BÁN HÀNG</span><strong th:text="${'#' + maHien}">#DH000001</strong>
+              <small th:text="${'Ngày ' + #temporals.format(d.ngayDat, 'dd/MM/yyyy')}">Ngày</small></div>
+          </div>
+
+          <div class="mh-info-grid">
+            <div class="mh-info"><span class="mh-info-icon"><i class="bi bi-person"></i></span>
+              <div><small>Người nhận</small><strong th:text="${d.hoTenNguoiNhan}">Họ tên</strong><span th:text="${d.soDienThoaiNguoiNhan}">SĐT</span></div></div>
+            <div class="mh-info"><span class="mh-info-icon"><i class="bi bi-geo-alt"></i></span>
+              <div><small>Địa chỉ giao hàng</small><strong th:text="${d.diaChiGiaoHang}">Địa chỉ</strong>
+                <span th:if="${ct.ngayNhanDuKien() != null}" th:text="|Dự kiến nhận: ${ct.ngayNhanDuKien()}|">Dự kiến nhận</span></div></div>
+            <div class="mh-info"><span class="mh-info-icon"><i class="bi bi-wallet2"></i></span>
+              <div><small>Thanh toán</small>
+                <strong th:text="${ct.thanhToan() != null} ? ${ct.thanhToan().phuongThuc.nhan} : 'Chưa có thông tin'">COD</strong>
+                <span th:if="${ct.thanhToan() != null}" class="mh-pay-state" th:classappend="${'mh-pay-' + ct.thanhToan().trangThai.mau}">
+                  <th:block th:text="${ct.thanhToan().trangThai.nhan}">Trạng thái</th:block><th:block th:if="${ct.thanhToan().ngayThanhToan != null}"
+                    th:text="${' · ' + #temporals.format(ct.thanhToan().ngayThanhToan, 'dd/MM/yyyy')}"></th:block></span></div></div>
+          </div>
+
+          <div class="mh-table-wrap" id="san-pham">
+            <table class="mh-table">
+              <thead><tr><th>Sản phẩm</th><th class="so">Đơn giá</th><th class="so">SL</th><th class="so">Thành tiền</th><th class="mh-no-print" th:if="${ct.duocDanhGia()}"></th></tr></thead>
+              <tbody>
+                <tr th:each="c : ${ct.chiTiet()}" th:with="sp=${c.sanPham}">
+                  <td><div class="mh-table-product">
+                    <img th:if="${sp.hinhAnh != null}" th:src="@{${sp.hinhAnh}}" alt="" />
+                    <span th:unless="${sp.hinhAnh != null}" class="mh-item-noimg"><i class="bi bi-image"></i></span>
+                    <div><a th:href="@{/san-pham/{id}(id=${sp.maSanPham})}" th:text="${sp.tenSanPham}">Tên sản phẩm</a>
+                      <small th:text="|Bảo hành ${sp.thoiGianBaoHanh} tháng|">Bảo hành</small></div></div></td>
+                  <td class="so" data-label="Đơn giá" th:text="${#numbers.formatDecimal(c.donGia, 1, 'POINT', 0, 'COMMA')} + '₫'">0₫</td>
+                  <td class="so" data-label="SL" th:text="${c.soLuong}">1</td>
+                  <td class="so" data-label="Thành tiền"><strong th:text="${#numbers.formatDecimal(c.thanhTien, 1, 'POINT', 0, 'COMMA')} + '₫'">0₫</strong></td>
+                  <td class="mh-no-print mh-review-cell" th:if="${ct.duocDanhGia()}">
+                    <span class="mh-reviewed" th:if="${ct.daDanhGia(sp.maSanPham)}" th:title="|Bạn đã đánh giá ${ct.soSao(sp.maSanPham)} sao|">
+                      <span class="mh-stars-static" th:text="${#strings.repeat('★', ct.soSao(sp.maSanPham)) + #strings.repeat('☆', 5 - ct.soSao(sp.maSanPham))}">★★★★★</span> Đã đánh giá</span>
+                    <button type="button" class="mh-btn-primary mh-btn-sm" th:unless="${ct.daDanhGia(sp.maSanPham)}"
+                            data-bs-toggle="modal" data-bs-target="#modalDanhGia"
+                            th:data-ma-san-pham="${sp.maSanPham}" th:data-ten="${sp.tenSanPham}"
+                            th:data-anh="${sp.hinhAnh != null} ? @{${sp.hinhAnh}} : ''"><i class="bi bi-star"></i> Đánh giá</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <dl class="mh-sum-list mh-invoice-sum">
+            <div><dt>Tạm tính</dt><dd th:text="${#numbers.formatDecimal(ct.tamTinh(), 1, 'POINT', 0, 'COMMA')} + '₫'">0₫</dd></div>
+            <div th:if="${d.tienGiam != null and d.tienGiam.signum() > 0}"><dt>Giảm giá <span class="mh-code" th:if="${d.khuyenMai != null}" th:text="${d.khuyenMai.maGiamGia}">MA</span></dt>
+              <dd class="mh-minus" th:text="${'−' + #numbers.formatDecimal(d.tienGiam, 1, 'POINT', 0, 'COMMA')} + '₫'">−0₫</dd></div>
+            <div th:if="${ct.thanhToan() != null and ct.thanhToan().tienGiamUuDai != null and ct.thanhToan().tienGiamUuDai.signum() > 0}">
+              <dt>Ưu đãi thanh toán <small th:text="${ct.thanhToan().uuDai}">Ưu đãi</small></dt>
+              <dd class="mh-minus" th:text="${'−' + #numbers.formatDecimal(ct.thanhToan().tienGiamUuDai, 1, 'POINT', 0, 'COMMA')} + '₫'">−0₫</dd></div>
+            <div><dt>Phí vận chuyển</dt><dd class="mh-free">Miễn phí</dd></div>
+            <div class="mh-sum-total"><dt>Tổng thanh toán</dt><dd th:text="${#numbers.formatDecimal(d.tongTien, 1, 'POINT', 0, 'COMMA')} + '₫'">0₫</dd></div>
+          </dl>
+          <p class="mh-invoice-thanks">Cảm ơn quý khách đã mua sắm tại PDMJV!</p>
+        </section>
+
+        <div class="account-security-hint mh-no-print">
+          <i class="bi bi-headset"></i><span>Cần hỗ trợ về đơn hàng này? Gửi yêu cầu, cửa hàng phản hồi trong 24 giờ – hoặc gọi <strong>1800 1234</strong>.</span>
+          <a href="#" th:href="@{/tai-khoan/ho-tro(maDon=${d.maDonHang})}">Liên hệ hỗ trợ <i class="bi bi-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- KH22: đánh giá sản phẩm (1 – 5 sao, nội dung ≤ 1000 ký tự). muaHang.js điền sản phẩm theo nút được bấm. -->
+<div class="modal fade mh-modal" id="modalDanhGia" tabindex="-1" aria-labelledby="tieuDeDanhGia" aria-hidden="true" th:if="${ct.duocDanhGia()}">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" method="post" action="#" th:action="@{/don-hang/{id}/danh-gia(id=${ct.donHang().maDonHang})}" id="formDanhGia">
+      <div class="modal-header">
+        <h2 class="modal-title" id="tieuDeDanhGia"><i class="bi bi-star"></i> Đánh giá sản phẩm</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="maSanPham" value="" />
+        <div class="mh-review-product"><img src="" alt="" data-review-anh /><strong data-review-ten>Tên sản phẩm</strong></div>
+        <fieldset class="mh-rating">
+          <legend>Bạn chấm sản phẩm này mấy sao? <em>*</em></legend>
+          <div class="mh-rating-stars">
+            <input type="radio" id="sao5" name="soSao" value="5" required /><label for="sao5" title="Tuyệt vời"><i class="bi bi-star-fill"></i></label>
+            <input type="radio" id="sao4" name="soSao" value="4" /><label for="sao4" title="Hài lòng"><i class="bi bi-star-fill"></i></label>
+            <input type="radio" id="sao3" name="soSao" value="3" /><label for="sao3" title="Bình thường"><i class="bi bi-star-fill"></i></label>
+            <input type="radio" id="sao2" name="soSao" value="2" /><label for="sao2" title="Không hài lòng"><i class="bi bi-star-fill"></i></label>
+            <input type="radio" id="sao1" name="soSao" value="1" /><label for="sao1" title="Rất tệ"><i class="bi bi-star-fill"></i></label>
+          </div>
+          <span class="mh-rating-text" data-rating-text>Chọn số sao</span>
+        </fieldset>
+        <div class="account-field">
+          <label for="noiDungDanhGia">Nhận xét của bạn</label>
+          <textarea id="noiDungDanhGia" name="noiDungDanhGia" class="account-input account-textarea" maxlength="1000" rows="4"
+                    placeholder="Chất lượng sản phẩm, đóng gói, giao hàng... (không bắt buộc)"></textarea>
+          <small class="mh-char-count"><span data-dem-ky-tu>0</span>/1000 ký tự</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="mh-btn-outline" data-bs-dismiss="modal">Để sau</button>
+        <button type="submit" class="mh-btn-primary"><i class="bi bi-send"></i> Gửi đánh giá</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<th:block th:if="${ct.duocHuy()}">
+<!-- KH18: hộp xác nhận hủy đơn. muaHang.js gán action theo nút được bấm (data-action); th:action để có mã CSRF. -->
+<div class="modal fade mh-modal" id="modalHuyDon" tabindex="-1" aria-labelledby="tieuDeHuyDon" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" method="post" action="#" th:action="@{/don-hang}" id="formHuyDon">
+      <div class="modal-header">
+        <h2 class="modal-title" id="tieuDeHuyDon"><i class="bi bi-exclamation-triangle"></i> Hủy đơn <span data-ma-don-hien></span>?</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">
+        <p>Sau khi hủy, đơn hàng không thể khôi phục. Bạn có chắc muốn hủy?</p>
+        <ul class="mh-modal-notes">
+          <li><i class="bi bi-info-circle"></i> Chỉ hủy được khi đơn còn <strong>Chờ xác nhận</strong>.</li>
+          <li><i class="bi bi-ticket-perforated"></i> Mã giảm giá đã dùng (nếu có) được hoàn lại lượt.</li>
+          <li><i class="bi bi-wallet2"></i> Nếu đã thanh toán, tiền sẽ được hoàn trong 3 – 5 ngày làm việc.</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="mh-btn-outline" data-bs-dismiss="modal">Giữ đơn hàng</button>
+        <button type="submit" class="mh-btn-danger-solid"><i class="bi bi-x-circle"></i> Xác nhận hủy</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</th:block>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <a class="logo d-inline-block mb-3" th:href="@{/}">
+          <img src="../../static/images/header-banner/logo-footer.png" th:src="@{/images/header-banner/logo-footer.png}" alt="PDMJV - Điện máy &amp; Công nghệ" class="logo-img" />
+        </a>
+        <p>Hệ thống bán lẻ điện máy, điện tử, gia dụng chính hãng với giá tốt nhất.</p>
+        <div class="socials">
+          <a href="#"><i class="bi bi-facebook"></i></a>
+          <a href="#"><i class="bi bi-youtube"></i></a>
+          <a href="#"><i class="bi bi-tiktok"></i></a>
+          <a href="#"><i class="bi bi-instagram"></i></a>
+        </div>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h6>Hỗ trợ</h6>
+        <ul>
+          <li><a href="#">Hướng dẫn mua hàng</a></li>
+          <li><a href="#">Chính sách bảo hành</a></li>
+          <li><a href="#">Chính sách đổi trả</a></li>
+          <li><a href="#">Trả góp</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h6>Về chúng tôi</h6>
+        <ul>
+          <li><a href="#">Giới thiệu</a></li>
+          <li><a href="#">Tuyển dụng</a></li>
+          <li><a href="#">Tin tức</a></li>
+          <li><a href="#">Liên hệ</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4">
+        <h6>Liên hệ</h6>
+        <ul>
+          <li><i class="bi bi-geo-alt"></i> 123 Nguyễn Văn Linh, Q.7, TP.HCM</li>
+          <li><i class="bi bi-telephone"></i> 1800 1234</li>
+          <li><i class="bi bi-envelope"></i> hotro@dienmaypro.vn</li>
+          <li><i class="bi bi-clock"></i> 8:00 - 22:00 (cả tuần)</li>
+        </ul>
+      </div>
+    </div>
+    <hr />
+    <p class="text-center small mb-0">© 2026 PDMJV. All rights reserved.</p>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../static/js/muaHang.js" th:src="@{/js/muaHang.js}"></script>
+</body>
+</html>

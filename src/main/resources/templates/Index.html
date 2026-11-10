@@ -96,9 +96,9 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a class="nav-link cart-link" href="#">
+            <a class="nav-link cart-link" href="#" th:href="@{/gio-hang}">
               <i class="bi bi-cart3"></i> Giỏ hàng
-              <span class="badge rounded-pill" id="cartCount">0</span>
+              <span class="badge rounded-pill" id="cartCount" th:text="${soLuongGioHang ?: 0}">0</span>
             </a>
           </li>
         </ul>
@@ -482,12 +482,13 @@
             <div class="rating" th:unless="${sp.soLuotDanhGia > 0}">
               <i class="bi bi-star" aria-hidden="true"></i> Chưa có đánh giá
             </div>
-            <div class="product-actions">
-              <button type="button" class="buy-now-button" disabled>Mua ngay</button>
-              <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+            <form class="product-actions" method="post" th:action="@{/gio-hang/them}">
+              <input type="hidden" name="maSanPham" th:value="${sp.maSanPham}" />
+              <button type="submit" name="muaNgay" value="true" class="buy-now-button" th:disabled="${sp.soLuong == null or sp.soLuong <= 0}">Mua ngay</button>
+              <button type="submit" class="add-to-cart-button" th:disabled="${sp.soLuong == null or sp.soLuong <= 0}" aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
                 <i class="bi bi-cart-plus" aria-hidden="true"></i>
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </div>
@@ -540,12 +541,13 @@
             <div class="rating" th:unless="${sp.soLuotDanhGia > 0}">
               <i class="bi bi-star" aria-hidden="true"></i> Chưa có đánh giá
             </div>
-            <div class="product-actions">
-              <button type="button" class="buy-now-button" disabled>Mua ngay</button>
-              <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+            <form class="product-actions" method="post" th:action="@{/gio-hang/them}">
+              <input type="hidden" name="maSanPham" th:value="${sp.maSanPham}" />
+              <button type="submit" name="muaNgay" value="true" class="buy-now-button" th:disabled="${sp.soLuong == null or sp.soLuong <= 0}">Mua ngay</button>
+              <button type="submit" class="add-to-cart-button" th:disabled="${sp.soLuong == null or sp.soLuong <= 0}" aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
                 <i class="bi bi-cart-plus" aria-hidden="true"></i>
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </div>
@@ -704,13 +706,13 @@
                   </small>
                 </div>
                 <div class="product-card-actions tv2-product-actions mt-auto">
-                  <div class="product-actions">
-                    <button type="button" class="buy-now-button" disabled>Mua ngay
-                    </button>
-                    <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+                  <form class="product-actions" method="post" th:action="@{/gio-hang/them}">
+                    <input type="hidden" name="maSanPham" th:value="${sp.maSanPham}" />
+                    <button type="submit" name="muaNgay" value="true" class="buy-now-button" th:disabled="${sp.soLuong == null or sp.soLuong <= 0}">Mua ngay</button>
+                    <button type="submit" class="add-to-cart-button" th:disabled="${sp.soLuong == null or sp.soLuong <= 0}" aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
                       <i class="bi bi-cart-plus" aria-hidden="true"></i>
                     </button>
-                  </div>
+                  </form>
                 </div>
               </article>
             </div>
@@ -859,5 +861,6 @@
 <script th:src="@{/js/product-filter.js}"></script>
 <script th:src="@{/js/script-index.js}"></script>
 <script th:src="@{/js/trangChuNoiBat.js}" defer></script>
+<script th:src="@{/js/gioHangNhanh.js}"></script>
 </body>
 </html>

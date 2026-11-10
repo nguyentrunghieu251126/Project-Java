@@ -131,5 +131,4 @@ public interface SanPhamRepository
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("UPDATE SanPham s SET s.soLuong = s.soLuong + :soLuong WHERE s.maSanPham = :maSanPham")
     int congTonKho(@Param("maSanPham") Integer maSanPham, @Param("soLuong") int soLuong);
-    
 }

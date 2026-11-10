@@ -223,18 +223,33 @@ document.addEventListener('DOMContentLoaded', () => {
             price.className = 'detail-related-price';
             price.textContent = item.price;
 
-            const actions = document.createElement('div');
+            // TV3: dùng lại action + mã CSRF của form mua hàng chính trên trang để thêm vào giỏ
+            const mauForm = root.querySelector('form.product-actions[action]');
+            const actions = document.createElement(mauForm ? 'form' : 'div');
             actions.className = 'product-actions';
+            if (mauForm) {
+                actions.method = 'post';
+                actions.action = mauForm.action;
+                const csrf = mauForm.querySelector('input[type="hidden"][name="_csrf"]');
+                if (csrf) actions.appendChild(csrf.cloneNode());
+                const maSanPham = document.createElement('input');
+                maSanPham.type = 'hidden';
+                maSanPham.name = 'maSanPham';
+                maSanPham.value = String(item.id);
+                actions.appendChild(maSanPham);
+            }
 
             const buyButton = document.createElement('button');
-            buyButton.type = 'button';
+            buyButton.type = mauForm ? 'submit' : 'button';
+            buyButton.name = 'muaNgay';
+            buyButton.value = 'true';
             buyButton.className = 'buy-now-button';
             buyButton.textContent = 'Mua ngay';
-            buyButton.disabled = true;
+            buyButton.disabled = !mauForm;
             const cartButton = document.createElement('button');
-            cartButton.type = 'button';
+            cartButton.type = mauForm ? 'submit' : 'button';
             cartButton.className = 'add-to-cart-button';
-            cartButton.disabled = true;
+            cartButton.disabled = !mauForm;
             cartButton.title = 'Thêm vào giỏ hàng';
             cartButton.setAttribute('aria-label', `Thêm ${item.name} vào giỏ hàng`);
             const cartIcon = document.createElement('i');

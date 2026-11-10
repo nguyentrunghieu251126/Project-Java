@@ -98,9 +98,9 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a class="nav-link cart-link" href="#">
+            <a class="nav-link cart-link" href="#" th:href="@{/gio-hang}">
               <i class="bi bi-cart3"></i> Giỏ hàng
-              <span class="badge rounded-pill" id="cartCount">0</span>
+              <span class="badge rounded-pill" id="cartCount" th:text="${soLuongGioHang ?: 0}">0</span>
             </a>
           </li>
         </ul>
@@ -285,13 +285,13 @@
             <div><dt>Danh mục</dt><dd th:text="${sanPham.danhMuc.tenDanhMuc}">Danh mục</dd></div>
             <div><dt>Bảo hành</dt><dd th:text="${sanPham.thoiGianBaoHanh != null ? sanPham.thoiGianBaoHanh + ' tháng' : 'Đang cập nhật'}">Bảo hành</dd></div>
           </dl>
-          <div class="detail-action-row product-actions" aria-label="Thao tác sản phẩm">
-            <button type="button" class="buy-now-button" disabled>Mua ngay</button>
-            <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+          <form class="detail-action-row product-actions" method="post" th:action="@{/gio-hang/them}" aria-label="Thao tác sản phẩm">
+            <input type="hidden" name="maSanPham" th:value="${sanPham.maSanPham}" />
+            <button type="submit" name="muaNgay" value="true" class="buy-now-button" th:disabled="${sanPham.soLuong == null or sanPham.soLuong <= 0}">Mua ngay</button>
+            <button type="submit" class="add-to-cart-button" th:disabled="${sanPham.soLuong == null or sanPham.soLuong <= 0}" aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
               <i class="bi bi-cart-plus" aria-hidden="true"></i>
             </button>
-          </div>
-          <p class="detail-integration-note"><i class="bi bi-info-circle" aria-hidden="true"></i>Chức năng mua hàng và giỏ hàng đang được cập nhật.</p>
+          </form>
           <!-- KH10 – So sánh: chức năng TV2, đặt sau thao tác mua hàng -->
           <div class="detail-compare-panel">
             <span class="detail-compare-hint">Cần lựa chọn giữa các sản phẩm?</span>
@@ -431,13 +431,13 @@
              th:text="${sp.tenSanPham}">Tên sản phẩm</a>
           <strong class="detail-related-price"
                   th:text="${#numbers.formatDecimal(sp.donGia, 1, 'POINT', 0, 'COMMA') + '₫'}">Giá bán</strong>
-          <div class="product-actions">
-            <button type="button" class="buy-now-button" disabled>Mua ngay
-            </button>
-            <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+          <form class="product-actions" method="post" th:action="@{/gio-hang/them}">
+            <input type="hidden" name="maSanPham" th:value="${sp.maSanPham}" />
+            <button type="submit" name="muaNgay" value="true" class="buy-now-button" th:disabled="${sp.soLuong == null or sp.soLuong <= 0}">Mua ngay</button>
+            <button type="submit" class="add-to-cart-button" th:disabled="${sp.soLuong == null or sp.soLuong <= 0}" aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
               <i class="bi bi-cart-plus" aria-hidden="true"></i>
             </button>
-          </div>
+          </form>
         </article>
       </div>
     </section>
@@ -458,13 +458,13 @@
         <strong th:text="${sanPham.tenSanPham}">Tên sản phẩm</strong>
         <span th:text="${#numbers.formatDecimal(sanPham.donGia, 1, 'POINT', 0, 'COMMA') + '₫'}">0₫</span>
       </div>
-      <div class="product-actions">
-        <button type="button" class="buy-now-button" disabled>Mua ngay
-        </button>
-        <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+      <form class="product-actions" method="post" th:action="@{/gio-hang/them}">
+        <input type="hidden" name="maSanPham" th:value="${sanPham.maSanPham}" />
+        <button type="submit" name="muaNgay" value="true" class="buy-now-button" th:disabled="${sanPham.soLuong == null or sanPham.soLuong <= 0}">Mua ngay</button>
+        <button type="submit" class="add-to-cart-button" th:disabled="${sanPham.soLuong == null or sanPham.soLuong <= 0}" aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
           <i class="bi bi-cart-plus" aria-hidden="true"></i>
         </button>
-      </div>
+      </form>
     </div>
   </div>
 
@@ -540,5 +540,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/chiTietSanPham.js}"></script>
+<script th:src="@{/js/gioHangNhanh.js}"></script>
 </body>
 </html>
