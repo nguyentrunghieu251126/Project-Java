@@ -20,6 +20,7 @@ import project.dien_may.project_java.repository.ChiTietDonHangRepository;
 import project.dien_may.project_java.repository.DanhMucRepository;
 import project.dien_may.project_java.repository.DonHangRepository;
 import project.dien_may.project_java.repository.SanPhamRepository;
+import project.dien_may.project_java.repository.PhieuXuatRepository;
 import project.dien_may.project_java.repository.YeuCauNhapHangRepository;
 import project.dien_may.project_java.service.admin.KhoAdminService;
 import project.dien_may.project_java.service.admin.KhoAdminService.KetQuaNhap;
@@ -41,16 +42,19 @@ public class AdminKhoController {
     private final SanPhamRepository sanPhamRepository;
     private final DanhMucRepository danhMucRepository;
     private final YeuCauNhapHangRepository yeuCauRepository;
+    private final PhieuXuatRepository phieuXuatRepository;
 
     public AdminKhoController(KhoAdminService khoService, DonHangRepository donHangRepository,
                               ChiTietDonHangRepository chiTietDonHangRepository, SanPhamRepository sanPhamRepository,
-                              DanhMucRepository danhMucRepository, YeuCauNhapHangRepository yeuCauRepository) {
+                              DanhMucRepository danhMucRepository, YeuCauNhapHangRepository yeuCauRepository,
+                              PhieuXuatRepository phieuXuatRepository) {
         this.khoService = khoService;
         this.donHangRepository = donHangRepository;
         this.chiTietDonHangRepository = chiTietDonHangRepository;
         this.sanPhamRepository = sanPhamRepository;
         this.danhMucRepository = danhMucRepository;
         this.yeuCauRepository = yeuCauRepository;
+        this.phieuXuatRepository = phieuXuatRepository;
     }
 
     @GetMapping("/don-hang")
@@ -81,6 +85,8 @@ public class AdminKhoController {
         model.addAttribute("donHang", donHangRepository.findById(ma)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
         model.addAttribute("dsChiTiet", chiTietDonHangRepository.findByDonHangMaDonHang(ma));
+        // TV4: phiếu xuất của đơn (null khi chưa xuất kho)
+        model.addAttribute("phieuXuat", phieuXuatRepository.findByDonHangMaDonHang(ma).orElse(null));
         return "admin/kho/don-hang-chi-tiet";
     }
 

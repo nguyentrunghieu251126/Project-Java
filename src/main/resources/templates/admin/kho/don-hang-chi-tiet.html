@@ -7,6 +7,28 @@
         <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/kho/don-hang}">
             <i class="bi bi-arrow-left" aria-hidden="true"></i> Danh sách đơn hàng</a>
         <span th:replace="~{admin/fragments :: nhan(${donHang.trangThai})}"></span>
+
+        <!-- TV4: Nhân viên kho xử lý đơn (NVK03 – NVK06); nút chỉ hiện đúng trạng thái và đúng quyền -->
+        <form th:if="${donHang.trangThai.name() == 'CHO_XAC_NHAN'}" sec:authorize="hasAuthority('DONHANG_XULY')"
+              th:action="@{/admin/kho/don-hang/{ma}/xac-nhan(ma=${donHang.maDonHang})}" method="post" class="d-inline"
+              onsubmit="return confirm('Xác nhận đơn hàng này?');">
+            <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-check2" aria-hidden="true"></i> Xác nhận đơn</button>
+        </form>
+        <form th:if="${donHang.trangThai.name() == 'DA_XAC_NHAN'}" sec:authorize="hasAuthority('KHO_XUAT_HANG')"
+              th:action="@{/admin/kho/don-hang/{ma}/xuat-kho(ma=${donHang.maDonHang})}" method="post"
+              class="d-inline-flex gap-1" onsubmit="return confirm('Lập phiếu xuất kho cho đơn hàng này?');">
+            <input type="text" name="ghiChu" maxlength="500" class="form-control form-control-sm" placeholder="Ghi chú (không bắt buộc)">
+            <button type="submit" class="btn btn-sm btn-primary text-nowrap"><i class="bi bi-box-seam" aria-hidden="true"></i> Xuất kho</button>
+        </form>
+        <form th:if="${donHang.trangThai.name() == 'DA_XUAT_KHO'}" sec:authorize="hasAuthority('DONHANG_XULY')"
+              th:action="@{/admin/kho/don-hang/{ma}/giao-hang(ma=${donHang.maDonHang})}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-truck" aria-hidden="true"></i> Bắt đầu giao</button>
+        </form>
+        <form th:if="${donHang.trangThai.name() == 'DANG_GIAO'}" sec:authorize="hasAuthority('DONHANG_XULY')"
+              th:action="@{/admin/kho/don-hang/{ma}/da-giao(ma=${donHang.maDonHang})}" method="post" class="d-inline"
+              onsubmit="return confirm('Xác nhận khách đã nhận hàng?');">
+            <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check2-circle" aria-hidden="true"></i> Đã giao</button>
+        </form>
     </div>
 
     <div class="row g-3 mb-3">
@@ -30,6 +52,11 @@
                     <dt>Khách hàng</dt><dd th:text="${donHang.taiKhoan.email}"></dd>
                     <dt>Khuyến mãi</dt>
                     <dd th:text="${donHang.khuyenMai != null} ? ${donHang.khuyenMai.maGiamGia} : 'Không dùng'"></dd>
+                    <!-- TV4: thông tin phiếu xuất kho -->
+                    <dt>Phiếu xuất</dt>
+                    <dd th:text="${phieuXuat != null}
+                        ? |Số ${phieuXuat.maPhieuXuat} – ${#temporals.format(phieuXuat.ngayXuat, 'dd/MM/yyyy HH:mm')} – ${phieuXuat.taiKhoan.hoTen}|
+                        : 'Chưa xuất kho'"></dd>
                 </dl>
             </section>
         </div>
