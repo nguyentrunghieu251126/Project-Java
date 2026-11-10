@@ -11,6 +11,7 @@
     <link rel="stylesheet" th:href="@{/css/responsive/respon-index.css}">
     <link rel="stylesheet" th:href="@{/css/style-DangNhap/DangNhap.css}">
     <link rel="stylesheet" th:href="@{/css/responsive/respon-DangNhap.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 </head>
 <body>
@@ -30,24 +31,20 @@
                 <div class="dang-nhap-content">
                     <h1 class="dang-nhap-title">Đăng nhập</h1>
                     <p class="dang-nhap-subtitle">Chào mừng bạn quay trở lại hệ thống PDMJV</p>
-
-
-                    <div th:if="${thongBaoDangKy}" class="thong-bao-dang-ky" role="status">
+                    <div th:if="${thongBaoDangKy}" class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow thong-bao-tai-khoan" role="status" style="z-index: 1100;">
                         <span aria-hidden="true">✓</span>
                         <span th:text="${thongBaoDangKy}"></span>
+                        <button type="button" class="btn-close" aria-label="Đóng"></button>
                     </div>
 
                     <div th:if="${param.khoa != null}" class="alert alert-danger" role="alert">
                         Tài khoản của bạn đã bị khóa hoặc không còn tồn tại.
                     </div>
 
-                    <div th:if="${thongBaoDoiMatKhau}"
-                         class="thong-bao-dang-ky"
-                         role="status">
-
+                    <div th:if="${thongBaoDoiMatKhau}" class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow thong-bao-tai-khoan" role="status" style="z-index: 1100;">
                         <span aria-hidden="true">✓</span>
-
                         <span th:text="${thongBaoDoiMatKhau}"></span>
+                        <button type="button" class="btn-close" aria-label="Đóng"></button>
                     </div>
 
                     <form th:action="@{/dang-nhap}" method="post" class="dang-nhap-form"  id="dangNhapForm" novalidate>
@@ -56,10 +53,14 @@
                             <input type="email" id="username" name="username" class="form-control" placeholder="Nhập email" autocomplete="username" maxlength="100" required>
                             <div id="loiEmail" class="invalid-feedback" role="alert"></div>
                         </div>
-
                         <div class="mb-3">
                             <label for="password" class="form-label">Mật khẩu</label>
-                            <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu" autocomplete="current-password" required>
+                            <div class="dang-nhap-password-field">
+                                <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu" autocomplete="current-password" required>
+                                <button type="button" id="nutHienMatKhauDangNhap" class="dang-nhap-password-toggle" aria-label="Hiện mật khẩu" aria-pressed="false">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                             <div id="loiMatKhau" class="invalid-feedback" role="alert"></div>
                         </div>
                         <div th:if="${thongBaoLoi}" class="alert alert-danger" role="alert" th:text="${thongBaoLoi}"></div>
