@@ -1,12 +1,10 @@
 package project.dien_may.project_java.repository;
 
-import jakarta.persistence.LockModeType;  
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Lock; 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +13,6 @@ import project.dien_may.project_java.entity.SanPham;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional; 
 
 public interface SanPhamRepository
         extends JpaRepository<SanPham, Integer>, JpaSpecificationExecutor<SanPham> {
@@ -134,12 +131,5 @@ public interface SanPhamRepository
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("UPDATE SanPham s SET s.soLuong = s.soLuong + :soLuong WHERE s.maSanPham = :maSanPham")
     int congTonKho(@Param("maSanPham") Integer maSanPham, @Param("soLuong") int soLuong);
-
-    // ===== buihuytu TV5: xử lý đồng thời (NFR02) =====
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT s FROM SanPham s WHERE s.maSanPham = :maSanPham")
-    Optional<SanPham> khoaTheoMa(@Param("maSanPham") Integer maSanPham);
-
-    Optional<SanPham> findByMaModelIgnoreCase(String maModel);
+    
 }
