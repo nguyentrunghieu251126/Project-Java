@@ -972,6 +972,34 @@ a.o-so-lieu:hover {
   .bo-loc .o-loc-rong {
     max-width: none;
   }
+
+  /* Ô số liệu: 2 ô trên một dòng, thu nhỏ chữ cho vừa nửa màn hình */
+  .luoi-so-lieu {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .o-so-lieu {
+    min-width: 0;
+    padding: 12px;
+  }
+
+  .o-so-lieu .nhan-so {
+    align-items: flex-start;
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .o-so-lieu .gia-tri {
+    margin-top: 4px;
+    font-size: 1.05rem;
+    overflow-wrap: anywhere;
+  }
+
+  .o-so-lieu .chu-thich {
+    font-size: 0.72rem;
+  }
 }
 
 /* ===== Bản in báo cáo ===== */
