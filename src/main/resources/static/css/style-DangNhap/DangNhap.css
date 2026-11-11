@@ -206,4 +206,147 @@
     font-weight: 500;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
 }
+.dang-nhap-form .mat-khau-wrapper {
+    position: relative;
+    width: 100%;
+}
+.dang-nhap-form .mat-khau-wrapper .form-control {
+    width: 100%;
+    padding-right: 48px;
+}
+.dang-nhap-form .nut-hien-mat-khau {
+    position: absolute;
+    top: 0;
+    right: 4px;
+
+    width: 42px;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    margin: 0;
+
+    border: none;
+    border-radius: 0;
+    background: transparent;
+
+    color: #7b8496;
+    font-size: 17px;
+
+    cursor: pointer;
+    box-shadow: none;
+    z-index: 2;
+}
+.dang-nhap-form .nut-hien-mat-khau:hover {
+    color: #009b45;
+    background: transparent;
+}
+.dang-nhap-form .nut-hien-mat-khau:focus {
+    box-shadow: none;
+}
+.dang-nhap-form .nut-hien-mat-khau:focus-visible {
+    outline: 2px solid #009b45;
+    outline-offset: -4px;
+    border-radius: 8px;
+}
+.dang-nhap-form .mat-khau-wrapper .form-control.is-invalid {
+    background-image: none;
+    padding-right: 48px;
+}
+.dang-nhap-form #loiMatKhau:not(:empty) {
+    display: block;
+}
+/* Hien/an mat khau - Dang nhap */
+.dang-nhap-password-field {
+    position: relative;
+    width: 100%;
+}
+.dang-nhap-password-field .form-control {
+    width: 100%;
+    padding-right: 48px;
+}
+.dang-nhap-password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    color: #7b8496;
+    font-size: 18px;
+    cursor: pointer;
+}
+.dang-nhap-password-toggle:hover {
+    color: #009b45;
+}
+.dang-nhap-password-toggle:focus-visible {
+    outline: 2px solid #009b45;
+    outline-offset: -4px;
+    border-radius: 6px;
+}
+.dang-nhap-password-field .form-control.is-invalid {
+    background-image: none;
+    padding-right: 48px;
+}
+.dang-nhap-form #loiMatKhau:not(:empty) {
+    display: block;
+}
+/* Hien/an mat khau - Quen mat khau */
+.quen-mat-khau-password-field {
+    position: relative;
+    width: 100%;
+}
+.quen-mat-khau-password-field .form-control {
+    width: 100%;
+    padding-right: 48px;
+}
+.quen-mat-khau-password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #7b8496;
+    font-size: 18px;
+    cursor: pointer;
+}
+.quen-mat-khau-password-toggle:hover {
+    color: #009b45;
+}
+.quen-mat-khau-password-toggle:focus {
+    box-shadow: none;
+}
+.quen-mat-khau-password-toggle:focus-visible {
+    outline: 2px solid #009b45;
+    outline-offset: -4px;
+    border-radius: 6px;
+}
+.quen-mat-khau-password-field .form-control.is-invalid {
+    background-image: none;
+    padding-right: 48px;
+}
+.quen-mat-khau-password-field:has(.is-invalid) + .invalid-feedback {
+    display: block;
+}
 

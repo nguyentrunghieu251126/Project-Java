@@ -103,3 +103,46 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+// Hien/an mat khau - Dang ky
+document.addEventListener("DOMContentLoaded", function () {
+
+    function xuLyHienMatKhau(idInput, idNut) {
+        const input = document.getElementById(idInput);
+        const nut = document.getElementById(idNut);
+
+        if (!input || !nut) return;
+
+        const bieuTuong = nut.querySelector("i");
+        if (!bieuTuong) return;
+
+        nut.addEventListener("click", function () {
+
+            const dangAn = input.type === "password";
+
+            input.type = dangAn ? "text" : "password";
+
+            bieuTuong.classList.toggle("bi-eye", !dangAn);
+            bieuTuong.classList.toggle("bi-eye-slash", dangAn);
+
+            nut.setAttribute(
+                "aria-label",
+                dangAn ? "Ẩn mật khẩu" : "Hiện mật khẩu"
+            );
+
+            nut.setAttribute(
+                "aria-pressed",
+                String(dangAn)
+            );
+        });
+    }
+
+    xuLyHienMatKhau(
+        "matKhau",
+        "nutHienMatKhauDangKy"
+    );
+
+    xuLyHienMatKhau(
+        "xacNhanMatKhau",
+        "nutHienXacNhanMatKhauDangKy"
+    );
+});

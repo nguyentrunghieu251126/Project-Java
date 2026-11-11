@@ -183,3 +183,51 @@
 .quay-ve-trang-chu a:hover {
     color: var(--primary);
 }
+/* Hien/an mat khau - Dang ky */
+.dang-ky-password-field {
+    position: relative;
+    width: 100%;
+}
+.dang-ky-password-field .form-control {
+    width: 100%;
+    padding-right: 48px;
+}
+.dang-ky-password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #7b8496;
+    font-size: 18px;
+    cursor: pointer;
+}
+.dang-ky-password-toggle:hover {
+    color: #009b45;
+}
+.dang-ky-password-toggle:focus {
+    box-shadow: none;
+}
+.dang-ky-password-toggle:focus-visible {
+    outline: 2px solid #009b45;
+    outline-offset: -4px;
+    border-radius: 6px;
+}
+.dang-ky-password-field .form-control.is-invalid {
+    background-image: none;
+    padding-right: 48px;
+}
+.dang-ky-password-field:has(.is-invalid)
++ .invalid-feedback {
+    display: block;
+}

@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
 
     const form = document.getElementById("dangNhapForm");
@@ -76,4 +75,45 @@ document.addEventListener("DOMContentLoaded", function () {
         xoaLoi(matKhau, loiMatKhau);
     });
 });
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".thong-bao-tai-khoan").forEach(function (thongBao) {
+        let daDong = false;
 
+        function dongThongBao() {
+            if (daDong) return;
+            daDong = true;
+            thongBao.classList.remove("show");
+            setTimeout(function () {
+                thongBao.remove();
+            }, 200);
+        }
+
+        const nutDong = thongBao.querySelector(".btn-close");
+        if (nutDong) {
+            nutDong.addEventListener("click", dongThongBao);
+        }
+
+        setTimeout(dongThongBao, 3000);
+    });
+});
+// Hien/an mat khau - Dang nhap
+document.addEventListener("DOMContentLoaded", function () {
+    const matKhau = document.getElementById("password");
+    const nutHienMatKhau = document.getElementById("nutHienMatKhauDangNhap");
+    if (!matKhau || !nutHienMatKhau) return;
+    const bieuTuong = nutHienMatKhau.querySelector("i");
+    nutHienMatKhau.addEventListener("click", function () {
+        const dangAn = matKhau.type === "password";
+        matKhau.type = dangAn ? "text" : "password";
+        bieuTuong.classList.toggle("bi-eye", !dangAn);
+        bieuTuong.classList.toggle("bi-eye-slash", dangAn);
+        nutHienMatKhau.setAttribute(
+            "aria-label",
+            dangAn ? "Ẩn mật khẩu" : "Hiện mật khẩu"
+        );
+        nutHienMatKhau.setAttribute(
+            "aria-pressed",
+            String(dangAn)
+        );
+    });
+});

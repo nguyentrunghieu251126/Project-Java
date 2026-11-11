@@ -208,17 +208,12 @@
     #product-detail .detail-related-card { transition: none; }
 }
 body.detail-lightbox-open { overflow: hidden; }
-
-/* Trang báo lỗi KH07 sẵn có dùng cùng CSS nhưng không thuộc #product-detail. */
 .detail-not-found { max-width: 670px; margin: 9vh auto; padding: 55px 30px; text-align: center; font-family: "Be Vietnam Pro", system-ui, sans-serif; color: #253646; background: #fff; border-radius: 16px; border: 1px solid #e5edef; box-shadow: 0 12px 34px rgba(15,23,42,.07); }
 .detail-not-found > i { display: block; font-size: 48px; color: #bf4543; margin-bottom: 12px; }
 .detail-not-found h1 { font-size: 25px; font-weight: 800; margin-bottom: 13px; }
 .detail-not-found p { color: #657589; margin-bottom: 22px; }
 .detail-not-found .detail-back { display: inline-flex; padding: 10px 21px; border-radius: 8px; background: #0a8f3c; color: #fff; text-decoration: none; font-weight: 700; }
 .detail-not-found .detail-back:hover { background: #066b2c; }
-
-
-/* KH07 gallery: các quy tắc giới hạn trong vùng chi tiết, không tác động Index. */
 #product-detail .detail-gallery-stage:focus-visible { outline: 2px solid var(--detail-accent); outline-offset: 3px; }
 #product-detail .detail-gallery-stage { touch-action: pan-y; }
 #product-detail .detail-gallery-arrow { cursor: pointer; user-select: none; }
@@ -226,10 +221,6 @@ body.detail-lightbox-open { overflow: hidden; }
 #product-detail .detail-gallery-thumb:focus-visible { outline: 2px solid var(--detail-accent); outline-offset: 2px; }
 #product-detail .detail-gallery-thumbs { position: relative; scroll-behavior: smooth; }
 #product-detail .detail-gallery-thumb { cursor: pointer; }
-
-/* ===== KH07: tinh chỉnh giao diện trong stylesheet sẵn có =====
-   Đây là phần override có phạm vi #product-detail; không tạo file CSS mới.
-   Giữ KhungAnhChiTiet.css để gallery ảnh PNG không bị cắt. */
 #product-detail.detail-page {
     --tv2-green:#07963b;
     --tv2-green-dark:#06762f;
@@ -240,17 +231,12 @@ body.detail-lightbox-open { overflow: hidden; }
     --kh07-image-padding:48px;
     background:#f3f6f5;
 }
-
-/* B. CHI TIET SAN PHAM KH07: khong can thiep CSS trang chu */
-
-
 #product-detail.detail-page .detail-container { max-width: 1210px; }
 #product-detail.detail-page .detail-hero { grid-template-columns: minmax(0,1.02fr) minmax(0,.98fr); gap:22px; }
 #product-detail.detail-page .detail-card { border-radius:var(--tv2-round); border-color:#e3ece7; box-shadow:var(--tv2-card-shadow); }
 #product-detail.detail-page .detail-gallery { padding:20px; }
 #product-detail.detail-page .detail-gallery-stage { border-radius:14px; background:var(--tv2-image-bg); border:1px solid #e7f0ea; }
 #product-detail.detail-page .detail-gallery-image { padding:var(--kh07-image-padding); }
-
 #product-detail.detail-page .detail-summary { padding:26px; }
 #product-detail.detail-page .detail-summary h1 { font-size:clamp(23px, 2.1vw, 29px); line-height:1.4; letter-spacing:-.35px; }
 #product-detail.detail-page .detail-price-panel { border:1px solid #d7eee0; background:linear-gradient(120deg,#f0fcf4,#fff); padding:18px; }
@@ -287,7 +273,6 @@ body.detail-lightbox-open { overflow: hidden; }
 #product-detail.detail-page .tv2-cart-notice > i { font-size:20px; flex-shrink:0; }
 #product-detail.detail-page .tv2-cart-notice > span { flex:1; }
 #product-detail.detail-page .tv2-cart-notice button { flex-shrink:0; border:0; background:transparent; color:#31774c; padding:3px; }
-
 @media (max-width:991.98px) {
     #product-detail.detail-page { --kh07-stage-height:380px; --kh07-image-padding:32px; }
     #product-detail.detail-page .detail-hero { grid-template-columns:minmax(0,1fr); }
@@ -304,7 +289,6 @@ body.detail-lightbox-open { overflow: hidden; }
 @media (prefers-reduced-motion:reduce) {
     #product-detail.detail-page .detail-related-card, #product-detail.detail-page .detail-button-cart { transition:none; }
 }
-/* Dong bo hai nut o trang chi tiet */
 #product-detail .detail-action-row.product-actions {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 52px;
@@ -459,4 +443,263 @@ body.detail-lightbox-open { overflow: hidden; }
         grid-template-columns: repeat(2, minmax(0, 1fr));
         justify-content: stretch;
     }
+}
+#product-detail {
+    --detail-accent: #079447;
+    --detail-border: #e4eaf0;
+    --detail-ink: #172b43;
+
+    background: #f5f7fa;
+    padding: 24px 0 72px;
+}
+#product-detail .detail-container {
+    max-width: 1240px;
+}
+#product-detail .detail-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+#product-detail .detail-card {
+    background: #ffffff;
+    border: 1px solid var(--detail-border);
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(20, 39, 60, 0.045);
+}
+#product-detail .detail-gallery {
+    padding: 22px;
+}
+#product-detail .detail-gallery-stage {
+    height: 450px;
+    background: #ffffff;
+    border-radius: 14px;
+}
+#product-detail .detail-gallery-image {
+    width: 100%;
+    height: 100%;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#product-detail .detail-gallery-image img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+}
+#product-detail .detail-gallery-image img:hover {
+    transform: scale(1.025);
+}
+#product-detail .detail-gallery-zoom {
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #52647a;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+#product-detail .detail-summary {
+    padding: 30px;
+}
+#product-detail .detail-summary h1 {
+    font-size: clamp(24px, 2.2vw, 30px);
+    line-height: 1.4;
+    font-weight: 800;
+    color: #14273e;
+    margin-bottom: 14px;
+}
+#product-detail .detail-meta {
+    font-size: 13px;
+    color: #728094;
+    gap: 10px 20px;
+}
+#product-detail .detail-review-inline {
+    margin-top: 18px;
+}
+#product-detail .detail-divider {
+    margin: 24px 0;
+}
+#product-detail .detail-price-panel {
+    background: #f1faf5;
+    border: 1px solid #d6eddf;
+    border-radius: 14px;
+    padding: 22px 24px;
+    gap: 8px;
+}
+#product-detail .detail-price {
+    font-size: clamp(30px, 3vw, 39px);
+    font-weight: 800;
+    color: #d32625;
+    line-height: 1.2;
+}
+#product-detail .detail-stock {
+    margin-top: 18px;
+    font-size: 13px;
+}
+#product-detail .detail-summary-facts {
+    margin: 22px 0;
+}
+#product-detail .detail-summary-facts > div {
+    padding: 13px 0;
+    font-size: 13px;
+    border-bottom: 1px solid #edf1f5;
+}
+#product-detail .detail-action-row {
+    gap: 12px;
+}
+#product-detail .detail-button {
+    min-height: 48px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    transition: background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+#product-detail .detail-button-buy:not(:disabled) {
+    background: var(--detail-accent);
+    border-color: var(--detail-accent);
+    color: #ffffff;
+}
+#product-detail .detail-button-cart:not(:disabled) {
+    border-color: var(--detail-accent);
+}
+#product-detail .detail-compare-panel {
+    margin-top: 20px;
+}
+#product-detail .detail-highlight-card {
+    padding: 24px;
+}
+
+#product-detail .detail-highlight-list {
+    gap: 12px;
+}
+
+#product-detail .detail-highlight-item {
+    padding: 14px;
+    border-radius: 12px;
+    background: #f7faf8;
+}
+
+#product-detail .detail-description-card,
+#product-detail .detail-spec-card,
+#product-detail .detail-review-section,
+#product-detail .detail-related {
+    padding: 28px;
+}
+
+#product-detail .detail-section-head h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #172b43;
+}
+#product-detail .detail-gallery-total,
+#product-detail .detail-gallery-footer,
+#product-detail .detail-gallery-thumbs,
+#product-detail .detail-gallery-counter,
+#product-detail .detail-gallery-arrow,
+#product-detail .detail-integration-note,
+#product-detail .detail-price-panel > p,
+#product-detail .detail-compare-hint,
+#product-detail .detail-review-integration > span {
+    display: none !important;
+}
+#product-detail .detail-purchase-column
+> .detail-info-panel:not(.detail-info-warranty) {
+    display: none;
+}
+@media (max-width: 991.98px) {
+    #product-detail .detail-hero {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    #product-detail .detail-gallery-stage {
+        height: 420px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    #product-detail {
+        padding: 16px 0 48px;
+    }
+    #product-detail .detail-gallery {
+        padding: 12px;
+    }
+
+    #product-detail .detail-gallery-stage {
+        height: 320px;
+    }
+
+    #product-detail .detail-gallery-image {
+        padding: 14px;
+    }
+
+    #product-detail .detail-summary {
+        padding: 20px;
+    }
+
+    #product-detail .detail-summary h1 {
+        font-size: 23px;
+    }
+
+    #product-detail .detail-price {
+        font-size: 30px;
+    }
+    #product-detail .detail-description-card,
+    #product-detail .detail-spec-card,
+    #product-detail .detail-review-section,
+    #product-detail .detail-related {
+        padding: 18px;
+    }
+}
+#product-detail .detail-related-grid {
+    display: grid;
+    align-items: stretch;
+}
+#product-detail .detail-related-grid .detail-related-card {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+#product-detail .detail-related-card .detail-related-photo {
+    flex-shrink: 0;
+}
+#product-detail .detail-related-card .detail-related-name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+
+    min-height: 42px;
+    line-height: 21px;
+}
+#product-detail .detail-related-card .detail-related-brand {
+    min-height: 18px;
+    line-height: 18px;
+}
+#product-detail .detail-related-card .detail-related-price {
+    margin-top: auto;
+    line-height: 22px;
+}
+#product-detail .detail-related-card .product-actions,
+#product-detail .detail-related-card .detail-related-actions {
+    flex-shrink: 0;
+    min-height: 38px;
+    margin-top: 0;
+    align-items: stretch;
+}
+#product-detail .detail-related-card .product-actions button,
+#product-detail .detail-related-card .product-actions a,
+#product-detail .detail-related-card .detail-related-button {
+    min-height: 38px;
 }
