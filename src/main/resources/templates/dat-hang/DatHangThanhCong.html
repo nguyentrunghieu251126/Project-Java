@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="_csrf" th:content="${_csrf != null} ? ${_csrf.token} : ''" />
+  <meta name="_csrf_parameter" th:content="${_csrf != null} ? ${_csrf.parameterName} : '_csrf'" />
+  <title>Đặt hàng thành công | PDMJV</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="../../static/css/style-index/style-index.css" th:href="@{/css/style-index/style-index.css}" rel="stylesheet" />
+  <link href="../../static/css/responsive/respon-index.css" th:href="@{/css/responsive/respon-index.css}" rel="stylesheet" />
+  <link href="../../static/css/style-TaiKhoan/TaiKhoan.css" th:href="@{/css/style-TaiKhoan/TaiKhoan.css}" rel="stylesheet" />
+  <link href="../../static/css/style-MuaHang/MuaHang.css" th:href="@{/css/style-MuaHang/MuaHang.css}" rel="stylesheet" />
+</head>
+<body>
+<!-- Thanh trên cùng -->
+<div class="topbar d-none d-md-block">
+  <div class="container d-flex justify-content-between">
+    <span><i class="bi bi-telephone"></i> Hotline: 1800 1234 (miễn phí)</span>
+    <span>
+          <a href="#"><i class="bi bi-geo-alt"></i> Hệ thống cửa hàng</a>
+          <a href="#"><i class="bi bi-truck"></i> Tra cứu đơn hàng</a>
+        </span>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="header sticky-top">
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand logo" th:href="@{/}">
+        <img src="../../static/images/header-banner/logo-header.png" th:src="@{/images/header-banner/logo-header.png}" alt="PDMJV - Điện máy &amp; Công nghệ" class="logo-img" />
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <i class="bi bi-list text-white fs-2"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <form class="search-box mx-lg-4 my-3 my-lg-0 flex-grow-1" role="search"
+              th:action="@{/#product-list}" method="get">
+          <input class="form-control" type="search" name="tuKhoa" maxlength="100"
+                 th:value="${tuKhoa}" aria-label="Tìm kiếm sản phẩm"
+                 placeholder="Bạn tìm gì hôm nay? Tivi, tủ lạnh, máy giặt..." />
+          <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+        </form>
+        <ul class="navbar-nav align-items-lg-center gap-lg-2">
+          <!-- Quản trị viên đang xem cửa hàng: nút quay lại khu quản trị -->
+          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO')">
+            <a class="nav-link admin-link" th:href="@{/admin}">
+              <i class="bi bi-speedometer2" aria-hidden="true"></i> Trang quản trị
+            </a>
+          </li>
+          <!-- Tài khoản (chưa đăng nhập): icon người, bấm để sang trang đăng nhập -->
+          <li class="nav-item" th:if="${#authorization.expression('isAnonymous()')}">
+            <a class="nav-link account-link" th:href="@{/dang-nhap}" title="Đăng nhập" aria-label="Đăng nhập">
+              <i class="bi bi-person-circle"></i>
+            </a>
+          </li>
+          <!-- KH04: menu tài khoản khách hàng, giữ nguyên POST đăng xuất đang có. -->
+          <li class="nav-item dropdown account-menu" sec:authorize="hasRole('KHACH_HANG')">
+            <button class="nav-link account-link account-trigger" type="button" id="customerAccountMenu"
+                    data-bs-toggle="dropdown" aria-expanded="false" title="Tài khoản" aria-label="Mở menu tài khoản">
+              <i class="bi bi-person-circle" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end account-dropdown" aria-labelledby="customerAccountMenu">
+              <li>
+                <a class="dropdown-item account-overview-link" th:href="@{/tai-khoan}">
+                  <i class="bi bi-person-lines-fill" aria-hidden="true"></i> Tổng quan tài khoản
+                </a>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <form th:action="@{/dang-xuat}" method="post" class="m-0">
+                  <button type="submit" class="dropdown-item account-logout">
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Đăng xuất
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </li>
+          <!-- Giu menu dang xuat cu cho vai tro khac, khong sua chuc nang cua nhom. -->
+          <li class="nav-item dropdown account-menu" sec:authorize="isAuthenticated() and !hasRole('KHACH_HANG')">
+            <a class="nav-link account-link" href="#" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false" title="Tài khoản" aria-label="Tài khoản">
+              <i class="bi bi-person-circle"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end account-dropdown">
+              <li>
+                <form th:action="@{/dang-xuat}" method="post" class="m-0">
+                  <button type="submit" class="dropdown-item account-logout">
+                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link cart-link" href="#" th:href="@{/gio-hang}">
+              <i class="bi bi-cart3"></i> Giỏ hàng
+              <span class="badge rounded-pill" id="cartCount" th:text="${soLuongGioHang ?: 0}">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="menu-bar d-none d-lg-block">
+    <div class="container">
+      <ul class="nav justify-content-center">
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=4)} + '#product-list'">
+            <i class="bi bi-tv"></i> Tivi
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=5)} + '#product-list'">
+            <i class="bi bi-snow"></i> Tủ lạnh
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=6)} + '#product-list'">
+            <i class="bi bi-water"></i> Máy giặt
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=7)} + '#product-list'">
+            <i class="bi bi-wind"></i> Điều hòa
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=1)} + '#product-list'">
+            <i class="bi bi-phone"></i> Điện thoại
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=3)} + '#product-list'">
+            <i class="bi bi-laptop"></i> Laptop
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=8)} + '#product-list'">
+            <i class="bi bi-cup-hot"></i> Gia dụng
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             th:href="@{/(maDanhMuc=13)} + '#product-list'">
+            <i class="bi bi-headphones"></i> Phụ kiện
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<!-- TV3 – trang báo đặt hàng thành công. Model: ct (ChiTietDonHangKhach). -->
+<main class="account-page mh-page" id="dat-hang-thanh-cong" th:with="d=${ct.donHang()}">
+  <div class="container account-shell">
+    <ol class="mh-steps mh-steps-card" aria-label="Các bước đặt hàng">
+      <li class="done"><span class="mh-step-num"><i class="bi bi-check-lg"></i></span><span>Giỏ hàng</span></li>
+      <li class="done"><span class="mh-step-num"><i class="bi bi-check-lg"></i></span><span>Thanh toán</span></li>
+      <li class="active" aria-current="step"><span class="mh-step-num"><i class="bi bi-check-lg"></i></span><span>Hoàn tất</span></li>
+    </ol>
+
+    <section class="mh-card mh-success">
+      <span class="mh-success-icon"><i class="bi bi-check-lg"></i></span>
+      <h1>Đặt hàng thành công!</h1>
+      <p>Cảm ơn bạn đã mua sắm tại PDMJV. Chúng tôi sẽ gọi xác nhận đơn trong thời gian sớm nhất.</p>
+      <dl class="mh-success-info">
+        <div><dt>Mã đơn hàng</dt><dd th:text="${'#' + ct.maHien()}">#DH000001</dd></div>
+        <div><dt>Tổng thanh toán</dt><dd class="mh-success-money" th:text="${#numbers.formatDecimal(d.tongTien, 1, 'POINT', 0, 'COMMA')} + '₫'">0₫</dd></div>
+        <div th:if="${ct.thanhToan() != null}"><dt>Thanh toán</dt><dd th:text="${ct.thanhToan().phuongThuc.nhan}">COD</dd></div>
+        <div th:if="${ct.thanhToan() != null and ct.thanhToan().tienGiamUuDai != null and ct.thanhToan().tienGiamUuDai.signum() > 0}"><dt>Ưu đãi thanh toán</dt>
+          <dd th:text="|−${#numbers.formatDecimal(ct.thanhToan().tienGiamUuDai, 1, 'POINT', 0, 'COMMA')}₫ (${ct.thanhToan().uuDai})|">−0₫</dd></div>
+        <div><dt>Người nhận</dt><dd th:text="|${d.hoTenNguoiNhan} · ${d.soDienThoaiNguoiNhan}|">Người nhận</dd></div>
+        <div><dt>Giao đến</dt><dd th:text="${d.diaChiGiaoHang}">Địa chỉ</dd></div>
+        <div th:if="${ct.ngayNhanDuKien() != null}"><dt>Dự kiến nhận hàng</dt>
+          <dd th:text="|${ct.ngayNhanDuKien()} (${ct.giaoHang().soNgay()})|">Thứ Năm 12/11 – Thứ Sáu 13/11</dd></div>
+      </dl>
+      <div class="mh-bank mh-bank-inline" th:if="${ct.thanhToan() != null and ct.thanhToan().phuongThuc.name() == 'CHUYEN_KHOAN'}">
+        <div class="mh-bank-qr" aria-hidden="true"><i class="bi bi-qr-code"></i></div>
+        <dl>
+          <div><dt>Ngân hàng</dt><dd>Vietcombank – CN TP.HCM</dd></div>
+          <div><dt>Số tài khoản</dt><dd>0123 4567 8910</dd></div>
+          <div><dt>Chủ tài khoản</dt><dd>CONG TY PDMJV</dd></div>
+          <div><dt>Nội dung</dt><dd th:text="${ct.maHien() + ' ' + d.soDienThoaiNguoiNhan}">Nội dung</dd></div>
+        </dl>
+      </div>
+      <div class="mh-success-actions">
+        <a class="account-primary" href="#" th:href="@{/don-hang/{id}(id=${d.maDonHang})}"><i class="bi bi-receipt"></i> Xem đơn hàng</a>
+        <a class="account-secondary" href="#" th:href="@{/}">Tiếp tục mua sắm</a>
+      </div>
+      <p class="mh-note"><i class="bi bi-info-circle"></i> Bạn có thể hủy đơn khi đơn còn ở trạng thái <strong>Chờ xác nhận</strong>.</p>
+    </section>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <a class="logo d-inline-block mb-3" th:href="@{/}">
+          <img src="../../static/images/header-banner/logo-footer.png" th:src="@{/images/header-banner/logo-footer.png}" alt="PDMJV - Điện máy &amp; Công nghệ" class="logo-img" />
+        </a>
+        <p>Hệ thống bán lẻ điện máy, điện tử, gia dụng chính hãng với giá tốt nhất.</p>
+        <div class="socials">
+          <a href="#"><i class="bi bi-facebook"></i></a>
+          <a href="#"><i class="bi bi-youtube"></i></a>
+          <a href="#"><i class="bi bi-tiktok"></i></a>
+          <a href="#"><i class="bi bi-instagram"></i></a>
+        </div>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h6>Hỗ trợ</h6>
+        <ul>
+          <li><a href="#">Hướng dẫn mua hàng</a></li>
+          <li><a href="#">Chính sách bảo hành</a></li>
+          <li><a href="#">Chính sách đổi trả</a></li>
+          <li><a href="#">Trả góp</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h6>Về chúng tôi</h6>
+        <ul>
+          <li><a href="#">Giới thiệu</a></li>
+          <li><a href="#">Tuyển dụng</a></li>
+          <li><a href="#">Tin tức</a></li>
+          <li><a href="#">Liên hệ</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4">
+        <h6>Liên hệ</h6>
+        <ul>
+          <li><i class="bi bi-geo-alt"></i> 123 Nguyễn Văn Linh, Q.7, TP.HCM</li>
+          <li><i class="bi bi-telephone"></i> 1800 1234</li>
+          <li><i class="bi bi-envelope"></i> hotro@dienmaypro.vn</li>
+          <li><i class="bi bi-clock"></i> 8:00 - 22:00 (cả tuần)</li>
+        </ul>
+      </div>
+    </div>
+    <hr />
+    <p class="text-center small mb-0">© 2026 PDMJV. All rights reserved.</p>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../static/js/muaHang.js" th:src="@{/js/muaHang.js}"></script>
+</body>
+</html>

@@ -1,9 +1,4 @@
-/* =====================================================================
-   Cập nhật database QLCuaHangDienMay đã có dữ liệu lên phiên bản 3:
-   thêm quyền xem trang tổng quan và bảng phân quyền theo từng nhân viên.
-   Không xóa dữ liệu; chạy lại nhiều lần vẫn an toàn.
-   Nếu dùng sqlcmd, thêm tham số -f 65001 để giữ đúng tiếng Việt.
-   ===================================================================== */
+
 USE QLCuaHangDienMay;
 
 

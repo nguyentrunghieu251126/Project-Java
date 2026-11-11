@@ -65,5 +65,4 @@ public interface TaiKhoanRepository
     @Modifying
     @Query(value = "DELETE FROM dbo.GioHang WHERE MaTaiKhoan = :ma", nativeQuery = true)
     void xoaGioHang(@Param("ma") Integer maTaiKhoan);
-  
 }

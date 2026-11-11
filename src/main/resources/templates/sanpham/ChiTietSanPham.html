@@ -1,484 +1,655 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title th:text="${sanPham.tenSanPham} + ' | PDMJV'">Chi tiết sản phẩm | PDMJV</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link th:href="@{/css/style-index/style-index.css}" rel="stylesheet" />
-  <link th:href="@{/css/responsive/respon-index.css}" rel="stylesheet" />
-  <link th:href="@{/css/style-SanPham/ChiTietSanPham.css}" rel="stylesheet" />
-  <link th:href="@{/css/style-SanPham/SoSanhSanPham.css}" rel="stylesheet" />
-  <link th:href="@{/css/style-SanPham/KhungAnhChiTiet.css}" rel="stylesheet" />
-</head>
-<body>
-<!-- Thanh trên cùng -->
-<div class="topbar d-none d-md-block">
-  <div class="container d-flex justify-content-between">
-    <span><i class="bi bi-telephone"></i> Hotline: 1800 1234 (miễn phí)</span>
-    <span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${sanPham.tenSanPham} + ' | PDMJV'">Chi tiết sản phẩm | PDMJV</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link th:href="@{/css/style-index/style-index.css}" rel="stylesheet" />
+    <link th:href="@{/css/responsive/respon-index.css}" rel="stylesheet" />
+    <link th:href="@{/css/style-SanPham/ChiTietSanPham.css}" rel="stylesheet" />
+    <link th:href="@{/css/style-SanPham/SoSanhSanPham.css}" rel="stylesheet" />
+    <link th:href="@{/css/style-SanPham/KhungAnhChiTiet.css}" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Thanh trên cùng -->
+    <div class="topbar d-none d-md-block">
+      <div class="container d-flex justify-content-between">
+        <span><i class="bi bi-telephone"></i> Hotline: 1800 1234 (miễn phí)</span>
+        <span>
           <a href="#"><i class="bi bi-geo-alt"></i> Hệ thống cửa hàng</a>
           <a href="#"><i class="bi bi-truck"></i> Tra cứu đơn hàng</a>
         </span>
-  </div>
-</div>
+      </div>
+    </div>
 
-<!-- Header -->
-<header class="header sticky-top">
-  <nav class="navbar navbar-expand-lg">
-    <div class="container">
-      <a class="navbar-brand logo" th:href="@{/}">
-        <img th:src="@{/images/header-banner/logo-header.png}" alt="PDMJV - Điện máy &amp; Công nghệ" class="logo-img" />
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
-        <i class="bi bi-list text-white fs-2"></i>
-      </button>
-      <div class="collapse navbar-collapse" id="mainNav">
-        <form class="search-box mx-lg-4 my-3 my-lg-0 flex-grow-1" role="search"
-              th:action="@{/#product-list}" method="get">
-          <input class="form-control" type="search" name="tuKhoa" maxlength="100"
-                 th:value="${tuKhoa}" aria-label="Tìm kiếm sản phẩm"
-                 placeholder="Bạn tìm gì hôm nay? Tivi, tủ lạnh, máy giặt..." />
-          <button class="btn" type="submit"><i class="bi bi-search"></i></button>
-        </form>
-        <ul class="navbar-nav align-items-lg-center gap-lg-2">
-          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO')">
-            <a class="nav-link admin-link" th:href="@{/admin}">
-              <i class="bi bi-speedometer2" aria-hidden="true"></i> Trang quản trị
-            </a>
-          </li>
-          <li class="nav-item" th:if="${#authorization.expression('isAnonymous()')}">
-            <a class="nav-link account-link" th:href="@{/dang-nhap}" title="Đăng nhập" aria-label="Đăng nhập">
-              <i class="bi bi-person-circle"></i>
-            </a>
-          </li>
-          <li class="nav-item dropdown account-menu" sec:authorize="hasRole('KHACH_HANG')">
-            <button class="nav-link account-link account-trigger" type="button" id="customerAccountMenu"
-                    data-bs-toggle="dropdown" aria-expanded="false" title="Tài khoản" aria-label="Mở menu tài khoản">
-              <i class="bi bi-person-circle" aria-hidden="true"></i>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end account-dropdown" aria-labelledby="customerAccountMenu">
-              <li>
-                <a class="dropdown-item account-overview-link" th:href="@{/tai-khoan}">
-                  <i class="bi bi-person-lines-fill" aria-hidden="true"></i> Tài khoản
+    <!-- Header -->
+    <header class="header sticky-top">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand logo" th:href="@{/}">
+            <img
+              th:src="@{/images/header-banner/logo-header.png}"
+              alt="PDMJV - Điện máy &amp; Công nghệ"
+              class="logo-img"
+            />
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <i class="bi bi-list text-white fs-2"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="mainNav">
+            <form
+              class="search-box mx-lg-4 my-3 my-lg-0 flex-grow-1"
+              role="search"
+              th:action="@{/#product-list}"
+              method="get"
+            >
+              <input
+                class="form-control"
+                type="search"
+                name="tuKhoa"
+                maxlength="100"
+                th:value="${tuKhoa}"
+                aria-label="Tìm kiếm sản phẩm"
+                placeholder="Bạn tìm gì hôm nay? Tivi, tủ lạnh, máy giặt..."
+              />
+              <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+            </form>
+            <ul class="navbar-nav align-items-lg-center gap-lg-2">
+              <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO')">
+                <a class="nav-link admin-link" th:href="@{/admin}">
+                  <i class="bi bi-speedometer2" aria-hidden="true"></i> Trang quản trị
                 </a>
               </li>
-              <li><hr class="dropdown-divider" /></li>
-              <li>
-                <form th:action="@{/dang-xuat}" method="post" class="m-0">
-                  <button type="submit" class="dropdown-item account-logout">
-                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Đăng xuất
-                  </button>
-                </form>
+              <li class="nav-item" th:if="${#authorization.expression('isAnonymous()')}">
+                <a class="nav-link account-link" th:href="@{/dang-nhap}" title="Đăng nhập" aria-label="Đăng nhập">
+                  <i class="bi bi-person-circle"></i>
+                </a>
+              </li>
+              <li class="nav-item dropdown account-menu" sec:authorize="hasRole('KHACH_HANG')">
+                <button
+                  class="nav-link account-link account-trigger"
+                  type="button"
+                  id="customerAccountMenu"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  title="Tài khoản"
+                  aria-label="Mở menu tài khoản"
+                >
+                  <i class="bi bi-person-circle" aria-hidden="true"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end account-dropdown" aria-labelledby="customerAccountMenu">
+                  <li>
+                    <a class="dropdown-item account-overview-link" th:href="@{/tai-khoan}">
+                      <i class="bi bi-person-lines-fill" aria-hidden="true"></i> Tài khoản
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <form th:action="@{/dang-xuat}" method="post" class="m-0">
+                      <button type="submit" class="dropdown-item account-logout">
+                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Đăng xuất
+                      </button>
+                    </form>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown account-menu" sec:authorize="isAuthenticated() and !hasRole('KHACH_HANG')">
+                <a
+                  class="nav-link account-link"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  title="Tài khoản"
+                  aria-label="Tài khoản"
+                >
+                  <i class="bi bi-person-circle"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end account-dropdown">
+                  <li>
+                    <form th:action="@{/dang-xuat}" method="post" class="m-0">
+                      <button type="submit" class="dropdown-item account-logout">
+                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                      </button>
+                    </form>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link cart-link" href="#" th:href="@{/gio-hang}">
+                  <i class="bi bi-cart3"></i> Giỏ hàng
+                  <span class="badge rounded-pill" id="cartCount" th:text="${soLuongGioHang ?: 0}">0</span>
+                </a>
               </li>
             </ul>
-          </li>
-          <li class="nav-item dropdown account-menu" sec:authorize="isAuthenticated() and !hasRole('KHACH_HANG')">
-            <a class="nav-link account-link" href="#" role="button" data-bs-toggle="dropdown"
-               aria-expanded="false" title="Tài khoản" aria-label="Tài khoản">
-              <i class="bi bi-person-circle"></i>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end account-dropdown">
-              <li>
-                <form th:action="@{/dang-xuat}" method="post" class="m-0">
-                  <button type="submit" class="dropdown-item account-logout">
-                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
-                  </button>
-                </form>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link cart-link" href="#">
-              <i class="bi bi-cart3"></i> Giỏ hàng
-              <span class="badge rounded-pill" id="cartCount">0</span>
-            </a>
-          </li>
-        </ul>
+          </div>
+        </div>
+      </nav>
+      <div class="menu-bar d-none d-lg-block">
+        <div class="container">
+          <ul class="nav justify-content-center">
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/(maDanhMuc=4)} + '#product-list'"> <i class="bi bi-tv"></i> Tivi </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/(maDanhMuc=5)} + '#product-list'"> <i class="bi bi-snow"></i> Tủ lạnh </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/(maDanhMuc=6)} + '#product-list'">
+                <i class="bi bi-water"></i> Máy giặt
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/(maDanhMuc=7)} + '#product-list'">
+                <i class="bi bi-wind"></i> Điều hòa
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/(maDanhMuc=1)} + '#product-list'">
+                <i class="bi bi-phone"></i> Điện thoại
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/(maDanhMuc=3)} + '#product-list'">
+                <i class="bi bi-laptop"></i> Laptop
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/(maDanhMuc=8)} + '#product-list'">
+                <i class="bi bi-cup-hot"></i> Gia dụng
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/(maDanhMuc=13)} + '#product-list'">
+                <i class="bi bi-headphones"></i> Phụ kiện
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
-  </nav>
-  <div class="menu-bar d-none d-lg-block">
-    <div class="container">
-      <ul class="nav justify-content-center">
-        <li class="nav-item">
-          <a class="nav-link"
-             th:href="@{/(maDanhMuc=4)} + '#product-list'">
-            <i class="bi bi-tv"></i> Tivi
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link"
-             th:href="@{/(maDanhMuc=5)} + '#product-list'">
-            <i class="bi bi-snow"></i> Tủ lạnh
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link"
-             th:href="@{/(maDanhMuc=6)} + '#product-list'">
-            <i class="bi bi-water"></i> Máy giặt
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link"
-             th:href="@{/(maDanhMuc=7)} + '#product-list'">
-            <i class="bi bi-wind"></i> Điều hòa
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link"
-             th:href="@{/(maDanhMuc=1)} + '#product-list'">
-            <i class="bi bi-phone"></i> Điện thoại
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link"
-             th:href="@{/(maDanhMuc=3)} + '#product-list'">
-            <i class="bi bi-laptop"></i> Laptop
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link"
-             th:href="@{/(maDanhMuc=8)} + '#product-list'">
-            <i class="bi bi-cup-hot"></i> Gia dụng
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link"
-             th:href="@{/(maDanhMuc=13)} + '#product-list'">
-            <i class="bi bi-headphones"></i> Phụ kiện
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</header>
-<main class="detail-page" id="product-detail"
-      th:attr="data-product-id=${sanPham.maSanPham},data-product-brand=${sanPham.thuongHieu},data-product-in-stock=${sanPham.soLuong != null and sanPham.soLuong > 0}">
-  <div class="container detail-container">
-    <nav class="detail-breadcrumb" aria-label="Đường dẫn">
-      <a th:href="@{/}">Trang chủ</a><i class="bi bi-chevron-right" aria-hidden="true"></i>
-      <a th:href="@{/(maDanhMuc=${sanPham.danhMuc.maDanhMuc})} + '#product-list'" th:text="${sanPham.danhMuc.tenDanhMuc}">Danh mục</a>
-      <i class="bi bi-chevron-right" aria-hidden="true"></i>
-      <span aria-current="page" th:text="${sanPham.tenSanPham}">Tên sản phẩm</span>
-    </nav>
+    </header>
+    <main
+      class="detail-page"
+      id="product-detail"
+      th:attr="data-product-id=${sanPham.maSanPham},data-product-brand=${sanPham.thuongHieu},data-product-in-stock=${sanPham.soLuong != null and sanPham.soLuong > 0}"
+    >
+      <div class="container detail-container">
+        <nav class="detail-breadcrumb" aria-label="Đường dẫn">
+          <a th:href="@{/}">Trang chủ</a><i class="bi bi-chevron-right" aria-hidden="true"></i>
+          <a
+            th:href="@{/(maDanhMuc=${sanPham.danhMuc.maDanhMuc})} + '#product-list'"
+            th:text="${sanPham.danhMuc.tenDanhMuc}"
+            >Danh mục</a
+          >
+          <i class="bi bi-chevron-right" aria-hidden="true"></i>
+          <span aria-current="page" th:text="${sanPham.tenSanPham}">Tên sản phẩm</span>
+        </nav>
 
-    <div class="detail-hero" id="detail-overview">
-      <div class="detail-gallery-column">
-        <section class="detail-card detail-gallery" aria-label="Hình ảnh sản phẩm">
-          <div class="detail-gallery-stage" id="detail-gallery-stage">
-            <div class="detail-gallery-empty" th:if="${#lists.isEmpty(danhSachAnh)}">
-              <i class="bi bi-image" aria-hidden="true"></i>
-              <strong>Đang cập nhật hình ảnh</strong>
+        <div class="detail-hero" id="detail-overview">
+          <div class="detail-gallery-column">
+            <section class="detail-card detail-gallery" aria-label="Hình ảnh sản phẩm">
+              <div class="detail-gallery-stage" id="detail-gallery-stage">
+                <div class="detail-gallery-empty" th:if="${#lists.isEmpty(danhSachAnh)}">
+                  <i class="bi bi-image" aria-hidden="true"></i>
+                  <strong>Đang cập nhật hình ảnh</strong>
+                </div>
+                <div class="detail-gallery-image is-active" th:if="${!#lists.isEmpty(danhSachAnh)}">
+                  <img th:src="@{${danhSachAnh[0]}}" th:alt="${sanPham.tenSanPham}" loading="eager" />
+                </div>
+                <button
+                  class="detail-gallery-zoom"
+                  type="button"
+                  id="detail-gallery-zoom"
+                  th:if="${!#lists.isEmpty(danhSachAnh)}"
+                  aria-label="Phóng to hình ảnh"
+                >
+                  <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i>
+                </button>
+              </div>
+            </section>
+
+            <section
+              class="detail-card detail-highlight-card"
+              th:if="${!#lists.isEmpty(danhSachThongSo)}"
+              aria-labelledby="detail-highlight-title"
+            >
+              <div class="detail-section-head">
+                <h2 id="detail-highlight-title">Thông số nổi bật</h2>
+                <a href="#detail-specifications">Xem tất cả <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+              </div>
+              <div class="detail-highlight-list">
+                <div class="detail-highlight-item" th:each="ts, stat : ${danhSachThongSo}" th:if="${stat.index < 6}">
+                  <i class="bi bi-check-circle" aria-hidden="true"></i>
+                  <div>
+                    <span th:text="${ts.tenThongSo}">Thông số</span><strong th:text="${ts.giaTri}">Giá trị</strong>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="detail-purchase-column">
+            <section class="detail-card detail-summary" aria-labelledby="detail-title">
+              <div class="detail-summary-eyebrow">
+                <i class="bi bi-shop" aria-hidden="true"></i> PDMJV • Thông tin sản phẩm
+              </div>
+              <h1 id="detail-title" th:text="${sanPham.tenSanPham}">Tên sản phẩm</h1>
+              <div class="detail-meta">
+                <span>Mã sản phẩm: <strong th:text="${sanPham.maSanPham}">0</strong></span>
+                <span>Model: <strong th:text="${sanPham.maModel}">Model</strong></span>
+              </div>
+              <div class="detail-review-inline">
+                <a href="#detail-reviews" th:if="${tongDanhGia > 0}">
+                  <i class="bi bi-star-fill" aria-hidden="true"></i>
+                  <strong th:text="${#numbers.formatDecimal(diemTrungBinh, 1, 1)}">0,0</strong>
+                  <span th:text="'(' + ${tongDanhGia} + ' đánh giá)'">(0 đánh giá)</span>
+                </a>
+                <a href="#detail-reviews" th:if="${tongDanhGia == 0}"
+                  ><i class="bi bi-star" aria-hidden="true"></i> Chưa có đánh giá</a
+                >
+                <span class="detail-review-separator" aria-hidden="true"></span>
+                <a href="#detail-specifications"
+                  ><i class="bi bi-list-check" aria-hidden="true"></i> Thông số kỹ thuật</a
+                >
+              </div>
+              <div class="detail-divider"></div>
+              <div class="detail-price-panel">
+                <span>Giá bán tại PDMJV</span>
+                <strong
+                  class="detail-price"
+                  th:text="${#numbers.formatDecimal(sanPham.donGia, 1, 'POINT', 0, 'COMMA') + '₫'}"
+                  >0₫</strong
+                >
+                <p>Giá niêm yết theo dữ liệu sản phẩm hiện tại.</p>
+              </div>
+              <div class="detail-stock" th:if="${sanPham.soLuong != null and sanPham.soLuong > 0}">
+                <span class="detail-stock-ok"
+                  ><i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                  <strong
+                    th:text="${sanPham.mucTonToiThieu != null and sanPham.soLuong <= sanPham.mucTonToiThieu ? 'Sắp hết hàng' : 'Còn hàng'}"
+                    >Còn hàng</strong
+                  >
+                </span>
+                <span th:text="'Hiện còn ' + ${sanPham.soLuong} + ' sản phẩm'">Còn hàng</span>
+              </div>
+              <div class="detail-stock" th:unless="${sanPham.soLuong != null and sanPham.soLuong > 0}">
+                <span class="detail-stock-no"
+                  ><i class="bi bi-x-circle-fill" aria-hidden="true"></i><strong>Hết hàng</strong></span
+                >
+                <span>Vui lòng tham khảo sản phẩm khác.</span>
+              </div>
+              <dl class="detail-summary-facts">
+                <div>
+                  <dt>Thương hiệu</dt>
+                  <dd th:text="${sanPham.thuongHieu}">Thương hiệu</dd>
+                </div>
+                <div>
+                  <dt>Danh mục</dt>
+                  <dd th:text="${sanPham.danhMuc.tenDanhMuc}">Danh mục</dd>
+                </div>
+                <div>
+                  <dt>Bảo hành</dt>
+                  <dd
+                    th:text="${sanPham.thoiGianBaoHanh != null ? sanPham.thoiGianBaoHanh + ' tháng' : 'Đang cập nhật'}"
+                  >
+                    Bảo hành
+                  </dd>
+                </div>
+              </dl>
+              <form
+                class="detail-action-row product-actions"
+                method="post"
+                th:action="@{/gio-hang/them}"
+                aria-label="Thao tác sản phẩm"
+              >
+                <input type="hidden" name="maSanPham" th:value="${sanPham.maSanPham}" />
+                <button
+                  type="submit"
+                  name="muaNgay"
+                  value="true"
+                  class="buy-now-button"
+                  th:disabled="${sanPham.soLuong == null or sanPham.soLuong <= 0}"
+                >
+                  Mua ngay
+                </button>
+                <button
+                  type="submit"
+                  class="add-to-cart-button"
+                  th:disabled="${sanPham.soLuong == null or sanPham.soLuong <= 0}"
+                  aria-label="Thêm vào giỏ hàng"
+                  title="Thêm vào giỏ hàng"
+                >
+                  <i class="bi bi-cart-plus" aria-hidden="true"></i>
+                </button>
+              </form>
+              <!-- KH10 – So sánh: chức năng TV2, đặt sau thao tác mua hàng -->
+              <div class="detail-compare-panel">
+                <span class="detail-compare-hint">Cần lựa chọn giữa các sản phẩm?</span>
+                <a class="product-compare-detail" th:href="@{/so-sanh(maSanPham=${sanPham.maSanPham})}">
+                  <i class="bi bi-columns-gap" aria-hidden="true"></i>
+                  So sánh với sản phẩm cùng loại
+                  <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </a>
+              </div>
+            </section>
+            <section class="detail-card detail-info-panel">
+              <h2><i class="bi bi-gift" aria-hidden="true"></i> Thông tin ưu đãi</h2>
+              <p>Các chương trình khuyến mãi hợp lệ sẽ hiển thị khi chức năng của nhóm được tích hợp.</p>
+            </section>
+            <section class="detail-card detail-info-panel detail-info-warranty">
+              <h2><i class="bi bi-shield-check" aria-hidden="true"></i> Bảo hành sản phẩm</h2>
+              <p
+                th:text="${sanPham.thoiGianBaoHanh != null ? 'Thời hạn bảo hành: ' + sanPham.thoiGianBaoHanh + ' tháng.' : 'Đang cập nhật thông tin bảo hành.'}"
+              >
+                Bảo hành
+              </p>
+            </section>
+            <section class="detail-card detail-info-panel">
+              <h2><i class="bi bi-truck" aria-hidden="true"></i> Thông tin giao hàng</h2>
+              <p>Địa chỉ, phí vận chuyển và thời gian giao dự kiến sẽ được xác nhận ở bước đặt hàng.</p>
+            </section>
+          </div>
+        </div>
+      </div>
+      <nav class="detail-section-nav container detail-container" aria-label="Điều hướng nội dung trang chi tiết">
+        <div class="detail-nav-inner">
+          <a class="is-active" href="#detail-overview">Thông tin sản phẩm</a>
+          <a href="#detail-description">Mô tả &amp; thông số</a>
+          <a href="#detail-reviews">Đánh giá</a>
+          <a href="#detail-related" th:if="${!#lists.isEmpty(danhSachTuongTu)}">Sản phẩm tương tự</a>
+        </div>
+      </nav>
+      <div class="container detail-container detail-content">
+        <div class="detail-content-grid" id="detail-description">
+          <section class="detail-card detail-description-card" aria-labelledby="detail-description-title">
+            <div class="detail-section-head"><h2 id="detail-description-title">Mô tả sản phẩm</h2></div>
+            <div
+              class="detail-description-text"
+              id="detail-description-text"
+              th:if="${sanPham.moTa != null and !#strings.isEmpty(sanPham.moTa)}"
+              th:text="${sanPham.moTa}"
+            >
+              Mô tả từ SQL Server
             </div>
-            <div class="detail-gallery-image is-active" th:if="${!#lists.isEmpty(danhSachAnh)}">
-              <img th:src="@{${danhSachAnh[0]}}" th:alt="${sanPham.tenSanPham}" loading="eager">
-            </div>
-            <button class="detail-gallery-zoom" type="button" id="detail-gallery-zoom" th:if="${!#lists.isEmpty(danhSachAnh)}" aria-label="Phóng to hình ảnh">
-              <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i>
+            <p class="detail-empty-message" th:unless="${sanPham.moTa != null and !#strings.isEmpty(sanPham.moTa)}">
+              Sản phẩm chưa có mô tả chi tiết.
+            </p>
+            <button type="button" id="detail-description-more" class="detail-text-button" hidden>
+              Đọc thêm <i class="bi bi-chevron-down" aria-hidden="true"></i>
             </button>
-          </div>
-        </section>
-
-        <section class="detail-card detail-highlight-card" th:if="${!#lists.isEmpty(danhSachThongSo)}" aria-labelledby="detail-highlight-title">
-          <div class="detail-section-head">
-            <h2 id="detail-highlight-title">Thông số nổi bật</h2>
-            <a href="#detail-specifications">Xem tất cả <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-          </div>
-          <div class="detail-highlight-list">
-            <div class="detail-highlight-item" th:each="ts, stat : ${danhSachThongSo}" th:if="${stat.index < 6}">
-              <i class="bi bi-check-circle" aria-hidden="true"></i>
-              <div><span th:text="${ts.tenThongSo}">Thông số</span><strong th:text="${ts.giaTri}">Giá trị</strong></div>
+          </section>
+          <section class="detail-card detail-spec-card" id="detail-specifications" aria-labelledby="detail-spec-title">
+            <div class="detail-section-head"><h2 id="detail-spec-title">Thông số kỹ thuật</h2></div>
+            <div class="table-responsive" th:if="${!#lists.isEmpty(danhSachThongSo)}">
+              <table class="table detail-spec-table">
+                <tbody>
+                  <tr th:each="ts : ${danhSachThongSo}">
+                    <th scope="row" th:text="${ts.tenThongSo}">Tên thông số</th>
+                    <td th:text="${ts.giaTri}">Giá trị</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-          </div>
-        </section>
-      </div>
-      <div class="detail-purchase-column">
-        <section class="detail-card detail-summary" aria-labelledby="detail-title">
-          <div class="detail-summary-eyebrow"><i class="bi bi-shop" aria-hidden="true"></i> PDMJV • Thông tin sản phẩm</div>
-          <h1 id="detail-title" th:text="${sanPham.tenSanPham}">Tên sản phẩm</h1>
-          <div class="detail-meta">
-            <span>Mã sản phẩm: <strong th:text="${sanPham.maSanPham}">0</strong></span>
-            <span>Model: <strong th:text="${sanPham.maModel}">Model</strong></span>
-          </div>
-          <div class="detail-review-inline">
-            <a href="#detail-reviews" th:if="${tongDanhGia > 0}">
-              <i class="bi bi-star-fill" aria-hidden="true"></i>
+            <p class="detail-empty-message" th:if="${#lists.isEmpty(danhSachThongSo)}">
+              Chưa có thông số kỹ thuật cho sản phẩm này.
+            </p>
+          </section>
+        </div>
+        <section class="detail-card detail-review-section" id="detail-reviews" aria-labelledby="detail-review-title">
+          <div class="detail-section-head"><h2 id="detail-review-title">Đánh giá và bình luận</h2></div>
+          <div class="detail-review-layout" th:if="${tongDanhGia > 0}">
+            <div class="detail-rating-summary">
               <strong th:text="${#numbers.formatDecimal(diemTrungBinh, 1, 1)}">0,0</strong>
-              <span th:text="'(' + ${tongDanhGia} + ' đánh giá)'">(0 đánh giá)</span>
-            </a>
-            <a href="#detail-reviews" th:if="${tongDanhGia == 0}"><i class="bi bi-star" aria-hidden="true"></i> Chưa có đánh giá</a>
-            <span class="detail-review-separator" aria-hidden="true"></span>
-            <a href="#detail-specifications"><i class="bi bi-list-check" aria-hidden="true"></i> Thông số kỹ thuật</a>
+              <div class="detail-rating-stars" aria-label="Điểm trung bình trên 5">
+                <i class="bi bi-star-fill" aria-hidden="true"></i>
+                <span>/ 5</span>
+              </div>
+              <p th:text="${tongDanhGia} + ' đánh giá thực tế'">Đánh giá</p>
+            </div>
+            <div class="detail-rating-distribution">
+              <div class="detail-rating-row" th:each="soSao : ${soLuongTheoSao.keySet()}">
+                <span th:text="${soSao} + ' sao'">5 sao</span>
+                <progress th:value="${soLuongTheoSao[soSao]}" th:max="${tongDanhGia}"></progress>
+                <span th:text="${soLuongTheoSao[soSao]}">0</span>
+              </div>
+            </div>
           </div>
-          <div class="detail-divider"></div>
-          <div class="detail-price-panel">
-            <span>Giá bán tại PDMJV</span>
-            <strong class="detail-price" th:text="${#numbers.formatDecimal(sanPham.donGia, 1, 'POINT', 0, 'COMMA') + '₫'}">0₫</strong>
-            <p>Giá niêm yết theo dữ liệu sản phẩm hiện tại.</p>
+          <div class="detail-review-none" th:if="${tongDanhGia == 0}">
+            <i class="bi bi-chat-left-text" aria-hidden="true"></i>
+            <p>Chưa có đánh giá nào cho sản phẩm này.</p>
           </div>
-          <div class="detail-stock" th:if="${sanPham.soLuong != null and sanPham.soLuong > 0}">
-            <span class="detail-stock-ok"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>
-              <strong th:text="${sanPham.mucTonToiThieu != null and sanPham.soLuong <= sanPham.mucTonToiThieu ? 'Sắp hết hàng' : 'Còn hàng'}">Còn hàng</strong>
-            </span>
-            <span th:text="'Hiện còn ' + ${sanPham.soLuong} + ' sản phẩm'">Còn hàng</span>
+          <div class="detail-review-actions">
+            <strong th:text="${tongDanhGia} + ' nhận xét'">0 nhận xét</strong>
+            <div class="detail-review-filter" th:if="${tongDanhGia > 0}">
+              <button type="button" class="is-active" data-rating="all" aria-pressed="true">Tất cả</button>
+              <button type="button" data-rating="5" aria-pressed="false">5★</button>
+              <button type="button" data-rating="4" aria-pressed="false">4★</button>
+              <button type="button" data-rating="3" aria-pressed="false">3★</button>
+              <button type="button" data-rating="2" aria-pressed="false">2★</button>
+              <button type="button" data-rating="1" aria-pressed="false">1★</button>
+            </div>
           </div>
-          <div class="detail-stock" th:unless="${sanPham.soLuong != null and sanPham.soLuong > 0}">
-            <span class="detail-stock-no"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><strong>Hết hàng</strong></span>
-            <span>Vui lòng tham khảo sản phẩm khác.</span>
+          <div class="detail-review-list" id="detail-review-list" th:if="${tongDanhGia > 0}">
+            <article class="detail-review-item" th:each="dg : ${danhSachDanhGia}" th:attr="data-rating=${dg.soSao}">
+              <div class="detail-review-avatar"><i class="bi bi-person" aria-hidden="true"></i></div>
+              <div class="detail-review-content">
+                <div class="detail-review-person">
+                  <strong th:text="${dg.tenHienThi}">Khách hàng</strong>
+                  <span th:text="${#temporals.format(dg.ngayDanhGia, 'dd/MM/yyyy')}">Ngày</span>
+                </div>
+                <div class="detail-review-score">
+                  <i class="bi bi-star-fill" aria-hidden="true"></i>
+                  <span th:text="${dg.soSao} + '/5'">5/5</span>
+                </div>
+                <p th:if="${dg.noiDung != null and !#strings.isEmpty(dg.noiDung)}" th:text="${dg.noiDung}">Nhận xét</p>
+              </div>
+            </article>
           </div>
-          <dl class="detail-summary-facts">
-            <div><dt>Thương hiệu</dt><dd th:text="${sanPham.thuongHieu}">Thương hiệu</dd></div>
-            <div><dt>Danh mục</dt><dd th:text="${sanPham.danhMuc.tenDanhMuc}">Danh mục</dd></div>
-            <div><dt>Bảo hành</dt><dd th:text="${sanPham.thoiGianBaoHanh != null ? sanPham.thoiGianBaoHanh + ' tháng' : 'Đang cập nhật'}">Bảo hành</dd></div>
-          </dl>
-          <div class="detail-action-row product-actions" aria-label="Thao tác sản phẩm">
-            <button type="button" class="buy-now-button" disabled>Mua ngay</button>
-            <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
+          <p class="detail-empty-message" id="detail-review-filter-empty" hidden>
+            Không có đánh giá phù hợp với số sao đã chọn.
+          </p>
+          <div class="detail-review-integration">
+            <button type="button" disabled title="Đánh giá sản phẩm do TV3 xây dựng (KH22)">
+              <i class="bi bi-pencil-square" aria-hidden="true"></i> Đánh giá sản phẩm
+            </button>
+            <span>Chức năng gửi đánh giá sẽ được TV3 tích hợp.</span>
+          </div>
+        </section>
+        <section
+          class="detail-card detail-related"
+          id="detail-related"
+          th:if="${!#lists.isEmpty(danhSachTuongTu)}"
+          aria-labelledby="detail-related-title"
+        >
+          <div class="detail-section-head">
+            <h2 id="detail-related-title">Sản phẩm tương tự</h2>
+            <a th:href="@{/(maDanhMuc=${sanPham.danhMuc.maDanhMuc})} + '#product-list'"
+              >Xem trong danh mục <i class="bi bi-arrow-right" aria-hidden="true"></i
+            ></a>
+          </div>
+          <div class="detail-related-grid">
+            <article class="detail-related-card product-card light" th:each="sp : ${danhSachTuongTu}">
+              <a
+                class="detail-related-photo"
+                th:href="@{/san-pham/{id}(id=${sp.maSanPham})}"
+                th:aria-label="'Xem ' + ${sp.tenSanPham}"
+              >
+                <img
+                  th:if="${anhTuongTu[sp.maSanPham] != null}"
+                  th:src="@{${anhTuongTu[sp.maSanPham]}}"
+                  th:alt="${sp.tenSanPham}"
+                  loading="lazy"
+                />
+                <span th:if="${anhTuongTu[sp.maSanPham] == null}"
+                  ><i class="bi bi-box-seam" aria-hidden="true"></i> Đang cập nhật ảnh</span
+                >
+              </a>
+              <small class="detail-related-brand" th:text="${sp.thuongHieu}">Thương hiệu</small>
+              <a class="detail-related-name" th:href="@{/san-pham/{id}(id=${sp.maSanPham})}" th:text="${sp.tenSanPham}"
+                >Tên sản phẩm</a
+              >
+              <strong
+                class="detail-related-price"
+                th:text="${#numbers.formatDecimal(sp.donGia, 1, 'POINT', 0, 'COMMA') + '₫'}"
+                >Giá bán</strong
+              >
+              <form class="product-actions" method="post" th:action="@{/gio-hang/them}">
+                <input type="hidden" name="maSanPham" th:value="${sp.maSanPham}" />
+                <button
+                  type="submit"
+                  name="muaNgay"
+                  value="true"
+                  class="buy-now-button"
+                  th:disabled="${sp.soLuong == null or sp.soLuong <= 0}"
+                >
+                  Mua ngay
+                </button>
+                <button
+                  type="submit"
+                  class="add-to-cart-button"
+                  th:disabled="${sp.soLuong == null or sp.soLuong <= 0}"
+                  aria-label="Thêm vào giỏ hàng"
+                  title="Thêm vào giỏ hàng"
+                >
+                  <i class="bi bi-cart-plus" aria-hidden="true"></i>
+                </button>
+              </form>
+            </article>
+          </div>
+        </section>
+        <section
+          class="detail-card detail-recently-viewed"
+          id="detail-recently-viewed"
+          hidden
+          aria-labelledby="detail-recent-title"
+        >
+          <div class="detail-section-head">
+            <h2 id="detail-recent-title">Sản phẩm đã xem</h2>
+          </div>
+          <div class="detail-related-grid" id="detail-recent-grid"></div>
+        </section>
+        <a class="detail-back-list" th:href="@{/#product-list}"
+          ><i class="bi bi-arrow-left" aria-hidden="true"></i> Quay lại danh sách sản phẩm</a
+        >
+      </div>
+
+      <div class="detail-purchase-dock" id="detail-purchase-dock" hidden>
+        <div class="container detail-purchase-dock-inner">
+          <div class="detail-purchase-dock-info">
+            <strong th:text="${sanPham.tenSanPham}">Tên sản phẩm</strong>
+            <span th:text="${#numbers.formatDecimal(sanPham.donGia, 1, 'POINT', 0, 'COMMA') + '₫'}">0₫</span>
+          </div>
+          <form class="product-actions" method="post" th:action="@{/gio-hang/them}">
+            <input type="hidden" name="maSanPham" th:value="${sanPham.maSanPham}" />
+            <button
+              type="submit"
+              name="muaNgay"
+              value="true"
+              class="buy-now-button"
+              th:disabled="${sanPham.soLuong == null or sanPham.soLuong <= 0}"
+            >
+              Mua ngay
+            </button>
+            <button
+              type="submit"
+              class="add-to-cart-button"
+              th:disabled="${sanPham.soLuong == null or sanPham.soLuong <= 0}"
+              aria-label="Thêm vào giỏ hàng"
+              title="Thêm vào giỏ hàng"
+            >
               <i class="bi bi-cart-plus" aria-hidden="true"></i>
             </button>
-          </div>
-          <p class="detail-integration-note"><i class="bi bi-info-circle" aria-hidden="true"></i>Chức năng mua hàng và giỏ hàng đang được cập nhật.</p>
-          <!-- So sánh mua hàng -->
-          <div class="detail-compare-panel">
-            <span class="detail-compare-hint">Cần lựa chọn giữa các sản phẩm?</span>
-            <a class="product-compare-detail"
-               th:href="@{/so-sanh(maSanPham=${sanPham.maSanPham})}">
-              <i class="bi bi-columns-gap" aria-hidden="true"></i>
-              So sánh với sản phẩm cùng loại
-              <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </form>
+        </div>
+      </div>
+      <div
+        class="detail-lightbox"
+        id="detail-lightbox"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Xem hình ảnh sản phẩm"
+        aria-hidden="true"
+        hidden
+      >
+        <button type="button" class="detail-lightbox-close" id="detail-lightbox-close" aria-label="Đóng ảnh">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="detail-lightbox-prev" id="detail-lightbox-prev" aria-label="Ảnh trước">
+          <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </button>
+        <img id="detail-lightbox-image" alt="Ảnh sản phẩm phóng to" />
+        <button type="button" class="detail-lightbox-next" id="detail-lightbox-next" aria-label="Ảnh sau">
+          <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="tv2-cart-notice" id="tv2-cart-notice" role="status" aria-live="polite" hidden>
+        <i class="bi bi-info-circle" aria-hidden="true"></i><span id="tv2-cart-notice-text"></span>
+        <button type="button" id="tv2-cart-notice-close" aria-label="Đóng thông báo"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </main>
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <a class="logo d-inline-block mb-3" th:href="@{/}">
+              <img
+                th:src="@{/images/header-banner/logo-footer.png}"
+                alt="PDMJV - Điện máy &amp; Công nghệ"
+                class="logo-img"
+              />
             </a>
-          </div>
-        </section>
-        <section class="detail-card detail-info-panel">
-          <h2><i class="bi bi-gift" aria-hidden="true"></i> Thông tin ưu đãi</h2>
-          <p>Các chương trình khuyến mãi hợp lệ sẽ hiển thị khi chức năng của nhóm được tích hợp.</p>
-        </section>
-        <section class="detail-card detail-info-panel detail-info-warranty">
-          <h2><i class="bi bi-shield-check" aria-hidden="true"></i> Bảo hành sản phẩm</h2>
-          <p th:text="${sanPham.thoiGianBaoHanh != null ? 'Thời hạn bảo hành: ' + sanPham.thoiGianBaoHanh + ' tháng.' : 'Đang cập nhật thông tin bảo hành.'}">Bảo hành</p>
-        </section>
-        <section class="detail-card detail-info-panel">
-          <h2><i class="bi bi-truck" aria-hidden="true"></i> Thông tin giao hàng</h2>
-          <p>Địa chỉ, phí vận chuyển và thời gian giao dự kiến sẽ được xác nhận ở bước đặt hàng.</p>
-        </section>
-      </div>
-    </div>
-  </div>
-  <nav class="detail-section-nav container detail-container" aria-label="Điều hướng nội dung trang chi tiết">
-    <div class="detail-nav-inner">
-      <a class="is-active" href="#detail-overview">Thông tin sản phẩm</a>
-      <a href="#detail-description">Mô tả &amp; thông số</a>
-      <a href="#detail-reviews">Đánh giá</a>
-      <a href="#detail-related" th:if="${!#lists.isEmpty(danhSachTuongTu)}">Sản phẩm tương tự</a>
-    </div>
-  </nav>
-  <div class="container detail-container detail-content">
-    <div class="detail-content-grid" id="detail-description">
-      <section class="detail-card detail-description-card" aria-labelledby="detail-description-title">
-        <div class="detail-section-head"><h2 id="detail-description-title">Mô tả sản phẩm</h2></div>
-        <div class="detail-description-text" id="detail-description-text"
-             th:if="${sanPham.moTa != null and !#strings.isEmpty(sanPham.moTa)}"
-             th:text="${sanPham.moTa}">Mô tả từ SQL Server</div>
-        <p class="detail-empty-message" th:unless="${sanPham.moTa != null and !#strings.isEmpty(sanPham.moTa)}">Sản phẩm chưa có mô tả chi tiết.</p>
-        <button type="button" id="detail-description-more" class="detail-text-button" hidden>
-          Đọc thêm <i class="bi bi-chevron-down" aria-hidden="true"></i>
-        </button>
-      </section>
-      <section class="detail-card detail-spec-card" id="detail-specifications" aria-labelledby="detail-spec-title">
-        <div class="detail-section-head"><h2 id="detail-spec-title">Thông số kỹ thuật</h2></div>
-        <div class="table-responsive" th:if="${!#lists.isEmpty(danhSachThongSo)}">
-          <table class="table detail-spec-table"><tbody>
-          <tr th:each="ts : ${danhSachThongSo}">
-            <th scope="row" th:text="${ts.tenThongSo}">Tên thông số</th>
-            <td th:text="${ts.giaTri}">Giá trị</td>
-          </tr>
-          </tbody></table>
-        </div>
-        <p class="detail-empty-message" th:if="${#lists.isEmpty(danhSachThongSo)}">Chưa có thông số kỹ thuật cho sản phẩm này.</p>
-      </section>
-    </div>
-    <section class="detail-card detail-review-section" id="detail-reviews" aria-labelledby="detail-review-title">
-      <div class="detail-section-head"><h2 id="detail-review-title">Đánh giá và bình luận</h2></div>
-      <div class="detail-review-layout" th:if="${tongDanhGia > 0}">
-        <div class="detail-rating-summary">
-          <strong th:text="${#numbers.formatDecimal(diemTrungBinh, 1, 1)}">0,0</strong>
-          <div class="detail-rating-stars" aria-label="Điểm trung bình trên 5">
-            <i class="bi bi-star-fill" aria-hidden="true"></i>
-            <span>/ 5</span>
-          </div>
-          <p th:text="${tongDanhGia} + ' đánh giá thực tế'">Đánh giá</p>
-        </div>
-        <div class="detail-rating-distribution">
-          <div class="detail-rating-row" th:each="soSao : ${soLuongTheoSao.keySet()}">
-            <span th:text="${soSao} + ' sao'">5 sao</span>
-            <progress th:value="${soLuongTheoSao[soSao]}" th:max="${tongDanhGia}"></progress>
-            <span th:text="${soLuongTheoSao[soSao]}">0</span>
-          </div>
-        </div>
-      </div>
-      <div class="detail-review-none" th:if="${tongDanhGia == 0}">
-        <i class="bi bi-chat-left-text" aria-hidden="true"></i>
-        <p>Chưa có đánh giá nào cho sản phẩm này.</p>
-      </div>
-      <div class="detail-review-actions">
-        <strong th:text="${tongDanhGia} + ' nhận xét'">0 nhận xét</strong>
-        <div class="detail-review-filter" th:if="${tongDanhGia > 0}">
-          <button type="button" class="is-active" data-rating="all" aria-pressed="true">Tất cả</button>
-          <button type="button" data-rating="5" aria-pressed="false">5★</button>
-          <button type="button" data-rating="4" aria-pressed="false">4★</button>
-          <button type="button" data-rating="3" aria-pressed="false">3★</button>
-          <button type="button" data-rating="2" aria-pressed="false">2★</button>
-          <button type="button" data-rating="1" aria-pressed="false">1★</button>
-        </div>
-      </div>
-      <div class="detail-review-list" id="detail-review-list" th:if="${tongDanhGia > 0}">
-        <article class="detail-review-item" th:each="dg : ${danhSachDanhGia}" th:attr="data-rating=${dg.soSao}">
-          <div class="detail-review-avatar"><i class="bi bi-person" aria-hidden="true"></i></div>
-          <div class="detail-review-content">
-            <div class="detail-review-person">
-              <strong th:text="${dg.tenHienThi}">Khách hàng</strong>
-              <span th:text="${#temporals.format(dg.ngayDanhGia, 'dd/MM/yyyy')}">Ngày</span>
+            <p>Hệ thống bán lẻ điện máy, điện tử, gia dụng chính hãng với giá tốt nhất.</p>
+            <div class="socials">
+              <a href="#"><i class="bi bi-facebook"></i></a>
+              <a href="#"><i class="bi bi-youtube"></i></a>
+              <a href="#"><i class="bi bi-tiktok"></i></a>
+              <a href="#"><i class="bi bi-instagram"></i></a>
             </div>
-            <div class="detail-review-score"><i class="bi bi-star-fill" aria-hidden="true"></i>
-              <span th:text="${dg.soSao} + '/5'">5/5</span>
-            </div>
-            <p th:if="${dg.noiDung != null and !#strings.isEmpty(dg.noiDung)}" th:text="${dg.noiDung}">Nhận xét</p>
           </div>
-        </article>
-      </div>
-      <p class="detail-empty-message" id="detail-review-filter-empty" hidden>Không có đánh giá phù hợp với số sao đã chọn.</p>
-      <div class="detail-review-integration">
-        <button type="button" disabled title="Đánh giá sản phẩm do TV3 xây dựng (KH22)">
-          <i class="bi bi-pencil-square" aria-hidden="true"></i> Đánh giá sản phẩm
-        </button>
-        <span>Chức năng gửi đánh giá sẽ được TV3 tích hợp.</span>
-      </div>
-    </section>
-    <section class="detail-card detail-related" id="detail-related" th:if="${!#lists.isEmpty(danhSachTuongTu)}"
-             aria-labelledby="detail-related-title">
-      <div class="detail-section-head"><h2 id="detail-related-title">Sản phẩm tương tự</h2>
-        <a th:href="@{/(maDanhMuc=${sanPham.danhMuc.maDanhMuc})} + '#product-list'">Xem trong danh mục <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-      </div>
-      <div class="detail-related-grid">
-        <article class="detail-related-card product-card light" th:each="sp : ${danhSachTuongTu}">
-          <a class="detail-related-photo" th:href="@{/san-pham/{id}(id=${sp.maSanPham})}"
-             th:aria-label="'Xem ' + ${sp.tenSanPham}">
-            <img th:if="${anhTuongTu[sp.maSanPham] != null}"
-                 th:src="@{${anhTuongTu[sp.maSanPham]}}" th:alt="${sp.tenSanPham}" loading="lazy" />
-            <span th:if="${anhTuongTu[sp.maSanPham] == null}"><i class="bi bi-box-seam" aria-hidden="true"></i> Đang cập nhật ảnh</span>
-          </a>
-          <small class="detail-related-brand" th:text="${sp.thuongHieu}">Thương hiệu</small>
-          <a class="detail-related-name" th:href="@{/san-pham/{id}(id=${sp.maSanPham})}"
-             th:text="${sp.tenSanPham}">Tên sản phẩm</a>
-          <strong class="detail-related-price"
-                  th:text="${#numbers.formatDecimal(sp.donGia, 1, 'POINT', 0, 'COMMA') + '₫'}">Giá bán</strong>
-          <div class="product-actions">
-            <button type="button" class="buy-now-button" disabled>Mua ngay
-            </button>
-            <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
-              <i class="bi bi-cart-plus" aria-hidden="true"></i>
-            </button>
+          <div class="col-6 col-lg-2">
+            <h6>Hỗ trợ</h6>
+            <ul>
+              <li><a href="#">Hướng dẫn mua hàng</a></li>
+              <li><a href="#">Chính sách bảo hành</a></li>
+              <li><a href="#">Chính sách đổi trả</a></li>
+              <li><a href="#">Trả góp</a></li>
+            </ul>
           </div>
-        </article>
-      </div>
-    </section>
-    <section class="detail-card detail-recently-viewed" id="detail-recently-viewed" hidden
-             aria-labelledby="detail-recent-title">
-      <div class="detail-section-head">
-        <h2 id="detail-recent-title">Sản phẩm đã xem</h2>
-      </div>
-      <div class="detail-related-grid" id="detail-recent-grid"></div>
-    </section>
-    <a class="detail-back-list" th:href="@{/#product-list}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Quay lại danh sách sản phẩm</a>
-  </div>
-
-  <div class="detail-purchase-dock" id="detail-purchase-dock" hidden>
-    <div class="container detail-purchase-dock-inner">
-      <div class="detail-purchase-dock-info">
-        <strong th:text="${sanPham.tenSanPham}">Tên sản phẩm</strong>
-        <span th:text="${#numbers.formatDecimal(sanPham.donGia, 1, 'POINT', 0, 'COMMA') + '₫'}">0₫</span>
-      </div>
-      <div class="product-actions">
-        <button type="button" class="buy-now-button" disabled>Mua ngay
-        </button>
-        <button type="button" class="add-to-cart-button" disabled aria-label="Thêm vào giỏ hàng" title="Thêm vào giỏ hàng">
-          <i class="bi bi-cart-plus" aria-hidden="true"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-  <div class="detail-lightbox" id="detail-lightbox" role="dialog" aria-modal="true"
-       aria-label="Xem hình ảnh sản phẩm" aria-hidden="true" hidden>
-    <button type="button" class="detail-lightbox-close" id="detail-lightbox-close" aria-label="Đóng ảnh">
-      <i class="bi bi-x-lg" aria-hidden="true"></i>
-    </button>
-    <button type="button" class="detail-lightbox-prev" id="detail-lightbox-prev" aria-label="Ảnh trước">
-      <i class="bi bi-chevron-left" aria-hidden="true"></i>
-    </button>
-    <img id="detail-lightbox-image" alt="Ảnh sản phẩm phóng to" />
-    <button type="button" class="detail-lightbox-next" id="detail-lightbox-next" aria-label="Ảnh sau">
-      <i class="bi bi-chevron-right" aria-hidden="true"></i>
-    </button>
-  </div>
-  <div class="tv2-cart-notice" id="tv2-cart-notice" role="status" aria-live="polite" hidden>
-    <i class="bi bi-info-circle" aria-hidden="true"></i><span id="tv2-cart-notice-text"></span>
-    <button type="button" id="tv2-cart-notice-close" aria-label="Đóng thông báo"><i class="bi bi-x-lg"></i></button>
-  </div>
-</main>
-<!-- Footer -->
-<footer class="footer">
-  <div class="container">
-    <div class="row g-4">
-      <div class="col-lg-4">
-        <a class="logo d-inline-block mb-3" th:href="@{/}">
-          <img th:src="@{/images/header-banner/logo-footer.png}" alt="PDMJV - Điện máy &amp; Công nghệ" class="logo-img" />
-        </a>
-        <p>Hệ thống bán lẻ điện máy, điện tử, gia dụng chính hãng với giá tốt nhất.</p>
-        <div class="socials">
-          <a href="#"><i class="bi bi-facebook"></i></a>
-          <a href="#"><i class="bi bi-youtube"></i></a>
-          <a href="#"><i class="bi bi-tiktok"></i></a>
-          <a href="#"><i class="bi bi-instagram"></i></a>
+          <div class="col-6 col-lg-2">
+            <h6>Về chúng tôi</h6>
+            <ul>
+              <li><a href="#">Giới thiệu</a></li>
+              <li><a href="#">Tuyển dụng</a></li>
+              <li><a href="#">Tin tức</a></li>
+              <li><a href="#">Liên hệ</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-4">
+            <h6>Liên hệ</h6>
+            <ul>
+              <li><i class="bi bi-geo-alt"></i> 123 Nguyễn Văn Linh, Q.7, TP.HCM</li>
+              <li><i class="bi bi-telephone"></i> 1800 1234</li>
+              <li><i class="bi bi-envelope"></i> hotro@dienmaypro.vn</li>
+              <li><i class="bi bi-clock"></i> 8:00 - 22:00 (cả tuần)</li>
+            </ul>
+          </div>
         </div>
+        <hr />
+        <p class="text-center small mb-0">© 2026 PDMJV. All rights reserved.</p>
       </div>
-      <div class="col-6 col-lg-2">
-        <h6>Hỗ trợ</h6>
-        <ul>
-          <li><a href="#">Hướng dẫn mua hàng</a></li>
-          <li><a href="#">Chính sách bảo hành</a></li>
-          <li><a href="#">Chính sách đổi trả</a></li>
-          <li><a href="#">Trả góp</a></li>
-        </ul>
-      </div>
-      <div class="col-6 col-lg-2">
-        <h6>Về chúng tôi</h6>
-        <ul>
-          <li><a href="#">Giới thiệu</a></li>
-          <li><a href="#">Tuyển dụng</a></li>
-          <li><a href="#">Tin tức</a></li>
-          <li><a href="#">Liên hệ</a></li>
-        </ul>
-      </div>
-      <div class="col-lg-4">
-        <h6>Liên hệ</h6>
-        <ul>
-          <li><i class="bi bi-geo-alt"></i> 123 Nguyễn Văn Linh, Q.7, TP.HCM</li>
-          <li><i class="bi bi-telephone"></i> 1800 1234</li>
-          <li><i class="bi bi-envelope"></i> hotro@dienmaypro.vn</li>
-          <li><i class="bi bi-clock"></i> 8:00 - 22:00 (cả tuần)</li>
-        </ul>
-      </div>
-    </div>
-    <hr />
-    <p class="text-center small mb-0">© 2026 PDMJV. All rights reserved.</p>
-  </div>
-</footer>
-<button class="back-to-top" id="backToTop" type="button" title="Lên đầu trang"><i class="bi bi-arrow-up"></i></button>
+    </footer>
+    <button class="back-to-top" id="backToTop" type="button" title="Lên đầu trang">
+      <i class="bi bi-arrow-up"></i>
+    </button>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script th:src="@{/js/chiTietSanPham.js}"></script>
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/chiTietSanPham.js}"></script>
+    <script th:src="@{/js/gioHangNhanh.js}"></script>
+  </body>
 </html>
