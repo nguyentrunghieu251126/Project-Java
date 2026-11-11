@@ -3,7 +3,7 @@ package project.dien_may.project_java.entity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/** Giá trị khớp ràng buộc CK_ThanhToan_PhuongThuc trong CSDL (xem CapNhat_ThanhToan_TV3.sql). */
+/** Giá trị khớp ràng buộc CK_ThanhToan_PhuongThuc trong CSDL (xem CapNhat_TV3.sql). */
 @Getter
 @RequiredArgsConstructor
 public enum PhuongThucThanhToan {

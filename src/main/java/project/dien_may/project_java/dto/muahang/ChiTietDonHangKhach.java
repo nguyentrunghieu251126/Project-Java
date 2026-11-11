@@ -2,6 +2,8 @@ package project.dien_may.project_java.dto.muahang;
 
 import project.dien_may.project_java.entity.ChiTietDonHang;
 import project.dien_may.project_java.entity.DonHang;
+import project.dien_may.project_java.entity.LichSuDiemThuong;
+import project.dien_may.project_java.entity.LoaiGiaoDichDiem;
 import project.dien_may.project_java.entity.ThanhToan;
 import project.dien_may.project_java.entity.TrangThaiDonHang;
 
@@ -15,8 +17,25 @@ public record ChiTietDonHangKhach(
         List<ChiTietDonHang> chiTiet,
         ThanhToan thanhToan,
         List<BuocDonHang> cacBuoc,
-        Map<Integer, Integer> soSaoDaDanhGia
+        Map<Integer, Integer> soSaoDaDanhGia,
+        List<LichSuDiemThuong> lichSuDiem
 ) {
+    /** Điểm thưởng đã dùng để giảm giá cho đơn (bản ghi TRU đầu tiên khi đặt). */
+    public int diemDaDung() {
+        return lichSuDiem.stream().filter(l -> l.getLoaiGiaoDich() == LoaiGiaoDichDiem.TRU
+                && l.getMoTa() != null && l.getMoTa().startsWith(QuyTacDiemThuong.MO_TA_DUNG)).mapToInt(LichSuDiemThuong::getSoDiem).sum();
+    }
+
+    public BigDecimal tienGiamBangDiem() {
+        return QuyTacDiemThuong.tienGiam(diemDaDung());
+    }
+
+    /** Điểm tích được từ đơn (bản ghi CONG khi đặt). */
+    public int diemTichLuy() {
+        return lichSuDiem.stream().filter(l -> l.getLoaiGiaoDich() == LoaiGiaoDichDiem.CONG
+                && l.getMoTa() != null && l.getMoTa().startsWith(QuyTacDiemThuong.MO_TA_TICH)).mapToInt(LichSuDiemThuong::getSoDiem).sum();
+    }
+
     /** Mã hiển thị dạng DH000031. */
     public String maHien() {
         return String.format("DH%06d", donHang.getMaDonHang());

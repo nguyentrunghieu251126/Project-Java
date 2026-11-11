@@ -8,8 +8,13 @@
    thông số kỹ thuật (ThongSoKyThuat), ngày giao hàng, ngừng kinh doanh,
    mức tồn tối thiểu.
    Phiên bản 3: bổ sung phân quyền theo từng nhân viên (TaiKhoan_Quyen),
-   quyền xem trang tổng quan. Tổng cộng 24 bảng.
-   Database đã có dữ liệu: chạy CapNhat_PhanQuyenTheoNhanVien.sql thay vì file này.
+   quyền xem trang tổng quan.
+   Phiên bản 4 (TV3 – mua hàng): sổ địa chỉ giao hàng (SoDiaChi), phương thức thanh toán
+   mới + ưu đãi lần đầu (2 cột mới của ThanhToan), điểm thưởng (LichSuDiemThuong).
+   Tổng cộng 26 bảng.
+   Đây là FILE DUY NHẤT của cơ sở dữ liệu: đã gộp toàn bộ các file cập nhật trước đây
+   (CapNhat_PhanQuyenTheoNhanVien.sql, CapNhat_SoDiaChi_TV3.sql, CapNhat_ThanhToan_TV3.sql,
+   CapNhat_TV3.sql). Chạy file này sẽ tạo lại database với đầy đủ bảng và dữ liệu mẫu.
    ===================================================================== */
 USE master;
 
@@ -1805,7 +1810,7 @@ WHERE v.TenVaiTro = 'KHACH_HANG'
   AND NOT EXISTS (SELECT 1 FROM dbo.SoDiaChi s WHERE s.MaTaiKhoan = t.MaTaiKhoan);
 GO
 
-/* ===== TV3 – Phương thức thanh toán mới + ưu đãi lần đầu (giống CapNhat_ThanhToan_TV3.sql) ===== */
+/* ============ TV3 – PHƯƠNG THỨC THANH TOÁN MỚI + ƯU ĐÃI LẦN ĐẦU ============ */
 IF COL_LENGTH(N'dbo.ThanhToan', N'UuDaiThanhToan') IS NULL
     ALTER TABLE dbo.ThanhToan ADD UuDaiThanhToan NVARCHAR (200) NULL; -- ưu đãi lần đầu của phương thức đã áp dụng
 GO
@@ -1824,4 +1829,45 @@ GO
 -- Tìm nhanh ưu đãi lần đầu khách đã dùng
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_ThanhToan_UuDai' AND object_id = OBJECT_ID(N'dbo.ThanhToan'))
     CREATE INDEX IX_ThanhToan_UuDai ON dbo.ThanhToan (PhuongThucThanhToan, MaDonHang) WHERE TienGiamThanhToan > 0;
+GO
+
+/* ======================= TV3 – ĐIỂM THƯỞNG ======================= */
+-- Lịch sử điểm thưởng: số điểm hiện có = tổng CONG − tổng TRU (không thêm cột vào bảng TaiKhoan)
+IF OBJECT_ID(N'dbo.LichSuDiemThuong', N'U') IS NULL
+    CREATE TABLE dbo.LichSuDiemThuong (
+        MaLichSu     INT            IDENTITY (1, 1) NOT NULL,
+        MaTaiKhoan   INT            NOT NULL,
+        MaDonHang    INT            NULL, -- đơn hàng liên quan (tích / dùng / hoàn / thu hồi điểm)
+        LoaiGiaoDich VARCHAR (10)   NOT NULL, -- CONG | TRU
+        SoDiem       INT            NOT NULL, -- luôn > 0, cộng hay trừ xem LoaiGiaoDich
+        MoTa         NVARCHAR (255) NULL,
+        NgayGiaoDich DATETIME2 (0)  CONSTRAINT DF_LichSuDiemThuong_Ngay DEFAULT SYSDATETIME() NOT NULL,
+        CONSTRAINT PK_LichSuDiemThuong PRIMARY KEY (MaLichSu),
+        CONSTRAINT FK_LSDT_TaiKhoan FOREIGN KEY (MaTaiKhoan) REFERENCES dbo.TaiKhoan (MaTaiKhoan) ON DELETE CASCADE,
+        CONSTRAINT FK_LSDT_DonHang FOREIGN KEY (MaDonHang) REFERENCES dbo.DonHang (MaDonHang),
+        CONSTRAINT CK_LichSuDiemThuong_Loai CHECK (LoaiGiaoDich IN ('CONG', 'TRU')),
+        CONSTRAINT CK_LichSuDiemThuong_SoDiem CHECK (SoDiem > 0)
+    );
+GO
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_LichSuDiemThuong_TaiKhoan' AND object_id = OBJECT_ID(N'dbo.LichSuDiemThuong'))
+    CREATE INDEX IX_LichSuDiemThuong_TaiKhoan ON dbo.LichSuDiemThuong (MaTaiKhoan, NgayGiaoDich);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_LichSuDiemThuong_DonHang' AND object_id = OBJECT_ID(N'dbo.LichSuDiemThuong'))
+    CREATE INDEX IX_LichSuDiemThuong_DonHang ON dbo.LichSuDiemThuong (MaDonHang);
+GO
+-- Tích điểm cho các đơn đã có (chưa hủy): mỗi 100.000₫ thực trả = 1 điểm. Chạy lại không cộng trùng.
+INSERT INTO dbo.LichSuDiemThuong (MaTaiKhoan, MaDonHang, LoaiGiaoDich, SoDiem, MoTa, NgayGiaoDich)
+SELECT d.MaTaiKhoan, d.MaDonHang, 'CONG', CAST(FLOOR(d.TongTien / 100000) AS INT),
+       N'Tích điểm từ đơn #DH' + RIGHT('000000' + CAST(d.MaDonHang AS VARCHAR(10)), 6), d.NgayDat
+FROM   dbo.DonHang d
+JOIN   dbo.TaiKhoan t ON t.MaTaiKhoan = d.MaTaiKhoan
+JOIN   dbo.VaiTro v ON v.MaVaiTro = t.MaVaiTro AND v.TenVaiTro = 'KHACH_HANG' -- chỉ tài khoản khách hàng
+WHERE  d.TrangThaiDonHang <> 'DA_HUY'
+  AND  FLOOR(d.TongTien / 100000) > 0
+  AND  NOT EXISTS (SELECT 1 FROM dbo.LichSuDiemThuong l WHERE l.MaDonHang = d.MaDonHang);
+GO
+
+/* ===================== KIỂM TRA CÁC BẢNG CỦA TV3 ===================== */
+SELECT (SELECT COUNT(*) FROM dbo.SoDiaChi) AS SoDiaChi,
+       (SELECT COUNT(*) FROM dbo.LichSuDiemThuong) AS LichSuDiemThuong,
+       COL_LENGTH(N'dbo.ThanhToan', N'TienGiamThanhToan') AS CotTienGiamThanhToan;
 GO

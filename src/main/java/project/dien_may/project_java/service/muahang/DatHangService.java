@@ -6,6 +6,7 @@ import project.dien_may.project_java.dto.muahang.DatHangForm;
 import project.dien_may.project_java.dto.muahang.DongGioHang;
 import project.dien_may.project_java.dto.muahang.LuaChonThanhToan;
 import project.dien_may.project_java.dto.muahang.MaUuDai;
+import project.dien_may.project_java.dto.muahang.QuyTacDiemThuong;
 import project.dien_may.project_java.dto.muahang.TrangThanhToan;
 import project.dien_may.project_java.dto.muahang.UuDaiThanhToan;
 import project.dien_may.project_java.entity.*;
@@ -42,13 +43,15 @@ public class DatHangService {
     private final DonHangKhachHangRepository donHangRepository;
     private final ChiTietDonHangRepository chiTietDonHangRepository;
     private final ThanhToanRepository thanhToanRepository;
+    private final DiemThuongService diemThuongService;
 
     public DatHangService(GioHangService gioHangService, ChiTietGioHangRepository chiTietGioHangRepository,
                           TaiKhoanRepository taiKhoanRepository, TonKhoMuaHangRepository tonKhoRepository,
                           KhuyenMaiKhachHangRepository khuyenMaiRepository,
                           DonHangKhachHangRepository donHangRepository,
                           ChiTietDonHangRepository chiTietDonHangRepository,
-                          ThanhToanRepository thanhToanRepository) {
+                          ThanhToanRepository thanhToanRepository,
+                          DiemThuongService diemThuongService) {
         this.gioHangService = gioHangService;
         this.chiTietGioHangRepository = chiTietGioHangRepository;
         this.taiKhoanRepository = taiKhoanRepository;
@@ -57,6 +60,7 @@ public class DatHangService {
         this.donHangRepository = donHangRepository;
         this.chiTietDonHangRepository = chiTietDonHangRepository;
         this.thanhToanRepository = thanhToanRepository;
+        this.diemThuongService = diemThuongService;
     }
 
     /** @param dsChon mã sản phẩm được tick ở giỏ; rỗng thì lấy cả giỏ */
@@ -105,7 +109,7 @@ public class DatHangService {
                     conUuDai ? UuDaiThanhToan.dieuKien(pt) : List.of(),
                     conUuDai ? UuDaiThanhToan.tinh(pt, tamTinh, tienLaptop).tienGiam() : BigDecimal.ZERO));
         }
-        return new TrangThanhToan(dong, tamTinh, sapXep, sapCo, hetHan, phuongThuc);
+        return new TrangThanhToan(dong, tamTinh, sapXep, sapCo, hetHan, phuongThuc, diemThuongService.tongDiem(email));
     }
 
     /** @return mã đơn hàng vừa tạo */
@@ -150,6 +154,22 @@ public class DatHangService {
             tienGiam = tinhTienGiam(khuyenMai, tamTinh);
         }
 
+        // 2a. Điểm thưởng: khóa dòng tài khoản để hai đơn đặt cùng lúc không dùng trùng điểm
+        diemThuongService.khoaTaiKhoan(taiKhoan);
+        int diemDung = form.getDiemSuDung() == null ? 0 : form.getDiemSuDung();
+        if (diemDung > 0) {
+            int diemToiDa = QuyTacDiemThuong.diemToiDa(diemThuongService.tongDiem(email), tamTinh.subtract(tienGiam));
+            if (diemDung < QuyTacDiemThuong.DIEM_TOI_THIEU) {
+                throw new NghiepVuException("Mỗi lần dùng ít nhất " + QuyTacDiemThuong.DIEM_TOI_THIEU + " điểm thưởng.");
+            }
+            if (diemDung > diemToiDa) {
+                throw new NghiepVuException(diemToiDa == 0
+                        ? "Bạn chưa đủ điểm thưởng để dùng cho đơn này."
+                        : "Đơn này chỉ dùng được tối đa " + diemToiDa + " điểm thưởng.");
+            }
+        }
+        BigDecimal tienGiamDiem = QuyTacDiemThuong.tienGiam(diemDung);
+
         // 2b. Ưu đãi lần đầu của phương thức thanh toán (mỗi phương thức một lần; đơn bị hủy thì được dùng lại)
         PhuongThucThanhToan phuongThuc = form.getPhuongThucThanhToan();
         UuDaiThanhToan.KetQua uuDai = UuDaiThanhToan.KetQua.KHONG;
@@ -160,8 +180,8 @@ public class DatHangService {
                     .map(ChiTietGioHang::getThanhTien).reduce(BigDecimal.ZERO, BigDecimal::add);
             uuDai = UuDaiThanhToan.tinh(phuongThuc, tamTinh, tienLaptop);
         }
-        // Không giảm quá số tiền còn lại sau mã giảm giá
-        BigDecimal tienGiamThanhToan = uuDai.tienGiam().min(tamTinh.subtract(tienGiam));
+        // Không giảm quá số tiền còn lại sau mã giảm giá và điểm thưởng
+        BigDecimal tienGiamThanhToan = uuDai.tienGiam().min(tamTinh.subtract(tienGiam).subtract(tienGiamDiem));
 
         // 3. Lưu đơn hàng, chi tiết (giá chốt tại thời điểm đặt) và thanh toán
         DonHang donHang = new DonHang();
@@ -172,7 +192,7 @@ public class DatHangService {
         donHang.setSoDienThoaiNguoiNhan(form.getSoDienThoaiNguoiNhan().trim());
         donHang.setDiaChiGiaoHang(form.getDiaChiGiaoHang().trim());
         donHang.setTienGiam(tienGiam);
-        donHang.setTongTien(tamTinh.subtract(tienGiam).subtract(tienGiamThanhToan));
+        donHang.setTongTien(tamTinh.subtract(tienGiam).subtract(tienGiamDiem).subtract(tienGiamThanhToan));
         donHang.setTrangThai(TrangThaiDonHang.CHO_XAC_NHAN);
         donHangRepository.save(donHang);
 
@@ -196,6 +216,12 @@ public class DatHangService {
         thanhToan.setSoTien(donHang.getTongTien());
         thanhToan.setTrangThai(TrangThaiThanhToan.CHUA_THANH_TOAN);
         thanhToanRepository.save(thanhToan);
+
+        // 3b. Lịch sử điểm: trừ điểm đã dùng, cộng điểm tích từ số tiền thực trả
+        String maHien = String.format("#DH%06d", donHang.getMaDonHang());
+        diemThuongService.ghi(taiKhoan, donHang, LoaiGiaoDichDiem.TRU, diemDung, QuyTacDiemThuong.MO_TA_DUNG + maHien);
+        diemThuongService.ghi(taiKhoan, donHang, LoaiGiaoDichDiem.CONG,
+                QuyTacDiemThuong.diemNhanDuoc(donHang.getTongTien()), QuyTacDiemThuong.MO_TA_TICH + maHien);
 
         // 4. Bỏ các sản phẩm đã mua khỏi giỏ
         chiTietGioHangRepository.xoaCacDong(dongMua.get(0).getGioHang().getMaGioHang(), dsChon);

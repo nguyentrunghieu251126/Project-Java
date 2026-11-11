@@ -149,6 +149,20 @@ if (radioDiaChiGiao.length && oNgayGiao) {
   capNhatNgayGiao();
 }
 
+// Chọn địa chỉ trong modal: cập nhật ô "Địa chỉ nhận hàng" rồi đóng modal
+const modalDiaChi = document.getElementById("modalDiaChi");
+if (modalDiaChi) {
+  modalDiaChi.querySelectorAll('input[name="maDiaChi"]').forEach((r) => {
+    r.addEventListener("change", () => {
+      ganChu("[data-chon-ten]", r.dataset.ten);
+      ganChu("[data-chon-sdt]", r.dataset.sdt);
+      ganChu("[data-chon-dia-chi]", r.dataset.diaChi);
+      document.querySelectorAll("[data-chon-mac-dinh]").forEach((el) => { el.hidden = r.dataset.macDinh !== "true"; });
+      bootstrap.Modal.getInstance(modalDiaChi)?.hide();
+    });
+  });
+}
+
 // Sổ địa chỉ: hỏi lại trước khi xóa (form xóa nằm ngoài form đặt hàng, nút dùng thuộc tính form=)
 document.querySelectorAll("form[data-xac-nhan]").forEach((f) => {
   f.addEventListener("submit", (e) => {
@@ -156,14 +170,55 @@ document.querySelectorAll("form[data-xac-nhan]").forEach((f) => {
   });
 });
 
-// Tổng thanh toán = tiền hàng − mã giảm giá − ưu đãi lần đầu của phương thức thanh toán
+// Tổng thanh toán = tiền hàng − mã giảm giá − điểm thưởng − ưu đãi lần đầu của phương thức thanh toán
 // (chỉ để hiển thị; server tính lại khi đặt hàng)
 const tongTienHang = Number(document.querySelector("[data-tam-tinh]")?.dataset.tamTinh || 0);
 let giamMaHienTai = 0;
+const hopDiem = document.getElementById("diem-thuong");
+const batDungDiem = document.getElementById("batDungDiem");
+const oDiem = document.getElementById("diemSuDung");
+
+// Điểm được dùng tối đa: không quá số điểm đang có, không quá 50% tiền hàng sau mã giảm giá; dưới 10 điểm thì 0
+function diemToiDa() {
+  if (!hopDiem) return 0;
+  const d = hopDiem.dataset;
+  const theoDon = Math.floor((tongTienHang - giamMaHienTai) * Number(d.phanTram) / 100 / Number(d.giaTri));
+  const toiDa = Math.min(Number(d.diem), Math.max(0, theoDon));
+  return toiDa < Number(d.toiThieu) ? 0 : toiDa;
+}
+
+function diemDangDung() {
+  if (!hopDiem || !batDungDiem?.checked) return 0;
+  const toiDa = diemToiDa();
+  let so = Math.floor(Number(oDiem.value) || 0);
+  if (so > toiDa) { so = toiDa; oDiem.value = so; }
+  return so < Number(hopDiem.dataset.toiThieu) ? 0 : so;
+}
+
 function capNhatTongThanhToan() {
   if (!document.querySelector("[data-tam-tinh]")) return;
+  // Điểm thưởng
+  const diem = diemDangDung();
+  const giamDiem = hopDiem ? diem * Number(hopDiem.dataset.giaTri) : 0;
+  if (hopDiem) {
+    const toiDa = diemToiDa();
+    const goiY = hopDiem.querySelector("[data-goi-y-diem]");
+    if (goiY) {
+      goiY.textContent = toiDa > 0
+        ? `Dùng từ ${hopDiem.dataset.toiThieu} đến ${toiDa.toLocaleString("vi-VN")} điểm cho đơn này (giảm tối đa ${dinhDangTien(toiDa * Number(hopDiem.dataset.giaTri))}).`
+        : "Đơn này chưa dùng được điểm (cần ít nhất 10 điểm và tối đa 50% giá trị đơn).";
+    }
+    oDiem.max = toiDa;
+    const dongDiem = document.querySelector("[data-dong-giam-diem]");
+    if (dongDiem) {
+      dongDiem.hidden = giamDiem <= 0;
+      ganChu("[data-so-tien-giam-diem]", "−" + dinhDangTien(giamDiem));
+      ganChu("[data-so-diem-dung]", `(${diem.toLocaleString("vi-VN")} điểm)`);
+    }
+  }
+  // Ưu đãi phương thức thanh toán: không vượt số tiền còn lại
   const pt = document.querySelector('input[name="phuongThucThanhToan"]:checked');
-  const giamTT = Math.min(Number(pt?.dataset.giamTt || 0), Math.max(0, tongTienHang - giamMaHienTai));
+  const giamTT = Math.min(Number(pt?.dataset.giamTt || 0), Math.max(0, tongTienHang - giamMaHienTai - giamDiem));
   const dongTT = document.querySelector("[data-dong-giam-tt]");
   if (dongTT) {
     // Luôn hiện dòng này; chưa có ưu đãi thì ghi 0₫ (màu xám)
@@ -175,14 +230,51 @@ function capNhatTongThanhToan() {
     const oTen = dongTT.querySelector("[data-ten-pt-giam]");
     if (oTen) oTen.textContent = ten ? `(${ten})` : "";
   }
-  const tongGiam = giamMaHienTai + giamTT;
+  const tongGiam = giamMaHienTai + giamDiem + giamTT;
+  const tong = Math.max(0, tongTienHang - tongGiam);
   const tietKiem = document.querySelector("[data-tiet-kiem]");
   if (tietKiem) {
     tietKiem.hidden = tongGiam <= 0;
     tietKiem.querySelector("b").textContent = dinhDangTien(tongGiam);
   }
-  ganChu("[data-tong-thanh-toan]", dinhDangTien(Math.max(0, tongTienHang - tongGiam)));
+  ganChu("[data-tong-thanh-toan]", dinhDangTien(tong));
+  // Điểm sẽ tích: mỗi 100.000₫ thực trả = 1 điểm
+  const diemNhan = document.querySelector("[data-diem-nhan]");
+  if (diemNhan) {
+    const so = Math.floor(tong / 100000);
+    diemNhan.hidden = so <= 0;
+    diemNhan.querySelector("b").textContent = so.toLocaleString("vi-VN");
+  }
 }
+
+// Bật / tắt dùng điểm; ô số điểm tắt thì không gửi lên server
+if (hopDiem && batDungDiem && oDiem) {
+  const oNhap = document.getElementById("oNhapDiem");
+  const capNhatBat = () => {
+    oNhap.hidden = !batDungDiem.checked;
+    oDiem.disabled = !batDungDiem.checked;
+    if (batDungDiem.checked && !(Number(oDiem.value) > 0)) oDiem.value = diemToiDa();
+    capNhatTongThanhToan();
+  };
+  batDungDiem.addEventListener("change", capNhatBat);
+  oDiem.addEventListener("input", capNhatTongThanhToan);
+  oDiem.addEventListener("change", () => {
+    const so = Math.floor(Number(oDiem.value) || 0);
+    if (so > 0 && so < Number(hopDiem.dataset.toiThieu)) oDiem.value = hopDiem.dataset.toiThieu;
+    capNhatTongThanhToan();
+  });
+  document.getElementById("nutDungToiDa")?.addEventListener("click", () => { oDiem.value = diemToiDa(); capNhatTongThanhToan(); });
+  capNhatBat();
+}
+
+// Ưu đãi: sao chép mã giảm giá
+document.querySelectorAll(".mh-copy-code").forEach((nut) => {
+  nut.addEventListener("click", () => {
+    const ma = nut.dataset.ma;
+    const xong = () => { const cu = nut.textContent; nut.textContent = "Đã sao chép"; setTimeout(() => { nut.textContent = cu; }, 1500); };
+    if (navigator.clipboard) navigator.clipboard.writeText(ma).then(xong, xong); else xong();
+  });
+});
 
 // Đổi phương thức thanh toán: hiện thông tin chuyển khoản (nếu có) và tính lại ưu đãi
 const radioThanhToan = document.querySelectorAll('input[name="phuongThucThanhToan"]');
@@ -306,15 +398,6 @@ if (modalDanhGia) {
   form.querySelectorAll('input[name="soSao"]').forEach((r) =>
     r.addEventListener("change", () => { chuSao.textContent = nhanSao[r.value]; }));
   noiDung.addEventListener("input", () => { demKyTu.textContent = noiDung.value.length; });
-}
-
-// Liên hệ hỗ trợ: đếm ký tự nội dung
-const oNoiDungHoTro = document.querySelector("#ho-tro #noiDung");
-if (oNoiDungHoTro) {
-  const dem = document.querySelector("[data-dem-ky-tu-ho-tro]");
-  const capNhatDem = () => { dem.textContent = oNoiDungHoTro.value.length; };
-  oNoiDungHoTro.addEventListener("input", capNhatDem);
-  capNhatDem();
 }
 
 // In hóa đơn

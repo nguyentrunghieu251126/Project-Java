@@ -60,19 +60,22 @@ public class DonHangKhachHangService {
     private final TonKhoMuaHangRepository tonKhoRepository;
     private final KhuyenMaiKhachHangRepository khuyenMaiRepository;
     private final TaiKhoanRepository taiKhoanRepository;
+    private final DiemThuongService diemThuongService;
 
     public DonHangKhachHangService(DonHangKhachHangRepository donHangRepository,
                                    ThanhToanRepository thanhToanRepository,
                                    DanhGiaKhachHangRepository danhGiaRepository,
                                    TonKhoMuaHangRepository tonKhoRepository,
                                    KhuyenMaiKhachHangRepository khuyenMaiRepository,
-                                   TaiKhoanRepository taiKhoanRepository) {
+                                   TaiKhoanRepository taiKhoanRepository,
+                                   DiemThuongService diemThuongService) {
         this.donHangRepository = donHangRepository;
         this.thanhToanRepository = thanhToanRepository;
         this.danhGiaRepository = danhGiaRepository;
         this.tonKhoRepository = tonKhoRepository;
         this.khuyenMaiRepository = khuyenMaiRepository;
         this.taiKhoanRepository = taiKhoanRepository;
+        this.diemThuongService = diemThuongService;
     }
 
     public static String chuanHoaTab(String tab) {
@@ -127,7 +130,8 @@ public class DonHangKhachHangService {
                 soSao.put((Integer) dong[0], ((Number) dong[1]).intValue());
             }
         }
-        return new ChiTietDonHangKhach(donHang, chiTiet, thanhToan, dungCacBuoc(donHang), soSao);
+        return new ChiTietDonHangKhach(donHang, chiTiet, thanhToan, dungCacBuoc(donHang), soSao,
+                diemThuongService.theoDon(maDon));
     }
 
     /** KH18: chỉ hủy khi đơn còn chờ xác nhận; hoàn tồn kho, hoàn lượt mã giảm giá và tiền (nếu đã trả). */
@@ -151,6 +155,8 @@ public class DonHangKhachHangService {
                 tt.setTrangThai(TrangThaiThanhToan.DA_HOAN_TIEN);
             }
         });
+        // Điểm thưởng: hoàn điểm đã dùng, thu hồi điểm đã tích từ đơn này
+        diemThuongService.hoanKhiHuy(donHang);
     }
 
     /** KH22: mỗi khách đánh giá một sản phẩm một lần, chỉ với sản phẩm trong đơn đã giao. */

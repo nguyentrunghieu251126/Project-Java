@@ -10,7 +10,8 @@ public record TrangThanhToan(
         List<MaUuDai> maDungDuoc,
         List<MaUuDai> maSapCo,
         List<MaUuDai> maHetHan,
-        List<LuaChonThanhToan> phuongThuc
+        List<LuaChonThanhToan> phuongThuc,
+        long diemHienCo
 ) {
     public int soSanPham() {
         return dong.size();
