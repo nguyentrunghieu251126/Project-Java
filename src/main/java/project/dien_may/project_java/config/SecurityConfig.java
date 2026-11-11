@@ -54,8 +54,14 @@ public class SecurityConfig {
                         .requestMatchers("/admin/khuyen-mai/*/xoa").access(quyen("KHUYENMAI_XOA"))
                         .requestMatchers("/admin/khuyen-mai/*/bat-tat").access(quyen("KHUYENMAI_BATTAT"))
 
-                        .requestMatchers("/admin/kho/don-hang", "/admin/kho/don-hang/*")
-                        .access(quyen("DONHANG_XEM_TATCA"))
+                        // TV4: nhân viên kho có quyền DONHANG_XULY cũng xem được đơn để xử lý (NVK03 – NVK06)
+                        .requestMatchers(HttpMethod.GET, "/admin/kho/don-hang", "/admin/kho/don-hang/*")
+                        .access(quyen("DONHANG_XEM_TATCA", "DONHANG_XULY"))
+                        .requestMatchers(HttpMethod.POST, "/admin/kho/don-hang/*/xac-nhan",
+                                "/admin/kho/don-hang/*/giao-hang", "/admin/kho/don-hang/*/da-giao")
+                        .access(quyen("DONHANG_XULY"))
+                        .requestMatchers(HttpMethod.POST, "/admin/kho/don-hang/*/xuat-kho")
+                        .access(quyen("KHO_XUAT_HANG"))
                         .requestMatchers("/admin/kho/ton-kho").access(quyen("KHO_XEM_TONKHO"))
                         .requestMatchers(HttpMethod.POST, "/admin/kho/ton-kho/*/yeu-cau-nhap")
                         .access(quyen("KHO_YEUCAU_NHAP"))
@@ -65,6 +71,10 @@ public class SecurityConfig {
                         .access(quyen("KHO_DUYET_NHAP"))
                         .requestMatchers(HttpMethod.GET, "/admin/kho/yeu-cau-nhap", "/admin/kho/yeu-cau-nhap/*")
                         .access(quyen("KHO_DUYET_NHAP", "KHO_YEUCAU_NHAP"))
+
+                        // TV4: bảo hành (NVK11, NVK13) và đổi trả (NVK12, NVK14)
+                        .requestMatchers("/admin/kho/bao-hanh", "/admin/kho/bao-hanh/**").access(quyen("BAOHANH_XULY"))
+                        .requestMatchers("/admin/kho/doi-tra", "/admin/kho/doi-tra/**").access(quyen("DOITRA_XULY"))
 
                         .requestMatchers("/admin/tai-khoan").access(quyen("TAIKHOAN_XEM"))
                         .requestMatchers("/admin/tai-khoan/them").access(quyen("TAIKHOAN_THEM"))
@@ -80,7 +90,8 @@ public class SecurityConfig {
                         // 3. Chỉ nhân viên kho
                         .requestMatchers("/kho/**").hasRole("NHAN_VIEN_KHO")
                         // 4. Chỉ khách hàng đã đăng nhập
-                        .requestMatchers("/gio-hang/**", "/dat-hang/**", "/don-hang/**", "/tai-khoan", "/tai-khoan/**")
+                        .requestMatchers("/gio-hang/**", "/dat-hang/**", "/don-hang/**", "/tai-khoan", "/tai-khoan/**",
+                                "/bao-hanh-doi-tra", "/bao-hanh-doi-tra/**")
                         .hasRole("KHACH_HANG")
                         // 5. Các trang còn lại: phải đăng nhập
                         .anyRequest().authenticated())

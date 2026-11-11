@@ -32,4 +32,13 @@ public interface ChiTietDonHangRepository extends JpaRepository<ChiTietDonHang, 
                                  @Param("den") LocalDateTime den,
                                  @Param("maDanhMuc") Integer maDanhMuc,
                                  Pageable pageable);
+
+    /** TV4 (KH20 – KH21): các sản phẩm khách đã nhận, tức thuộc đơn đã giao, mới nhất trước. */
+    @Query("""
+            SELECT ct FROM ChiTietDonHang ct JOIN FETCH ct.sanPham JOIN FETCH ct.donHang d
+            WHERE LOWER(d.taiKhoan.email) = LOWER(:email)
+              AND d.trangThai = project.dien_may.project_java.entity.TrangThaiDonHang.DA_GIAO
+            ORDER BY d.ngayGiao DESC, ct.maChiTietDonHang ASC
+            """)
+    List<ChiTietDonHang> sanPhamDaNhan(@Param("email") String email);
 }

@@ -3,6 +3,7 @@ package project.dien_may.project_java.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import project.dien_may.project_java.dto.baocao.DemTrangThaiDon;
@@ -55,4 +56,29 @@ public interface DonHangRepository extends JpaRepository<DonHang, Integer> {
     List<DoanhThuNgay> doanhThuTheoNgay(@Param("trangThai") TrangThaiDonHang trangThai,
                                         @Param("tu") LocalDateTime tu,
                                         @Param("den") LocalDateTime den);
+
+    // ===== TV4: Nhân viên kho xử lý đơn hàng (NVK03 – NVK06) =====
+
+    /**
+     * Chỉ đổi trạng thái khi đơn còn đúng trạng thái cũ; trả về 0 nghĩa là đơn đã được người khác
+     * xử lý trước, nhờ vậy hai nhân viên bấm cùng lúc không ghi đè kết quả của nhau.
+     */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("""
+            UPDATE DonHang d SET d.trangThai = :trangThaiMoi
+            WHERE d.maDonHang = :ma AND d.trangThai = :trangThaiCu
+            """)
+    int doiTrangThai(@Param("ma") Integer maDonHang,
+                     @Param("trangThaiCu") TrangThaiDonHang trangThaiCu,
+                     @Param("trangThaiMoi") TrangThaiDonHang trangThaiMoi);
+
+    /** NVK06: Giao thành công thì ghi ngày giao, làm mốc tính hạn bảo hành và đổi trả. */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("""
+            UPDATE DonHang d SET d.trangThai = project.dien_may.project_java.entity.TrangThaiDonHang.DA_GIAO,
+                                 d.ngayGiao = :ngayGiao
+            WHERE d.maDonHang = :ma
+              AND d.trangThai = project.dien_may.project_java.entity.TrangThaiDonHang.DANG_GIAO
+            """)
+    int xacNhanDaGiao(@Param("ma") Integer maDonHang, @Param("ngayGiao") LocalDateTime ngayGiao);
 }

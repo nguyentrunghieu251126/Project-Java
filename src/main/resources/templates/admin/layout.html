@@ -56,9 +56,9 @@
             </a>
         </div>
 
-        <div sec:authorize="hasAnyAuthority('DONHANG_XEM_TATCA','KHO_XEM_TONKHO','KHO_DUYET_NHAP','KHO_YEUCAU_NHAP')">
+        <div sec:authorize="hasAnyAuthority('DONHANG_XEM_TATCA','DONHANG_XULY','KHO_XEM_TONKHO','KHO_DUYET_NHAP','KHO_YEUCAU_NHAP','BAOHANH_XULY','DOITRA_XULY')">
             <p class="nhom-menu">Quản lý kho</p>
-            <a sec:authorize="hasAuthority('DONHANG_XEM_TATCA')" th:href="@{/admin/kho/don-hang}"
+            <a sec:authorize="hasAnyAuthority('DONHANG_XEM_TATCA','DONHANG_XULY')" th:href="@{/admin/kho/don-hang}"
                th:classappend="${menu == 'don-hang'} ? 'active'">
                 <i class="bi bi-receipt" aria-hidden="true"></i> Đơn hàng
             </a>
@@ -69,6 +69,15 @@
             <a sec:authorize="hasAnyAuthority('KHO_DUYET_NHAP','KHO_YEUCAU_NHAP')" th:href="@{/admin/kho/yeu-cau-nhap}"
                th:classappend="${menu == 'yeu-cau-nhap'} ? 'active'">
                 <i class="bi bi-clipboard-check" aria-hidden="true"></i> Yêu cầu nhập hàng
+            </a>
+            <!-- TV4: bảo hành, đổi trả -->
+            <a sec:authorize="hasAuthority('BAOHANH_XULY')" th:href="@{/admin/kho/bao-hanh}"
+               th:classappend="${menu == 'bao-hanh'} ? 'active'">
+                <i class="bi bi-tools" aria-hidden="true"></i> Bảo hành
+            </a>
+            <a sec:authorize="hasAuthority('DOITRA_XULY')" th:href="@{/admin/kho/doi-tra}"
+               th:classappend="${menu == 'doi-tra'} ? 'active'">
+                <i class="bi bi-arrow-left-right" aria-hidden="true"></i> Đổi trả
             </a>
         </div>
 
