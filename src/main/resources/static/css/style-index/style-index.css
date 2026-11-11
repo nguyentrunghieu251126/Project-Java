@@ -1601,6 +1601,37 @@ a {
   background: #e2e8f0;
 }
 
+/* Menu thu gọn (điện thoại/tablet): icon tài khoản và giỏ hàng nằm chung một dòng,
+   nút "Trang quản trị" vẫn chiếm nguyên một dòng riêng phía trên. */
+@media (max-width: 991.98px) {
+  .header .navbar .navbar-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .header .navbar .navbar-nav > .nav-item {
+    margin: 0;
+  }
+  .header .navbar .navbar-nav > .nav-item:has(> .admin-link) {
+    flex: 0 0 100%;
+  }
+  .header .navbar .navbar-nav > .nav-item:has(> .cart-link) {
+    flex: 1 1 auto;
+  }
+  .header .navbar .cart-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 44px;
+  }
+  .header .navbar .admin-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
 /* Máy tính: rê chuột là mở menu tài khoản. Điện thoại và bàn phím vẫn mở bằng cách bấm. */
 @media (hover: hover) and (min-width: 992px) {
   .header .account-menu:hover > .account-dropdown {
