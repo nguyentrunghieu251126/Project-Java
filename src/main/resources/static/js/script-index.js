@@ -116,3 +116,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
   setTimeout(dongThongBao, 3000);
 });
+// Flash sale
+(function () {
+  const luoi = document.getElementById("flashSaleGrid");
+  const nutTruoc = document.getElementById("flashSalePrev");
+  const nutSau = document.getElementById("flashSaleNext");
+  if (!luoi || !nutTruoc || !nutSau) return;
+
+  function buocTruot() {
+    const the = luoi.firstElementChild;
+    if (!the) return luoi.clientWidth;
+    const khoangCach = parseFloat(getComputedStyle(luoi).columnGap) || 0;
+    return the.getBoundingClientRect().width + khoangCach;
+  }
+
+  function capNhatNut() {
+    const toiDa = luoi.scrollWidth - luoi.clientWidth;
+    nutTruoc.disabled = luoi.scrollLeft <= 1;
+    nutSau.disabled = luoi.scrollLeft >= toiDa - 1;
+  }
+
+  nutTruoc.addEventListener("click", () => luoi.scrollBy({ left: -buocTruot(), behavior: "smooth" }));
+  nutSau.addEventListener("click", () => luoi.scrollBy({ left: buocTruot(), behavior: "smooth" }));
+  luoi.addEventListener("scroll", capNhatNut, { passive: true });
+  window.addEventListener("resize", capNhatNut);
+  capNhatNut();
+})();

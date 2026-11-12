@@ -689,7 +689,126 @@ a {
   min-width: 36px;
   text-align: center;
 }
+.flash-sale-carousel {
+  position: relative;
+}
+.flash-sale-grid > .col {
+  display: flex;
+}
+.flash-sale-card {
+  width: 100%;
+}
+.flash-sale-card h6 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+}
+.flash-sale-nav {
+  display: none;
+}
 
+@media (max-width: 991.98px) {
+  .flash-sale-carousel {
+    padding: 0 10px;
+  }
+  .flash-sale-grid {
+    --bs-gutter-x: 0;
+    --bs-gutter-y: 0;
+    flex-wrap: nowrap;
+    gap: 12px;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 8px 0 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .flash-sale-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .flash-sale-grid > .col {
+    /* Mobile: 2 thẻ */
+    flex: 0 0 calc((100% - 12px) / 2);
+    width: auto;
+    max-width: none;
+    margin-top: 0;
+    padding: 0;
+    scroll-snap-align: start;
+  }
+  .flash-sale-nav {
+    position: absolute;
+    top: 82px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--text);
+    font-size: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    transition: opacity 0.2s, background 0.2s;
+  }
+  .flash-sale-nav:hover:not(:disabled) {
+    background: #f1f5f9;
+  }
+  .flash-sale-card .buy-now-button {
+    padding-left: 2px;
+    padding-right: 2px;
+    white-space: nowrap;
+  }
+  .flash-sale-nav:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .flash-sale-prev {
+    left: -4px;
+  }
+  .flash-sale-next {
+    right: -4px;
+  }
+}
+@media (min-width: 576px) and (max-width: 991.98px) {
+  .flash-sale-carousel {
+    padding: 0 14px;
+  }
+  .flash-sale-nav {
+    top: 90px;
+    width: 34px;
+    height: 34px;
+  }
+  .flash-sale-prev {
+    left: -6px;
+  }
+  .flash-sale-next {
+    right: -6px;
+  }
+}
+@media (max-width: 575.98px) {
+  .flash-sale {
+    padding: 14px;
+  }
+  .flash-sale-card .rating {
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flash-sale-grid {
+    scroll-behavior: auto;
+  }
+}
 /* ===== Thẻ sản phẩm ===== */
 .product-img .product-photo {
   display: block;
@@ -1711,16 +1830,17 @@ a {
 @media (prefers-reduced-motion:reduce) {
   #product-list .tv2-product-card { transition:none; }
 }
-/* Anh san pham trong danh muc noi bat */
 .category .category-image {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 125px;
-  height: 100px;
+  max-width: 112px;
+  height: auto;
+  aspect-ratio: 1 / 1;
   margin: 0 auto;
-  border-radius: 0;
+  padding: 10px;
+  border-radius: 16px;
   background: transparent;
   overflow: hidden;
 }
@@ -1729,11 +1849,12 @@ a {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: center;
   transition: transform .2s ease;
 }
 .category:hover .category-image {
   background: transparent;
-  transform: none;
+  transform: translateY(-3px);
 }
 .category:hover .category-image img {
   transform: scale(1.05);
@@ -1791,7 +1912,7 @@ a {
   margin-top: 0;
 }
 @media (max-width: 575.98px) {
-  .category .category-image { height: 78px; }
+  .category .category-image { padding: 6px; border-radius: 12px; }
   .product-actions { gap: 5px; }
   .product-actions .buy-now-button {
     font-size: 11px;
