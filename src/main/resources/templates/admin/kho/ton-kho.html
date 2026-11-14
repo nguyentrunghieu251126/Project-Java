@@ -40,20 +40,20 @@
                     <td class="giua so-lieu" th:text="${s.mucTonToiThieu}"></td>
                     <td class="giua so-lieu" th:text="|${#numbers.formatInteger(s.giaTriTon, 1, 'POINT')} ₫|"></td>
                     <td class="giua"><span th:replace="~{admin/fragments :: nhan(${s.tinhTrangTonKho})}"></span></td>
-                    <!-- Sản phẩm cảnh báo có ô nhập hàng; quản trị viên nhập thẳng vào kho, nhân viên kho lập phiếu chờ duyệt -->
+                    <!-- Sản phẩm cảnh báo có ô nhập hàng; quản trị viên lập yêu cầu được duyệt luôn, nhân viên kho lập phiếu chờ duyệt; hàng vào kho khi lập phiếu nhập (TV4 – NVK10) -->
                     <td class="giua" sec:authorize="hasAnyAuthority('SANPHAM_SUA','KHO_YEUCAU_NHAP')">
                         <div class="nhom-nut">
                             <form sec:authorize="hasAuthority('KHO_YEUCAU_NHAP')" th:if="${s.tinhTrangTonKho.name() != 'DU'}"
                                   class="o-nhap-hang input-group" method="post"
                                   th:action="@{/admin/kho/ton-kho/{ma}/yeu-cau-nhap(ma=${s.maSanPham})}"
                                   th:attr="data-xac-nhan=${#authorization.expression('hasRole(''QUAN_TRI'')')}
-                                      ? |Nhập hàng ${s.tenSanPham} vào kho ngay, không qua duyệt?| : null">
+                                      ? |Lập yêu cầu nhập ${s.tenSanPham} (duyệt luôn), hàng vào kho khi nhân viên kho lập phiếu nhập?| : null">
                                 <input class="form-control" type="number" name="soLuong" min="1" required
                                        th:aria-label="|Số lượng cần nhập của ${s.tenSanPham}|"
                                        th:value="${s.mucTonToiThieu > s.soLuong} ? ${s.mucTonToiThieu - s.soLuong} : 1">
                                 <button class="btn btn-chinh text-nowrap" type="submit">
                                     <i class="bi bi-box-arrow-in-down" aria-hidden="true"></i>
-                                    <span th:text="${#authorization.expression('hasRole(''QUAN_TRI'')')} ? 'Nhập hàng' : 'Lập phiếu'">Lập phiếu</span>
+                                    <span th:text="${#authorization.expression('hasRole(''QUAN_TRI'')')} ? 'Yêu cầu nhập' : 'Lập phiếu'">Lập phiếu</span>
                                 </button>
                             </form>
                             <a sec:authorize="hasAuthority('SANPHAM_SUA')" class="btn btn-sm btn-outline-secondary nut-vuong"

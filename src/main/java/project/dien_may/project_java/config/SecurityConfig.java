@@ -69,6 +69,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/admin/kho/yeu-cau-nhap/*/duyet",
                                 "/admin/kho/yeu-cau-nhap/*/tu-choi")
                         .access(quyen("KHO_DUYET_NHAP"))
+                        // TV4 (NVK10): nhân viên kho lập phiếu nhập sau khi yêu cầu được duyệt
+                        .requestMatchers(HttpMethod.POST, "/admin/kho/yeu-cau-nhap/*/lap-phieu-nhap")
+                        .access(quyen("KHO_NHAP_HANG"))
                         .requestMatchers(HttpMethod.GET, "/admin/kho/yeu-cau-nhap", "/admin/kho/yeu-cau-nhap/*")
                         .access(quyen("KHO_DUYET_NHAP", "KHO_YEUCAU_NHAP"))
 
