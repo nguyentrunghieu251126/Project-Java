@@ -53,7 +53,9 @@ class LapYeuCauNhapTests {
     private SanPham sanPhamCanhBaoChuaCoPhieu() {
         SanPham sanPham = sanPham(s -> s.isDangKinhDoanh()
                 && !chiTietRepository.existsBySanPhamMaSanPhamAndYeuCauTrangThai(
-                        s.getMaSanPham(), TrangThaiYeuCauNhap.CHO_DUYET));
+                        s.getMaSanPham(), TrangThaiYeuCauNhap.CHO_DUYET)
+                && !chiTietRepository.existsBySanPhamMaSanPhamAndYeuCauTrangThai(
+                        s.getMaSanPham(), TrangThaiYeuCauNhap.DA_DUYET));
         if (sanPham.getTinhTrangTonKho() == TinhTrangTonKho.DU) {
             sanPham.setSoLuong(0);
             sanPham = sanPhamRepository.saveAndFlush(sanPham);
@@ -69,36 +71,39 @@ class LapYeuCauNhapTests {
 
         KetQuaNhap ketQua = khoService.lapYeuCauNhap(sanPham.getMaSanPham(), 7, NHAN_VIEN_KHO);
 
-        assertFalse(ketQua.daNhapKho());
+        assertFalse(ketQua.daDuyet());
         YeuCauNhapHang yeuCau = yeuCauRepository.findById(ketQua.maYeuCau()).orElseThrow();
         assertEquals(TrangThaiYeuCauNhap.CHO_DUYET, yeuCau.getTrangThai());
         assertEquals(NHAN_VIEN_KHO, yeuCau.getTaiKhoan().getEmail());
         assertEquals(tonTruoc, tonKho(sanPham), "Chưa duyệt thì chưa cộng tồn kho");
     }
 
+    /** TV4 (NVK10): quản trị viên lập thì yêu cầu được duyệt luôn, nhưng hàng chỉ vào kho khi lập phiếu nhập. */
     @Test
-    void quanTriNhapHangKhongCanDuyet() {
+    void quanTriLapYeuCauDuocDuyetLuonNhungChuaCongKho() {
         SanPham sanPham = sanPhamCanhBaoChuaCoPhieu();
         int tonTruoc = sanPham.getSoLuong();
 
         KetQuaNhap ketQua = khoService.lapYeuCauNhap(sanPham.getMaSanPham(), 7, QUAN_TRI);
 
-        assertTrue(ketQua.daNhapKho());
+        assertTrue(ketQua.daDuyet());
         YeuCauNhapHang yeuCau = yeuCauRepository.findById(ketQua.maYeuCau()).orElseThrow();
         assertEquals(TrangThaiYeuCauNhap.DA_DUYET, yeuCau.getTrangThai());
         assertEquals(QUAN_TRI, yeuCau.getNguoiDuyet().getEmail());
-        assertEquals(tonTruoc + 7, tonKho(sanPham));
+        assertEquals(tonTruoc, tonKho(sanPham), "Chưa lập phiếu nhập thì chưa cộng tồn kho");
     }
 
+    /** TV4 (NVK10): duyệt chỉ đổi trạng thái; cộng kho ở bước lập phiếu nhập (xem PhieuNhapTests). */
     @Test
-    void duyetPhieuThiCongTonKho() {
+    void duyetPhieuChuaCongTonKho() {
         SanPham sanPham = sanPhamCanhBaoChuaCoPhieu();
         int tonTruoc = sanPham.getSoLuong();
         Integer ma = khoService.lapYeuCauNhap(sanPham.getMaSanPham(), 7, NHAN_VIEN_KHO).maYeuCau();
 
         khoService.duyet(ma, QUAN_TRI);
 
-        assertEquals(tonTruoc + 7, tonKho(sanPham));
+        assertEquals(TrangThaiYeuCauNhap.DA_DUYET, yeuCauRepository.findById(ma).orElseThrow().getTrangThai());
+        assertEquals(tonTruoc, tonKho(sanPham));
     }
 
     @Test

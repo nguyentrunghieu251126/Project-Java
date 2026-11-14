@@ -555,6 +555,34 @@ VALUES                    (1, N'Huỳnh Minh Phúc', N'admin1@dienmay.vn', N'$2a
 
 SET IDENTITY_INSERT dbo.TaiKhoan OFF;
 
+GO
+-- TaiKhoan_Quyen: 8 bản ghi (TV4) – phần chỉnh riêng của từng nhân viên kho so với quyền mặc định của vai trò.
+-- Bảng cấu hình, chỉ lưu phần KHÁC quyền mặc định, nên số dòng theo đúng nghiệp vụ, không ép đủ 20.
+-- Chỉ chỉnh trong phạm vi công việc kho (bảng phân công: xử lý đơn, xuất/nhập, tồn kho, bảo hành, đổi trả):
+--   kho1 (MaTaiKhoan 3): giữ nguyên quyền mặc định của nhân viên kho.
+--   kho2 (4) – trưởng kho: cấp thêm xem báo cáo tồn kho (13) và xem tất cả đơn hàng (19).
+--   kho3 (5) – chuyên bảo hành, đổi trả: thu hồi xử lý đơn (22), lập phiếu xuất (23), lập phiếu nhập (25);
+--             cấp thêm xem tất cả đơn hàng (19) để tra cứu đơn gốc khi bảo hành, đổi trả (NVK13).
+--   kho4 (6) – chuyên xuất nhập: thu hồi xử lý bảo hành (26) và đổi trả (27).
+SET IDENTITY_INSERT dbo.TaiKhoan_Quyen ON;
+
+INSERT  INTO dbo.TaiKhoan_Quyen (
+    MaTaiKhoanQuyen,
+    MaTaiKhoan,
+    MaQuyen,
+    DuocCap
+)
+VALUES                          (1, 4, 13, 1),
+                                (2, 4, 19, 1),
+                                (3, 5, 22, 0),
+                                (4, 5, 23, 0),
+                                (5, 5, 25, 0),
+                                (6, 6, 26, 0),
+                                (7, 6, 27, 0),
+                                (8, 5, 19, 1);
+
+SET IDENTITY_INSERT dbo.TaiKhoan_Quyen OFF;
+
 
 GO
 -- DanhMuc: 20 bản ghi
