@@ -181,28 +181,48 @@
     <nav class="account-breadcrumb" aria-label="Đường dẫn"><a href="#" th:href="@{/}">Trang chủ</a><i class="bi bi-chevron-right"></i><a href="#" th:href="@{/tai-khoan/ho-so}">Hồ sơ</a><i class="bi bi-chevron-right"></i>
       <span th:text="${diaChiForm.maDiaChi == null} ? 'Thêm địa chỉ' : 'Sửa địa chỉ'">Thêm địa chỉ</span></nav>
     <div class="account-layout">
-      <aside class="account-sidebar" aria-label="Điều hướng tài khoản">
+      <aside class="account-sidebar mh-sidebar" aria-label="Điều hướng tài khoản">
         <section class="account-user-card">
           <div class="account-avatar" aria-hidden="true"><i class="bi bi-person-fill"></i></div>
           <div class="account-user-text">
             <span class="account-caption">Tài khoản khách hàng</span>
-            <strong th:text="${hoSo != null ? hoSo.hoTen : 'Khách hàng'}">Bùi Thu Lan</strong>
-            <small th:text="${hoSo != null ? hoSo.email : ''}">lan.bui7@gmail.com</small>
+            <strong th:text="${hoSo != null ? hoSo.hoTen : 'Khách hàng'}">Khách hàng</strong>
+            <small th:text="${hoSo != null ? hoSo.email : ''}">email@example.com</small>
           </div>
           <a class="account-profile-shortcut" href="#" th:href="@{/tai-khoan/ho-so}"><i class="bi bi-pencil-square"></i> Xem hồ sơ <i class="bi bi-arrow-right"></i></a>
         </section>
+        <!-- TV3: menu tài khoản theo bố cục FPT Shop (dùng chung cho TaiKhoan.html và các trang mua hàng) -->
         <section class="account-side-links">
-          <a href="#" th:href="@{/tai-khoan}"><i class="bi bi-grid-1x2"></i><span>Tổng quan</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
-          <a href="#" th:href="@{/tai-khoan/ho-so}" th:classappend="${menuTaiKhoan == 'ho-so'} ? 'active'"
-             th:attr="aria-current=${menuTaiKhoan == 'ho-so'} ? 'page' : null"><i class="bi bi-person-vcard"></i><span>Hồ sơ cá nhân & địa chỉ</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
-          <!-- TV3: KH16 – KH19 -->
+          <a href="#" th:href="@{/tai-khoan}" th:classappend="${trangTaiKhoan == 'tong-quan'} ? 'active'"
+             th:attr="aria-current=${trangTaiKhoan == 'tong-quan'} ? 'page' : null"><i class="bi bi-grid-1x2"></i><span>Tổng quan</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
           <a href="#" th:href="@{/don-hang}" th:classappend="${menuTaiKhoan == 'don-hang'} ? 'active'"
-             th:attr="aria-current=${menuTaiKhoan == 'don-hang'} ? 'page' : null"><i class="bi bi-bag-check"></i><span>Đơn hàng của tôi</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+             th:attr="aria-current=${menuTaiKhoan == 'don-hang'} ? 'page' : null"><i class="bi bi-box-seam"></i><span>Đơn hàng của tôi</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
           <a href="#" th:href="@{/gio-hang}"><i class="bi bi-cart3"></i><span>Giỏ hàng</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
-          <a href="#" th:href="@{/tai-khoan/ho-tro}" th:classappend="${menuTaiKhoan == 'ho-tro'} ? 'active'"
-             th:attr="aria-current=${menuTaiKhoan == 'ho-tro'} ? 'page' : null"><i class="bi bi-headset"></i><span>Liên hệ hỗ trợ</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
-          <a href="#" th:href="@{/tai-khoan/doi-mat-khau}"><i class="bi bi-shield-lock"></i><span>Đổi mật khẩu</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
         </section>
+        <a class="mh-point-card" href="#" th:href="@{/tai-khoan/diem-thuong}" th:classappend="${menuTaiKhoan == 'diem-thuong'} ? 'active'">
+          <span class="mh-point-card-title">Điểm thưởng của bạn</span>
+          <span class="mh-point-card-value"><i class="bi bi-coin"></i> <b th:text="${#numbers.formatInteger(diemThuong ?: 0, 1, 'POINT')}">0</b></span>
+          <span class="mh-point-card-link">Xem thể lệ <i class="bi bi-chevron-right"></i></span>
+          <i class="bi bi-coin mh-point-card-bg" aria-hidden="true"></i>
+        </a>
+        <section class="account-side-links">
+          <a href="#" th:href="@{/tai-khoan/uu-dai}" th:classappend="${menuTaiKhoan == 'uu-dai'} ? 'active'"
+             th:attr="aria-current=${menuTaiKhoan == 'uu-dai'} ? 'page' : null"><i class="bi bi-gift"></i><span>Ưu đãi của tôi</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+          <a href="#" th:href="@{/tai-khoan/diem-thuong/lich-su}" th:classappend="${menuTaiKhoan == 'lich-su-diem'} ? 'active'"
+             th:attr="aria-current=${menuTaiKhoan == 'lich-su-diem'} ? 'page' : null"><i class="bi bi-clock-history"></i><span>Lịch sử điểm thưởng</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+        </section>
+        <section class="account-side-links">
+          <a href="#" th:href="@{/tai-khoan/ho-so}" th:classappend="${trangTaiKhoan == 'ho-so' or menuTaiKhoan == 'ho-so'} ? 'active'"
+             th:attr="aria-current=${trangTaiKhoan == 'ho-so' or menuTaiKhoan == 'ho-so'} ? 'page' : null"><i class="bi bi-person-vcard"></i><span>Hồ sơ cá nhân</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+          <a href="#" th:href="@{/tai-khoan/ho-so} + '#so-dia-chi'"><i class="bi bi-geo-alt"></i><span>Sổ địa chỉ nhận hàng</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+          <!-- TV4: KH20 – KH21 -->
+          <a href="#" th:href="@{/bao-hanh-doi-tra}"><i class="bi bi-shield-check"></i><span>Thông tin bảo hành &amp; đổi trả</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+          <a href="#" th:href="@{/tai-khoan/doi-mat-khau}" th:classappend="${trangTaiKhoan == 'doi-mat-khau'} ? 'active'"
+             th:attr="aria-current=${trangTaiKhoan == 'doi-mat-khau'} ? 'page' : null"><i class="bi bi-shield-lock"></i><span>Đổi mật khẩu</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+        </section>
+        <form class="account-side-links mh-side-logout" method="post" action="#" th:action="@{/dang-xuat}">
+          <button type="submit"><i class="bi bi-box-arrow-right"></i><span>Đăng xuất</span></button>
+        </form>
         <p class="account-sidebar-note"><i class="bi bi-shield-check"></i> Thông tin của bạn được bảo vệ.</p>
       </aside>
 

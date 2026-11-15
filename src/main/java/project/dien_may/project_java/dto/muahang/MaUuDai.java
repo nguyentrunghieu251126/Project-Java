@@ -23,6 +23,16 @@ public record MaUuDai(
         return soLuotConLai != null && soLuotConLai <= 0;
     }
 
+    /** Số ngày còn lại đến hết hạn (0 = hết hạn hôm nay). */
+    public long soNgayConLai() {
+        return java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), ngayKetThuc);
+    }
+
+    public boolean sapHetHan() {
+        long con = soNgayConLai();
+        return con >= 0 && con <= 3;
+    }
+
     public boolean phanTram() {
         return loai == LoaiGiamGia.PHAN_TRAM;
     }

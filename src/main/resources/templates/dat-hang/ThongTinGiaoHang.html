@@ -201,34 +201,32 @@
         </div>
 
         <!-- ===== 1. Địa chỉ nhận hàng: chọn từ sổ địa chỉ (bảng SoDiaChi) ===== -->
+        <!-- Chỉ hiện địa chỉ đang chọn; bấm vào để mở danh sách (modal #modalDiaChi) -->
         <section class="mh-card" id="dia-chi-nhan">
           <div class="mh-card-head"><h2 class="mh-card-title"><i class="bi bi-geo-alt-fill mh-icon-red"></i> Địa chỉ nhận hàng</h2>
             <a class="account-inline-link" href="#" th:href="@{/tai-khoan/ho-so} + '#so-dia-chi'">Quản lý sổ địa chỉ</a></div>
 
-          <label class="mh-option mh-address" th:each="dc : ${dsDiaChi}">
-            <input type="radio" name="maDiaChi" th:value="${dc.maDiaChi}" th:checked="${dc.maDiaChi == datHangForm.maDiaChi}"
-                   th:data-vung="${dc.giaoHang.vung()}" th:data-so-ngay="${dc.giaoHang.soNgay()}"
-                   th:data-ngay-nhan="${dc.giaoHang.khoangNgayTuHomNay()}" />
-            <span class="mh-radio"></span>
-            <span class="mh-option-body">
-              <span class="mh-option-head"><strong th:text="${dc.tenNguoiNhan}">Họ tên</strong><span class="mh-sep">·</span>
-                <th:block th:text="${dc.soDienThoai}">SĐT</th:block>
-                <span class="mh-badge-soft" th:if="${dc.laMacDinh}">Mặc định</span>
-                <span class="mh-badge-type"><i class="bi" th:classappend="${dc.loaiDiaChi == 'Văn phòng'} ? 'bi-building' : 'bi-house-door'"></i>
-                  <th:block th:text="${dc.loaiDiaChi}">Nhà riêng</th:block></span></span>
-              <small th:text="${dc.diaChiDayDu}">Địa chỉ</small>
-            </span>
-            <span class="mh-address-actions">
-              <a class="mh-option-link" href="#" th:href="@{/tai-khoan/dia-chi/{id}/sua(id=${dc.maDiaChi},quayLai=${urlQuayLai})}">Sửa</a>
-              <button type="submit" class="mh-option-link mh-link-red" th:attr="form=${'formXoaDiaChi' + dc.maDiaChi}">Xóa</button>
-            </span>
-          </label>
+          <th:block th:each="dc : ${dsDiaChi}" th:if="${dc.maDiaChi == datHangForm.maDiaChi}">
+            <button type="button" class="mh-address-picked" data-bs-toggle="modal" data-bs-target="#modalDiaChi">
+              <i class="bi bi-geo-alt-fill mh-address-pin"></i>
+              <span class="mh-address-picked-body">
+                <span class="mh-address-picked-head"><strong data-chon-ten th:text="${dc.tenNguoiNhan}">Họ tên</strong>
+                  <span class="mh-sep">|</span><span data-chon-sdt th:text="${dc.soDienThoai}">SĐT</span>
+                  <span class="mh-badge-soft" data-chon-mac-dinh th:hidden="${!dc.laMacDinh}">Mặc định</span></span>
+                <span class="mh-address-picked-text" data-chon-dia-chi th:text="${dc.diaChiDayDu}">Địa chỉ</span>
+              </span>
+              <span class="mh-address-more">
+                <th:block th:text="${#lists.size(dsDiaChi) > 1} ? |Xem thêm (${#lists.size(dsDiaChi) - 1})| : 'Thay đổi'">Xem thêm</th:block>
+                <i class="bi bi-chevron-right"></i></span>
+            </button>
+          </th:block>
 
           <div class="account-field-error" th:if="${#fields.hasErrors('maDiaChi')}" th:errors="*{maDiaChi}"></div>
-          <p class="mh-hint" th:if="${#lists.isEmpty(dsDiaChi)}"><i class="bi bi-info-circle"></i>
-            Bạn chưa có địa chỉ nhận hàng. Thêm địa chỉ để tiếp tục đặt hàng.</p>
-          <a class="mh-add-address" href="#" th:href="@{/tai-khoan/dia-chi/them(quayLai=${urlQuayLai})}">
-            <i class="bi bi-plus-circle"></i> Thêm địa chỉ mới</a>
+          <th:block th:if="${#lists.isEmpty(dsDiaChi)}">
+            <p class="mh-hint"><i class="bi bi-info-circle"></i> Bạn chưa có địa chỉ nhận hàng. Thêm địa chỉ để tiếp tục đặt hàng.</p>
+            <a class="mh-add-address" href="#" th:href="@{/tai-khoan/dia-chi/them(quayLai=${urlQuayLai})}">
+              <i class="bi bi-plus-circle"></i> Thêm địa chỉ mới</a>
+          </th:block>
         </section>
 
         <!-- ===== 2. Sản phẩm ===== -->
@@ -260,6 +258,29 @@
             <span data-voucher-tom-tat>Chọn hoặc nhập mã giảm giá</span></span>
           <span class="mh-voucher-row-cta"><th:block th:text="${#lists.size(trang.maDungDuoc())} + ' mã dùng được'">0 mã</th:block> <i class="bi bi-chevron-right"></i></span>
         </button>
+
+        <!-- ===== 3b. Điểm thưởng (bảng LichSuDiemThuong): 1 điểm = 1.000₫, tối thiểu 10 điểm, tối đa 50% đơn sau mã giảm giá ===== -->
+        <section class="mh-card mh-point-box" id="diem-thuong"
+                 th:data-diem="${trang.diemHienCo()}" data-gia-tri="1000" data-toi-thieu="10" data-phan-tram="50">
+          <div class="mh-point-box-head">
+            <span class="mh-point-box-icon"><i class="bi bi-coin"></i></span>
+            <div><strong>Dùng điểm thưởng</strong>
+              <small>Bạn có <b th:text="${#numbers.formatInteger(trang.diemHienCo(), 1, 'POINT')}">0</b> điểm · 1 điểm = 1.000₫</small></div>
+            <label class="mh-switch" th:classappend="${trang.diemHienCo() < 10} ? 'is-disabled'">
+              <input type="checkbox" id="batDungDiem" th:disabled="${trang.diemHienCo() < 10}"
+                     th:checked="${datHangForm.diemSuDung != null and datHangForm.diemSuDung > 0}" />
+              <span></span></label>
+          </div>
+          <div class="mh-point-box-body" id="oNhapDiem" hidden>
+            <div class="mh-point-input">
+              <input type="number" class="account-input" id="diemSuDung" th:field="*{diemSuDung}" min="0" step="1" inputmode="numeric" />
+              <button type="button" class="mh-btn-outline" id="nutDungToiDa">Dùng tối đa</button>
+            </div>
+            <small class="mh-point-hint" data-goi-y-diem>Tối đa 0 điểm cho đơn này.</small>
+          </div>
+          <p class="mh-point-note" th:if="${trang.diemHienCo() < 10}">
+            <i class="bi bi-info-circle"></i> Cần ít nhất 10 điểm để dùng. Mỗi 100.000₫ thanh toán được tích 1 điểm.</p>
+        </section>
 
         <!-- ===== 4. Phương thức thanh toán (KH14) ===== -->
         <section class="mh-card">
@@ -301,11 +322,14 @@
             <div><dt>Phí vận chuyển</dt><dd class="mh-free">Miễn phí</dd></div>
             <div data-dong-giam hidden><dt>Mã giảm giá <span class="mh-code" data-ma-hien></span></dt><dd class="mh-minus" data-so-tien-giam>−0₫</dd></div>
             <!-- Luôn hiện: số tiền giảm của phương thức thanh toán đang chọn (muaHang.js cập nhật) -->
+            <div data-dong-giam-diem hidden><dt>Điểm thưởng <small class="mh-pay-sum-name" data-so-diem-dung></small></dt>
+              <dd class="mh-minus" data-so-tien-giam-diem>−0₫</dd></div>
             <div data-dong-giam-tt><dt>Ưu đãi thanh toán <small class="mh-pay-sum-name" data-ten-pt-giam></small></dt>
               <dd class="mh-minus" data-so-tien-giam-tt>0₫</dd></div>
           </dl>
           <div class="mh-sum-total"><span>Tổng thanh toán</span>
             <strong data-tong-thanh-toan th:text="${#numbers.formatDecimal(trang.tamTinh(), 1, 'POINT', 0, 'COMMA')} + '₫'">0₫</strong></div>
+          <p class="mh-earn" data-diem-nhan hidden><i class="bi bi-coin"></i> Nhận thêm <b>0</b> điểm thưởng khi đặt đơn này</p>
           <p class="mh-saving" data-tiet-kiem hidden><i class="bi bi-piggy-bank"></i> Bạn tiết kiệm được <b>0₫</b></p>
           <p class="mh-block-note" th:if="${trang.coDongKhongMuaDuoc()}"><i class="bi bi-exclamation-triangle"></i>
             Có sản phẩm hết hàng hoặc vượt tồn kho. Vui lòng sửa giỏ hàng trước khi đặt.</p>
@@ -327,6 +351,44 @@
     </form>
   </div>
 </main>
+
+<!-- ===== Modal chọn địa chỉ nhận hàng (radio thuộc form đặt hàng qua thuộc tính form) ===== -->
+<div class="modal fade mh-modal" id="modalDiaChi" tabindex="-1" aria-labelledby="tieuDeDiaChi" aria-hidden="true" th:unless="${#lists.isEmpty(dsDiaChi)}">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="tieuDeDiaChi"><i class="bi bi-geo-alt"></i> Chọn địa chỉ nhận hàng</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body mh-address-list">
+        <label class="mh-address-row" th:each="dc : ${dsDiaChi}">
+          <input type="radio" name="maDiaChi" form="formDatHang" th:value="${dc.maDiaChi}" th:checked="${dc.maDiaChi == datHangForm.maDiaChi}"
+                 th:data-vung="${dc.giaoHang.vung()}" th:data-so-ngay="${dc.giaoHang.soNgay()}"
+                 th:data-ngay-nhan="${dc.giaoHang.khoangNgayTuHomNay()}"
+                 th:data-ten="${dc.tenNguoiNhan}" th:data-sdt="${dc.soDienThoai}" th:data-dia-chi="${dc.diaChiDayDu}"
+                 th:data-mac-dinh="${dc.laMacDinh}" />
+          <span class="mh-radio"></span>
+          <span class="mh-address-row-body">
+            <span class="mh-address-picked-head"><strong th:text="${dc.tenNguoiNhan}">Họ tên</strong>
+              <span class="mh-sep">|</span><span th:text="${dc.soDienThoai}">SĐT</span></span>
+            <span class="mh-address-picked-text" th:text="${dc.diaChiDayDu}">Địa chỉ</span>
+            <span class="mh-address-tags"><span class="mh-tag-default" th:if="${dc.laMacDinh}">Mặc định</span>
+              <span class="mh-badge-type"><i class="bi" th:classappend="${dc.loaiDiaChi == 'Văn phòng'} ? 'bi-building' : 'bi-house-door'"></i>
+                <th:block th:text="${dc.loaiDiaChi}">Nhà riêng</th:block></span></span>
+          </span>
+          <span class="mh-address-actions">
+            <a class="mh-option-link" href="#" th:href="@{/tai-khoan/dia-chi/{id}/sua(id=${dc.maDiaChi},quayLai=${urlQuayLai})}">Sửa</a>
+            <button type="submit" class="mh-option-link mh-link-red" th:attr="form=${'formXoaDiaChi' + dc.maDiaChi}">Xóa</button>
+          </span>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <a class="mh-add-address-btn" href="#" th:href="@{/tai-khoan/dia-chi/them(quayLai=${urlQuayLai})}">
+          <i class="bi bi-plus-lg"></i> Thêm địa chỉ mới</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ===== Modal chọn mã ưu đãi: dữ liệu từ bảng KhuyenMai (đang bật, còn hạn, còn lượt) ===== -->
 <div class="modal fade mh-modal" id="modalMaUuDai" tabindex="-1" aria-labelledby="tieuDeMaUuDai" aria-hidden="true">

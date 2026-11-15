@@ -182,6 +182,10 @@
         <div th:if="${ct.thanhToan() != null and ct.thanhToan().tienGiamUuDai != null and ct.thanhToan().tienGiamUuDai.signum() > 0}"><dt>Ưu đãi thanh toán</dt>
           <dd th:text="|−${#numbers.formatDecimal(ct.thanhToan().tienGiamUuDai, 1, 'POINT', 0, 'COMMA')}₫ (${ct.thanhToan().uuDai})|">−0₫</dd></div>
         <div><dt>Người nhận</dt><dd th:text="|${d.hoTenNguoiNhan} · ${d.soDienThoaiNguoiNhan}|">Người nhận</dd></div>
+        <div th:if="${ct.diemDaDung() > 0}"><dt>Điểm thưởng đã dùng</dt>
+          <dd th:text="|${ct.diemDaDung()} điểm (−${#numbers.formatDecimal(ct.tienGiamBangDiem(), 1, 'POINT', 0, 'COMMA')}₫)|">Điểm</dd></div>
+        <div th:if="${ct.diemTichLuy() > 0}"><dt>Điểm thưởng nhận được</dt>
+          <dd class="mh-earn-text" th:text="|+${ct.diemTichLuy()} điểm|">+0 điểm</dd></div>
         <div><dt>Giao đến</dt><dd th:text="${d.diaChiGiaoHang}">Địa chỉ</dd></div>
         <div th:if="${ct.ngayNhanDuKien() != null}"><dt>Dự kiến nhận hàng</dt>
           <dd th:text="|${ct.ngayNhanDuKien()} (${ct.giaoHang().soNgay()})|">Thứ Năm 12/11 – Thứ Sáu 13/11</dd></div>

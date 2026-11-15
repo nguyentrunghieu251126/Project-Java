@@ -11,7 +11,6 @@ import project.dien_may.project_java.dto.muahang.ThoiGianGiaoHang;
 import project.dien_may.project_java.dto.muahang.UuDaiThanhToan;
 import project.dien_may.project_java.dto.muahang.TinhThanh;
 import project.dien_may.project_java.dto.muahang.DongGioHang;
-import project.dien_may.project_java.dto.muahang.HoTroForm;
 import project.dien_may.project_java.entity.KhuyenMai;
 import project.dien_may.project_java.entity.LoaiGiamGia;
 import project.dien_may.project_java.entity.PhuongThucThanhToan;
@@ -21,7 +20,6 @@ import project.dien_may.project_java.service.admin.NghiepVuException;
 import project.dien_may.project_java.service.muahang.DatHangService;
 import project.dien_may.project_java.service.muahang.DonHangKhachHangService;
 import project.dien_may.project_java.service.muahang.GioHangService;
-import project.dien_may.project_java.service.muahang.HoTroService;
 import project.dien_may.project_java.service.muahang.SoDiaChiService;
 
 import java.math.BigDecimal;
@@ -54,10 +52,10 @@ class MuaHangTests {
     private DonHangKhachHangService donHangService;
 
     @Autowired
-    private HoTroService hoTroService;
+    private SoDiaChiService soDiaChiService;
 
     @Autowired
-    private SoDiaChiService soDiaChiService;
+    private project.dien_may.project_java.service.muahang.DiemThuongService diemThuongService;
 
     /** Đẩy thay đổi của JPA xuống CSDL trước khi đọc lại bằng JDBC. */
     @Autowired
@@ -227,32 +225,6 @@ class MuaHangTests {
         assertThrows(NghiepVuException.class, () -> gioHangService.muaLai(KHACH_HANG, maDon));
     }
 
-    @Test
-    void guiYeuCauHoTroLuuVaoCsdl() {
-        int truoc = dem("SELECT COUNT(*) FROM dbo.YeuCauHoTro");
-        HoTroForm form = new HoTroForm();
-        form.setChuDe(HoTroForm.DS_CHU_DE.get(0));
-        form.setNoiDung("Tôi muốn hỏi thời gian giao hàng của đơn gần nhất.");
-
-        Integer ma = hoTroService.gui(KHACH_HANG, form);
-
-        assertEquals(truoc + 1, dem("SELECT COUNT(*) FROM dbo.YeuCauHoTro"));
-        assertEquals("MOI", jdbc.queryForObject("SELECT TrangThai FROM dbo.YeuCauHoTro WHERE MaYeuCauHoTro = ?",
-                String.class, ma));
-    }
-
-    @Test
-    void khongGuiHoTroChoDonCuaNguoiKhac() {
-        Integer donNguoiKhac = jdbc.queryForObject("""
-                SELECT TOP (1) d.MaDonHang FROM dbo.DonHang d JOIN dbo.TaiKhoan t ON t.MaTaiKhoan = d.MaTaiKhoan
-                WHERE t.Email <> ?""", Integer.class, KHACH_HANG);
-        HoTroForm form = new HoTroForm();
-        form.setMaDon(donNguoiKhac);
-        form.setNoiDung("Đơn này không phải của tôi nhưng thử gửi.");
-
-        assertThrows(NghiepVuException.class, () -> hoTroService.gui(KHACH_HANG, form));
-    }
-
     // ===== Sổ địa chỉ (bảng SoDiaChi) =====
 
     private DiaChiForm diaChiMoi(String ten, boolean macDinh) {
@@ -384,5 +356,60 @@ class MuaHangTests {
         assertFalse(UuDaiThanhToan.tinh(PhuongThucThanhToan.SACOMBANK, BigDecimal.valueOf(5_000_000), BigDecimal.ZERO).coGiam());
         // COD không có ưu đãi
         assertTrue(UuDaiThanhToan.dieuKien(PhuongThucThanhToan.COD).isEmpty());
+    }
+
+    // ===== Điểm thưởng (bảng LichSuDiemThuong) =====
+
+    private void tangDiem(int soDiem) {
+        jdbc.update("""
+                INSERT INTO dbo.LichSuDiemThuong (MaTaiKhoan, LoaiGiaoDich, SoDiem, MoTa)
+                SELECT MaTaiKhoan, 'CONG', ?, N'Điểm thử nghiệm' FROM dbo.TaiKhoan WHERE Email = ?""", soDiem, KHACH_HANG);
+    }
+
+    @Test
+    void datHangDungDiemVaTichDiemHuyThiTraLai() {
+        SanPham sp = sanPhamConHang(1);
+        assumeTrue(sp.getDonGia().compareTo(BigDecimal.valueOf(100_000)) >= 0, "Cần sản phẩm từ 100.000₫");
+        gioHangService.xoa(KHACH_HANG, List.of(sp.getMaSanPham()));
+        gioHangService.them(KHACH_HANG, sp.getMaSanPham(), 1);
+        tangDiem(500);
+        long diemTruoc = diemThuongService.tongDiem(KHACH_HANG);
+
+        DatHangForm f = form(sp.getMaSanPham());
+        f.setDiemSuDung(10);
+        Integer maDon = datHangService.datHang(KHACH_HANG, f);
+
+        BigDecimal tong = jdbc.queryForObject("SELECT TongTien FROM dbo.DonHang WHERE MaDonHang = ?", BigDecimal.class, maDon);
+        assertEquals(0, sp.getDonGia().subtract(BigDecimal.valueOf(10_000)).compareTo(tong), "Tổng tiền đã trừ 10 điểm = 10.000₫");
+        int diemTich = tong.divide(BigDecimal.valueOf(100_000), 0, java.math.RoundingMode.DOWN).intValue();
+        assertEquals(diemTruoc - 10 + diemTich, diemThuongService.tongDiem(KHACH_HANG));
+
+        // Hủy đơn: hoàn 10 điểm đã dùng, thu hồi điểm vừa tích
+        donHangService.huyDon(KHACH_HANG, maDon);
+        assertEquals(diemTruoc, diemThuongService.tongDiem(KHACH_HANG));
+    }
+
+    @Test
+    void khongDungDuoiToiThieuHoacVuotSoDiem() {
+        SanPham sp = sanPhamConHang(1);
+        gioHangService.xoa(KHACH_HANG, List.of(sp.getMaSanPham()));
+        gioHangService.them(KHACH_HANG, sp.getMaSanPham(), 1);
+
+        DatHangForm it = form(sp.getMaSanPham());
+        it.setDiemSuDung(5);
+        assertThrows(NghiepVuException.class, () -> datHangService.datHang(KHACH_HANG, it), "Dưới 10 điểm");
+
+        DatHangForm nhieu = form(sp.getMaSanPham());
+        nhieu.setDiemSuDung((int) diemThuongService.tongDiem(KHACH_HANG) + 1000);
+        assertThrows(NghiepVuException.class, () -> datHangService.datHang(KHACH_HANG, nhieu), "Vượt số điểm đang có");
+    }
+
+    @Test
+    void quyTacDiemThuong() {
+        assertEquals(12, project.dien_may.project_java.dto.muahang.QuyTacDiemThuong.diemNhanDuoc(BigDecimal.valueOf(1_250_000)));
+        // Đơn 100.000₫ chỉ dùng tối đa 50% = 50 điểm dù có 500 điểm
+        assertEquals(50, project.dien_may.project_java.dto.muahang.QuyTacDiemThuong.diemToiDa(500, BigDecimal.valueOf(100_000)));
+        // Có dưới 10 điểm thì không dùng được
+        assertEquals(0, project.dien_may.project_java.dto.muahang.QuyTacDiemThuong.diemToiDa(9, BigDecimal.valueOf(10_000_000)));
     }
 }

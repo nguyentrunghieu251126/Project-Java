@@ -64,4 +64,13 @@ public interface DonHangKhachHangRepository extends JpaRepository<DonHang, Integ
     int huyNeuDangCho(@Param("maDon") Integer maDon,
                       @Param("choXacNhan") TrangThaiDonHang choXacNhan,
                       @Param("daHuy") TrangThaiDonHang daHuy);
+
+    /** Sản phẩm trong các đơn đã giao của khách, mới nhất trước (khung "Thông tin bảo hành" ở trang Tổng quan). */
+    @Query("""
+            SELECT ct FROM ChiTietDonHang ct JOIN FETCH ct.sanPham JOIN FETCH ct.donHang d
+            WHERE d.taiKhoan.email = :email AND d.trangThai = :daGiao
+            ORDER BY d.ngayGiao DESC, d.maDonHang DESC
+            """)
+    List<ChiTietDonHang> daGiaoCuaKhach(@Param("email") String email, @Param("daGiao") TrangThaiDonHang daGiao,
+                                        Pageable pageable);
 }

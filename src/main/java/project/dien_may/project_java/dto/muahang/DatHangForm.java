@@ -31,4 +31,8 @@ public class DatHangForm {
 
     /** Mã các sản phẩm được tick ở giỏ hàng. */
     private List<Integer> sanPham = new ArrayList<>();
+
+    /** Số điểm thưởng muốn dùng (0 hoặc null = không dùng); server kiểm tra lại. */
+    @jakarta.validation.constraints.Min(value = 0, message = "Số điểm không hợp lệ.")
+    private Integer diemSuDung;
 }
