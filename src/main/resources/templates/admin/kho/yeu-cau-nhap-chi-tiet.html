@@ -64,6 +64,69 @@
         </div>
     </section>
 
+    <!-- TV4 (NVK10): yêu cầu đã duyệt, nhân viên kho nhập đơn giá theo hóa đơn rồi lập phiếu nhập -->
+    <section class="the" sec:authorize="hasAuthority('KHO_NHAP_HANG')"
+             th:if="${yeuCau.trangThai.name() == 'DA_DUYET' and phieuNhap == null}">
+        <div class="the-tieu-de"><h2>Lập phiếu nhập kho</h2></div>
+        <p class="text-muted small">Nhập đơn giá theo hóa đơn của nhà cung cấp. Giá điền sẵn là gợi ý 80% giá bán.
+            Lập phiếu xong, số lượng sẽ được cộng vào tồn kho.</p>
+        <form method="post" th:action="@{/admin/kho/yeu-cau-nhap/{ma}/lap-phieu-nhap(ma=${yeuCau.maYeuCauNhap})}"
+              th:data-xac-nhan="|Lập phiếu nhập cho yêu cầu #${yeuCau.maYeuCauNhap} và cộng hàng vào kho?|">
+            <div class="table-responsive">
+                <table class="table bang">
+                    <thead><tr><th>Sản phẩm</th><th class="so">Số lượng nhập</th><th class="so">Giá bán</th>
+                        <th class="so" style="width: 200px">Đơn giá nhập (₫) *</th></tr></thead>
+                    <tbody>
+                    <tr th:each="c : ${yeuCau.chiTiet}">
+                        <td><span class="ten-chinh" th:text="${c.sanPham.tenSanPham}"></span>
+                            <span class="ten-phu" th:text="${c.sanPham.maModel}"></span></td>
+                        <td class="so" th:text="${c.soLuongYeuCau}"></td>
+                        <td class="so" th:text="|${#numbers.formatInteger(c.sanPham.donGia, 1, 'POINT')} ₫|"></td>
+                        <td class="so">
+                            <input type="hidden" name="maChiTiet" th:value="${c.maChiTietYeuCauNhap}">
+                            <input class="form-control form-control-sm text-end" type="number" name="donGia"
+                                   min="0" step="1" required th:value="${giaNhapGoiY[c.maChiTietYeuCauNhap]}"
+                                   th:aria-label="|Đơn giá nhập của ${c.sanPham.tenSanPham}|">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex gap-2 align-items-start">
+                <input class="form-control form-control-sm" name="ghiChu" maxlength="500"
+                       placeholder="Ghi chú (không bắt buộc), ví dụ: số hóa đơn nhà cung cấp">
+                <button class="btn btn-chinh text-nowrap" type="submit">
+                    <i class="bi bi-box-arrow-in-down" aria-hidden="true"></i> Lập phiếu nhập</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- TV4 (NVK10): thông tin phiếu nhập đã lập -->
+    <section class="the" th:if="${phieuNhap != null}">
+        <div class="the-tieu-de"><h2 th:text="|Phiếu nhập #${phieuNhap.maPhieuNhap}|">Phiếu nhập</h2></div>
+        <dl class="bang-thong-tin">
+            <dt>Người lập</dt><dd th:text="${phieuNhap.taiKhoan.hoTen}"></dd>
+            <dt>Ngày nhập</dt><dd th:text="${#temporals.format(phieuNhap.ngayNhap, 'dd/MM/yyyy HH:mm')}"></dd>
+            <dt>Ghi chú</dt><dd th:text="${phieuNhap.ghiChu != null} ? ${phieuNhap.ghiChu} : '–'"></dd>
+        </dl>
+        <div class="table-responsive">
+            <table class="table bang">
+                <thead><tr><th>Sản phẩm</th><th class="so">Số lượng</th><th class="so">Đơn giá nhập</th>
+                    <th class="so">Thành tiền</th></tr></thead>
+                <tbody>
+                <tr th:each="d : ${phieuNhap.chiTiet}">
+                    <td th:text="${d.sanPham.tenSanPham}"></td>
+                    <td class="so" th:text="${d.soLuongNhap}"></td>
+                    <td class="so" th:text="|${#numbers.formatInteger(d.donGiaNhap, 1, 'POINT')} ₫|"></td>
+                    <td class="so" th:text="|${#numbers.formatInteger(d.thanhTien, 1, 'POINT')} ₫|"></td>
+                </tr>
+                </tbody>
+                <tfoot><tr><td colspan="3" class="so">Tổng tiền nhập</td>
+                    <td class="so" th:text="|${#numbers.formatInteger(phieuNhap.tongTienNhap, 1, 'POINT')} ₫|"></td></tr></tfoot>
+            </table>
+        </div>
+    </section>
+
     <div class="modal fade" id="hopTuChoi" tabindex="-1" aria-labelledby="hopTuChoiTieuDe" aria-hidden="true"
          sec:authorize="hasAuthority('KHO_DUYET_NHAP')" th:if="${yeuCau.trangThai.name() == 'CHO_DUYET'}">
         <div class="modal-dialog modal-dialog-centered">

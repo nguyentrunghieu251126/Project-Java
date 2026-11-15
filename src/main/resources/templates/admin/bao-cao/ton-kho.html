@@ -40,14 +40,14 @@
                         <form th:unless="${dangChoDuyet.contains(s.maSanPham)}" class="o-nhap-hang input-group" method="post"
                               th:action="@{/admin/kho/ton-kho/{ma}/yeu-cau-nhap(ma=${s.maSanPham})}"
                               th:attr="data-xac-nhan=${#authorization.expression('hasRole(''QUAN_TRI'')')}
-                                  ? |Nhập hàng ${s.tenSanPham} vào kho ngay, không qua duyệt?| : null">
+                                  ? |Lập yêu cầu nhập ${s.tenSanPham} (duyệt luôn), hàng vào kho khi nhân viên kho lập phiếu nhập?| : null">
                             <input type="hidden" name="quayVe" value="bao-cao">
                             <input class="form-control" type="number" name="soLuong"
                                    min="1" required th:value="${s.mucTonToiThieu - s.soLuong}"
                                    th:aria-label="|Số lượng nhập của ${s.tenSanPham}|">
                             <button class="btn btn-chinh text-nowrap" type="submit">
                                 <i class="bi bi-box-arrow-in-down" aria-hidden="true"></i>
-                                <span th:text="${#authorization.expression('hasRole(''QUAN_TRI'')')} ? 'Nhập hàng' : 'Lập phiếu'">Nhập hàng</span>
+                                <span th:text="${#authorization.expression('hasRole(''QUAN_TRI'')')} ? 'Yêu cầu nhập' : 'Lập phiếu'">Nhập hàng</span>
                             </button>
                         </form>
                     </td>

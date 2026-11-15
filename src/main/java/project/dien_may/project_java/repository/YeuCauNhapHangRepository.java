@@ -38,4 +38,17 @@ public interface YeuCauNhapHangRepository extends JpaRepository<YeuCauNhapHang, 
              @Param("nguoiDuyet") TaiKhoan nguoiDuyet,
              @Param("ngayDuyet") LocalDateTime ngayDuyet,
              @Param("lyDoTuChoi") String lyDoTuChoi);
+
+    /**
+     * TV4 (NVK10): Đổi trạng thái khi yêu cầu còn đúng trạng thái cũ (ví dụ DA_DUYET sang DA_NHAP).
+     * Trả về 0 nghĩa là đã có người lập phiếu nhập trước, nên không cộng kho hai lần.
+     */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("""
+            UPDATE YeuCauNhapHang y SET y.trangThai = :trangThaiMoi
+            WHERE y.maYeuCauNhap = :ma AND y.trangThai = :trangThaiCu
+            """)
+    int chuyenTrangThai(@Param("ma") Integer maYeuCauNhap,
+                        @Param("trangThaiCu") TrangThaiYeuCauNhap trangThaiCu,
+                        @Param("trangThaiMoi") TrangThaiYeuCauNhap trangThaiMoi);
 }

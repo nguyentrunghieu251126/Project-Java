@@ -25,6 +25,7 @@ import project.dien_may.project_java.repository.YeuCauNhapHangRepository;
 import project.dien_may.project_java.service.admin.KhoAdminService;
 import project.dien_may.project_java.service.admin.KhoAdminService.KetQuaNhap;
 import project.dien_may.project_java.service.admin.NghiepVuException;
+import project.dien_may.project_java.service.admin.PhieuNhapService;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -43,11 +44,12 @@ public class AdminKhoController {
     private final DanhMucRepository danhMucRepository;
     private final YeuCauNhapHangRepository yeuCauRepository;
     private final PhieuXuatRepository phieuXuatRepository;
+    private final PhieuNhapService phieuNhapService;
 
     public AdminKhoController(KhoAdminService khoService, DonHangRepository donHangRepository,
                               ChiTietDonHangRepository chiTietDonHangRepository, SanPhamRepository sanPhamRepository,
                               DanhMucRepository danhMucRepository, YeuCauNhapHangRepository yeuCauRepository,
-                              PhieuXuatRepository phieuXuatRepository) {
+                              PhieuXuatRepository phieuXuatRepository, PhieuNhapService phieuNhapService) {
         this.khoService = khoService;
         this.donHangRepository = donHangRepository;
         this.chiTietDonHangRepository = chiTietDonHangRepository;
@@ -55,6 +57,7 @@ public class AdminKhoController {
         this.danhMucRepository = danhMucRepository;
         this.yeuCauRepository = yeuCauRepository;
         this.phieuXuatRepository = phieuXuatRepository;
+        this.phieuNhapService = phieuNhapService;
     }
 
     @GetMapping("/don-hang")
@@ -113,8 +116,8 @@ public class AdminKhoController {
                                 Principal nguoiDung, RedirectAttributes redirect) {
         try {
             KetQuaNhap ketQua = khoService.lapYeuCauNhap(ma, soLuong, nguoiDung.getName());
-            redirect.addFlashAttribute("thongBao", ketQua.daNhapKho()
-                    ? "Đã nhập thêm " + soLuong + " sản phẩm vào kho (phiếu #" + ketQua.maYeuCau() + ")."
+            redirect.addFlashAttribute("thongBao", ketQua.daDuyet()
+                    ? "Đã lập và duyệt yêu cầu nhập hàng #" + ketQua.maYeuCau() + ", chờ kho lập phiếu nhập."
                     : "Đã gửi yêu cầu nhập hàng #" + ketQua.maYeuCau() + ".");
         } catch (NghiepVuException e) {
             redirect.addFlashAttribute("loi", e.getMessage());
@@ -139,6 +142,9 @@ public class AdminKhoController {
     public String chiTietYeuCau(@PathVariable Integer ma, Model model) {
         model.addAttribute("yeuCau", yeuCauRepository.findById(ma)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        // TV4 (NVK10): phiếu nhập đã lập (null nếu chưa) và giá nhập gợi ý cho form lập phiếu
+        model.addAttribute("phieuNhap", phieuNhapService.timTheoYeuCau(ma));
+        model.addAttribute("giaNhapGoiY", phieuNhapService.giaNhapGoiY(ma));
         return "admin/kho/yeu-cau-nhap-chi-tiet";
     }
 
@@ -146,7 +152,7 @@ public class AdminKhoController {
     public String duyet(@PathVariable Integer ma, Principal nguoiDung, RedirectAttributes redirect) {
         try {
             khoService.duyet(ma, nguoiDung.getName());
-            redirect.addFlashAttribute("thongBao", "Đã duyệt yêu cầu nhập hàng #" + ma + ".");
+            redirect.addFlashAttribute("thongBao", "Đã duyệt yêu cầu nhập hàng #" + ma + ", chờ kho lập phiếu nhập.");
         } catch (NghiepVuException e) {
             redirect.addFlashAttribute("loi", e.getMessage());
         }

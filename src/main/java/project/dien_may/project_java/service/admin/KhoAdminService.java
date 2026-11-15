@@ -45,13 +45,14 @@ public class KhoAdminService {
 
     private static final String VAI_TRO_QUAN_TRI = "QUAN_TRI";
 
-    /** @param daNhapKho true khi phiếu được duyệt ngay và số lượng đã cộng vào tồn kho */
-    public record KetQuaNhap(Integer maYeuCau, boolean daNhapKho) {
+    /** @param daDuyet true khi quản trị viên lập nên yêu cầu được duyệt luôn, chờ kho lập phiếu nhập (NVK10) */
+    public record KetQuaNhap(Integer maYeuCau, boolean daDuyet) {
     }
 
     /**
      * Lập phiếu yêu cầu nhập cho một sản phẩm đang ở mức cảnh báo (sắp hết hoặc hết hàng).
-     * Nhân viên kho gửi thì phiếu chờ duyệt; quản trị viên lập thì phiếu được duyệt luôn và hàng vào kho ngay.
+     * Nhân viên kho gửi thì phiếu chờ duyệt; quản trị viên lập thì phiếu được duyệt luôn.
+     * TV4: hàng chỉ vào kho khi nhân viên kho lập phiếu nhập (PhieuNhapService), không cộng ở bước này.
      */
     @Transactional
     public KetQuaNhap lapYeuCauNhap(Integer maSanPham, Integer soLuong, String emailNguoiGui) {
@@ -65,6 +66,10 @@ public class KhoAdminService {
         }
         if (chiTietYeuCauRepository.existsBySanPhamMaSanPhamAndYeuCauTrangThai(maSanPham, TrangThaiYeuCauNhap.CHO_DUYET)) {
             throw new NghiepVuException("Sản phẩm " + sanPham.getTenSanPham() + " đã có yêu cầu nhập đang chờ duyệt.");
+        }
+        if (chiTietYeuCauRepository.existsBySanPhamMaSanPhamAndYeuCauTrangThai(maSanPham, TrangThaiYeuCauNhap.DA_DUYET)) {
+            throw new NghiepVuException("Sản phẩm " + sanPham.getTenSanPham()
+                    + " đã có yêu cầu được duyệt, đang chờ kho lập phiếu nhập.");
         }
 
         TaiKhoan nguoiGui = taiKhoanRepository.findByEmailIgnoreCase(emailNguoiGui).orElseThrow();
@@ -89,11 +94,7 @@ public class KhoAdminService {
         chiTiet.setSoLuongYeuCau(soLuong);
         chiTietYeuCauRepository.save(chiTiet);
 
-        Integer maYeuCau = yeuCau.getMaYeuCauNhap();
-        if (nhapNgay) {
-            sanPhamRepository.congTonKho(maSanPham, soLuong);
-        }
-        return new KetQuaNhap(maYeuCau, nhapNgay);
+        return new KetQuaNhap(yeuCau.getMaYeuCauNhap(), nhapNgay);
     }
 
     @Transactional(readOnly = true)
@@ -105,13 +106,13 @@ public class KhoAdminService {
         return donHangRepository.timKiem(tuKhoa, maDon, trangThai, tu, den, pageable);
     }
 
-    /** Duyệt xong thì hàng trong phiếu được cộng vào tồn kho. */
+    /**
+     * Duyệt yêu cầu. TV4: chỉ đổi trạng thái sang DA_DUYET, chưa cộng kho;
+     * hàng vào kho khi nhân viên kho lập phiếu nhập (NVK10), tránh cộng hai lần.
+     */
     @Transactional
     public void duyet(Integer ma, String emailNguoiDuyet) {
         xuLy(ma, TrangThaiYeuCauNhap.DA_DUYET, emailNguoiDuyet, null);
-        for (ChiTietYeuCauNhapHang chiTiet : chiTietYeuCauRepository.findByYeuCauMaYeuCauNhap(ma)) {
-            sanPhamRepository.congTonKho(chiTiet.getSanPham().getMaSanPham(), chiTiet.getSoLuongYeuCau());
-        }
     }
 
     @Transactional
