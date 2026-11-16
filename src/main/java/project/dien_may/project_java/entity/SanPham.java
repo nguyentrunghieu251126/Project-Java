@@ -41,6 +41,10 @@ public class SanPham {
     @Column(name = "ThoiGianBaoHanh", nullable = false)
     private Integer thoiGianBaoHanh = 12;
 
+    /** TV3 – số tháng bảo hành mở rộng, tính tiếp sau bảo hành chính hãng. */
+    @Column(name = "ThoiGianBaoHanhMoRong", nullable = false)
+    private Integer thoiGianBaoHanhMoRong = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaDanhMuc", nullable = false)
     private DanhMuc danhMuc;

@@ -182,7 +182,6 @@
 .mh-page .mh-stars-static { color: #f5a524; font-size: 14px; letter-spacing: 1px; }
 .mh-page .mh-invoice-sum { max-width: 340px; margin-left: auto; }
 .mh-page .mh-invoice-sum .mh-sum-total { margin-top: 4px; }
-.mh-page .mh-invoice-thanks { display: none; }
 
 /* ----- Modal ----- */
 .mh-modal { font-family: "Be Vietnam Pro", sans-serif; color: #172a44; }
@@ -449,7 +448,6 @@
 .mh-page .mh-bank-inline { margin: -8px 0 22px; text-align: left; }
 .mh-modal .mh-voucher-empty { font-size: 12.5px; color: #708097; background: #f8fafb; border-radius: 10px; padding: 14px; text-align: center; }
 .mh-modal .mh-ticket-save { font-style: normal; font-size: 11px; font-weight: 650; color: #059669; }
-@media print { .mh-toast-wrap { display: none !important; } }
 
 
 /* ----- Mua lại (KH19) ----- */
@@ -518,17 +516,6 @@
   .mh-page .mh-reviewed { align-items: flex-start; }
   .mh-page .mh-invoice-sum { max-width: none; }
   .mh-page .mh-success { padding: 28px 18px; }
-}
-
-/* ----- In hóa đơn: chỉ giữ phần #hoa-don ----- */
-@media print {
-  .topbar, .header, .footer, .account-sidebar, .account-breadcrumb, .mh-detail-heading, .mh-tracker-panel,
-  .mh-no-print, .modal { display: none !important; }
-  body, .account-page { background: #fff !important; padding: 0 !important; }
-  .account-page .account-layout { display: block; }
-  .mh-page .mh-invoice { border: 0; box-shadow: none; padding: 0; }
-  .mh-page .mh-info { background: #fff; }
-  .mh-page .mh-invoice-thanks { display: block; text-align: center; margin-top: 28px; font-size: 12px; color: #53677e; }
 }
 
 /* ===================== SỔ ĐỊA CHỈ (thanh toán + hồ sơ + trang thêm/sửa) ===================== */
@@ -846,4 +833,96 @@
   .mh-page .mh-stat-grid, .mh-page .mh-howto, .mh-page .mh-vc-grid { grid-template-columns: 1fr; }
   .mh-page .mh-history-summary { grid-template-columns: 1fr; }
   .mh-page .mh-hs-item + .mh-hs-item { border-left: 0; border-top: 1px solid #eef2f6; }
+}
+
+/* Đường dẫn Trang chủ > Giỏ hàng > Thanh toán: mục đang xem là chữ thường, không bấm được */
+.mh-page .account-breadcrumb span[aria-current="page"] { color: #172a44; font-weight: 600; cursor: default; }
+
+/* ===================== TV3 – THÔNG TIN BẢO HÀNH (/tai-khoan/bao-hanh) ===================== */
+.mh-page .mh-bh-title { font-size: 24px; font-weight: 800; color: #0d233d; margin: 0 0 16px; letter-spacing: -.3px; }
+.mh-page .mh-bh-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; margin-bottom: 16px; }
+.mh-page .mh-bh-date-btn { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 300px; max-width: 100%; min-height: 44px; padding: 8px 14px;
+  background: #fff; border: 1px solid #dfe6ee; border-radius: 10px; font: inherit; font-size: 13.5px; color: #172a44; text-align: left; }
+.mh-page .mh-bh-date-btn:hover, .mh-page .mh-bh-date-btn[aria-expanded="true"] { border-color: #b9c6d4; }
+.mh-page .mh-bh-date-btn .bi { font-size: 18px; color: #5b6b80; }
+.mh-page .mh-bh-placeholder { color: #9aa7b6; }
+.mh-page .mh-bh-date-menu { width: 300px; padding: 14px; border-radius: 12px; border-color: #e4eaf0; box-shadow: 0 12px 28px rgba(18,45,72,.12); }
+.mh-page .mh-bh-date-menu label { display: block; font-size: 12px; font-weight: 600; color: #5b6b80; margin-bottom: 10px; }
+.mh-page .mh-bh-date-menu label .form-control { margin-top: 4px; font-size: 13px; }
+.mh-page .mh-bh-date-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.mh-page .mh-bh-date-actions a { font-size: 12.5px; font-weight: 600; color: #708097; text-decoration: none; }
+.mh-page .mh-bh-date-actions a:hover { color: #d0281e; }
+.mh-page .mh-bh-sort { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; }
+.mh-page .mh-bh-sort a { font-size: 13.5px; color: #708097; text-decoration: none; }
+.mh-page .mh-bh-sort a + a::before { content: "•"; margin: 0 12px; color: #9aa7b6; }
+.mh-page .mh-bh-sort a:hover { color: #172a44; }
+.mh-page .mh-bh-sort a.active { color: #d0281e; font-weight: 600; }
+
+.mh-page .mh-bh-card { background: #fff; border: 1px solid #e4eaf0; border-radius: 14px; margin-bottom: 12px; box-shadow: 0 5px 20px rgba(18,45,72,.035); }
+.mh-page .mh-bh-card > summary { display: grid; grid-template-columns: 80px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 18px 20px; cursor: pointer; list-style: none; }
+.mh-page .mh-bh-card > summary::-webkit-details-marker { display: none; }
+.mh-page .mh-bh-card > summary:focus-visible { outline: 2px solid #2563eb; outline-offset: -2px; border-radius: 14px; }
+.mh-page .mh-bh-card > summary img, .mh-page .mh-bh-card > summary .mh-item-noimg { width: 80px; height: 80px; object-fit: contain; border: 1px solid #edf1f5; border-radius: 10px; padding: 5px; background: #fff; }
+.mh-page .mh-bh-info { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
+.mh-page .mh-bh-info strong { font-size: 15px; font-weight: 600; line-height: 1.45; color: #172a44; }
+.mh-page .mh-bh-info small { font-size: 12px; color: #708097; }
+.mh-page .mh-bh-badge { font-size: 12.5px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.mh-page .mh-bh-badge.on { background: #e3f8ec; color: #059669; }
+.mh-page .mh-bh-badge.off { background: #f3f6f9; color: #708097; }
+.mh-page .mh-bh-toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: #172a44; white-space: nowrap; }
+.mh-page .mh-bh-toggle .bi { transition: transform .2s ease; }
+.mh-page .mh-bh-dong, .mh-page .mh-bh-card[open] .mh-bh-mo { display: none; }
+.mh-page .mh-bh-card[open] .mh-bh-dong { display: inline; }
+.mh-page .mh-bh-card[open] .mh-bh-toggle .bi { transform: rotate(180deg); }
+
+.mh-page .mh-bh-detail { margin: 0 20px 20px; border: 1px solid #e4eaf0; border-radius: 12px; overflow: hidden; }
+.mh-page .mh-bh-detail-title { padding: 14px 20px; background: #f6f8fa; border-bottom: 1px solid #e4eaf0; font-size: 14px; font-weight: 700; color: #172a44; }
+.mh-page .mh-bh-rows { margin: 0; }
+.mh-page .mh-bh-rows > div { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 16px 20px; border-bottom: 1px solid #eef2f6; }
+.mh-page .mh-bh-rows > div:last-child { border-bottom: 0; }
+.mh-page .mh-bh-rows dt { font-size: 14px; font-weight: 400; color: #415369; flex-shrink: 0; max-width: 45%; }
+.mh-page .mh-bh-rows dd { margin: 0; font-size: 14px; font-weight: 700; color: #172a44; text-align: right; overflow-wrap: anywhere; }
+.mh-page .mh-bh-rows dd.mh-bh-state { display: inline-flex; align-items: center; gap: 6px; }
+.mh-page .mh-bh-state.on { color: #059669; }
+.mh-page .mh-bh-state.off { color: #708097; }
+.mh-page .mh-bh-state .bi { font-size: 17px; }
+.mh-page .mh-bh-history { border-top: 1px solid #e4eaf0; }
+.mh-page .mh-bh-history ul { list-style: none; margin: 0; padding: 0; }
+.mh-page .mh-bh-history li { padding: 14px 20px; border-bottom: 1px solid #eef2f6; }
+.mh-page .mh-bh-history li:last-child { border-bottom: 0; }
+.mh-page .mh-bh-history-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+.mh-page .mh-bh-history-top strong { font-size: 13.5px; }
+.mh-page .mh-bh-history p { margin: 2px 0 0; font-size: 13px; color: #415369; }
+.mh-page .mh-bh-history p span { color: #708097; }
+
+@media (max-width: 767.98px) {
+  .mh-page .mh-bh-toolbar { flex-direction: column; align-items: stretch; }
+  .mh-page .mh-bh-date-btn { width: 100%; }
+  .mh-page .mh-bh-card > summary { grid-template-columns: 60px minmax(0, 1fr); padding: 14px; gap: 12px; }
+  .mh-page .mh-bh-card > summary img, .mh-page .mh-bh-card > summary .mh-item-noimg { width: 60px; height: 60px; }
+  .mh-page .mh-bh-toggle { grid-column: 2; justify-self: start; font-size: 13px; }
+  .mh-page .mh-bh-detail { margin: 0 14px 14px; }
+  .mh-page .mh-bh-rows > div { padding: 12px 14px; gap: 14px; }
+  .mh-page .mh-bh-rows dt, .mh-page .mh-bh-rows dd { font-size: 13px; }
+}
+
+/* Yêu cầu bảo hành trong ô chi tiết */
+.mh-page .mh-bh-request { border-top: 1px solid #e4eaf0; }
+.mh-page .mh-bh-request:empty { display: none; }
+.mh-page .mh-bh-request-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 14px 20px; background: #fffaf9; }
+.mh-page .mh-bh-request-text { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.mh-page .mh-bh-request-text > .bi { width: 38px; height: 38px; flex-shrink: 0; display: grid; place-items: center; border-radius: 10px; background: #fff1f0; color: #d0281e; font-size: 17px; }
+.mh-page .mh-bh-request-text strong { display: block; font-size: 14px; color: #172a44; }
+.mh-page .mh-bh-request-text small { display: block; font-size: 12.5px; color: #708097; }
+.mh-page .mh-bh-form { padding: 16px 20px 18px; border-top: 1px dashed #f2c9c5; background: #fff; }
+.mh-page .mh-bh-form-label { display: block; font-size: 13px; font-weight: 700; color: #172a44; margin-bottom: 6px; }
+.mh-page .mh-bh-form-label span { color: #d0281e; }
+.mh-page .mh-bh-form textarea { font-size: 13.5px; border-radius: 10px; border-color: #dfe6ee; resize: vertical; }
+.mh-page .mh-bh-form textarea:focus { border-color: #e9a59e; box-shadow: 0 0 0 3px rgba(208,40,30,.1); }
+.mh-page .mh-bh-form-note { list-style: none; margin: 10px 0 14px; padding: 0; display: grid; gap: 4px; font-size: 12.5px; color: #708097; }
+.mh-page .mh-bh-form-note .bi { margin-right: 4px; }
+.mh-page .mh-bh-form-actions { display: flex; justify-content: flex-end; gap: 10px; }
+@media (max-width: 767.98px) {
+  .mh-page .mh-bh-request-bar, .mh-page .mh-bh-form { padding: 12px 14px; }
+  .mh-page .mh-bh-request-bar .mh-btn-red { width: 100%; }
 }

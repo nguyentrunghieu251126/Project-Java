@@ -55,7 +55,10 @@ public class TongQuanTaiKhoanService {
     private BaoHanhSanPham chuyenBaoHanh(ChiTietDonHang ct) {
         var d = ct.getDonHang();
         LocalDate ngayNhan = (d.getNgayGiao() != null ? d.getNgayGiao() : d.getNgayDat()).toLocalDate();
-        int soThang = ct.getSanPham().getThoiGianBaoHanh() == null ? 0 : ct.getSanPham().getThoiGianBaoHanh();
+        var sp = ct.getSanPham();
+        // Bảo hành chính hãng + mở rộng, khớp trang /tai-khoan/bao-hanh
+        int soThang = (sp.getThoiGianBaoHanh() == null ? 0 : sp.getThoiGianBaoHanh())
+                + (sp.getThoiGianBaoHanhMoRong() == null ? 0 : sp.getThoiGianBaoHanhMoRong());
         return new BaoHanhSanPham(d.getMaDonHang(), ct.getSanPham().getTenSanPham(), ct.getSanPham().getHinhAnh(),
                 ngayNhan, soThang, ngayNhan.plusMonths(soThang));
     }

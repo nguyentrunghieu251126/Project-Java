@@ -400,6 +400,3 @@ if (modalDanhGia) {
   noiDung.addEventListener("input", () => { demKyTu.textContent = noiDung.value.length; });
 }
 
-// In hóa đơn
-document.querySelectorAll("[data-in-hoa-don]").forEach((nut) =>
-  nut.addEventListener("click", () => window.print()));

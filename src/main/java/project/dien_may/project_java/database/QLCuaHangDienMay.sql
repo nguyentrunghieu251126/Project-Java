@@ -1899,3 +1899,30 @@ SELECT (SELECT COUNT(*) FROM dbo.SoDiaChi) AS SoDiaChi,
        (SELECT COUNT(*) FROM dbo.LichSuDiemThuong) AS LichSuDiemThuong,
        COL_LENGTH(N'dbo.ThanhToan', N'TienGiamThanhToan') AS CotTienGiamThanhToan;
 GO
+
+/* ===================== TV3 – THÔNG TIN BẢO HÀNH ===================== */
+-- Chạy lại nhiều lần không lỗi: chỉ thêm cột khi chưa có.
+-- Thời gian bảo hành mở rộng (tháng), tính tiếp sau bảo hành chính hãng.
+IF COL_LENGTH(N'dbo.SanPham', N'ThoiGianBaoHanhMoRong') IS NULL
+    ALTER TABLE dbo.SanPham ADD ThoiGianBaoHanhMoRong INT
+        CONSTRAINT DF_SanPham_BaoHanhMoRong DEFAULT 0 NOT NULL
+        CONSTRAINT CK_SanPham_BaoHanhMoRong CHECK (ThoiGianBaoHanhMoRong >= 0);
+-- Số IMEI/Seri của sản phẩm đã giao cho khách (ghi khi xuất kho).
+IF COL_LENGTH(N'dbo.ChiTietDonHang', N'SoSeri') IS NULL
+    ALTER TABLE dbo.ChiTietDonHang ADD SoSeri VARCHAR (50) NULL;
+GO
+-- Dữ liệu mẫu: laptop, tivi, tủ lạnh, máy giặt, điều hòa được bảo hành mở rộng thêm 12 tháng.
+UPDATE dbo.SanPham
+SET    ThoiGianBaoHanhMoRong = 12
+WHERE  MaDanhMuc IN (3, 4, 5, 6, 7)
+  AND  ThoiGianBaoHanhMoRong = 0;
+-- Dữ liệu mẫu: sinh số seri cho sản phẩm thuộc đơn đã xuất kho / đang giao / đã giao.
+UPDATE ct
+SET    SoSeri = UPPER(LEFT(REPLACE(REPLACE(sp.MaModel, '-', ''), ' ', ''), 6))
+              + RIGHT('00000000' + CAST(ct.MaChiTietDonHang * 7919 + ct.MaDonHang * 104729 AS VARCHAR (12)), 8)
+FROM   dbo.ChiTietDonHang ct
+JOIN   dbo.SanPham sp ON sp.MaSanPham = ct.MaSanPham
+JOIN   dbo.DonHang d ON d.MaDonHang = ct.MaDonHang
+WHERE  d.TrangThaiDonHang IN ('DA_XUAT_KHO', 'DANG_GIAO', 'DA_GIAO')
+  AND  ct.SoSeri IS NULL;
+GO

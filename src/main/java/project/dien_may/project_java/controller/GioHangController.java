@@ -26,6 +26,7 @@ public class GioHangController {
 
     private static final String VIEW = "gio-hang/GioHang";
     private static final String VE_GIO_HANG = "redirect:/gio-hang";
+    private static final String TU_TAI_KHOAN = "tai-khoan";
     private static final int SO_GOI_Y = 5;
 
     private final GioHangService gioHangService;
@@ -42,6 +43,7 @@ public class GioHangController {
     /** chon: danh sách mã sản phẩm được tick sẵn (sau khi "Mua lại"); rỗng thì tick mọi dòng mua được. */
     @GetMapping
     public String gioHang(@RequestParam(name = "chon", required = false) List<Integer> chon,
+                          @RequestParam(name = "tu", required = false) String tu,
                           Principal principal, Model model) {
         List<DongGioHang> dong = gioHangService.layGioHang(principal.getName());
         Set<Integer> trongGio = dong.stream().map(DongGioHang::maSanPham).collect(Collectors.toSet());
@@ -55,6 +57,8 @@ public class GioHangController {
         model.addAttribute("dsChon", chon == null ? List.of() : chon);
         model.addAttribute("goiY", goiY);
         model.addAttribute("anhGoiY", anhGoiY);
+        // Vào từ menu trang tài khoản (?tu=tai-khoan): đường dẫn hiện "Tài khoản của tôi › Giỏ hàng"
+        model.addAttribute("tuTaiKhoan", TU_TAI_KHOAN.equals(tu));
         return VIEW;
     }
 
@@ -140,19 +144,27 @@ public class GioHangController {
     }
 
     @PostMapping("/xoa")
-    public String xoa(@RequestParam Integer maSanPham, Principal principal, RedirectAttributes redirect) {
+    public String xoa(@RequestParam Integer maSanPham, HttpServletRequest request, Principal principal,
+                      RedirectAttributes redirect) {
         gioHangService.xoa(principal.getName(), List.of(maSanPham));
         redirect.addFlashAttribute("thongBao", "Đã xóa sản phẩm khỏi giỏ hàng.");
-        return VE_GIO_HANG;
+        return veGioHang(request);
     }
 
     @PostMapping("/xoa-nhieu")
     public String xoaNhieu(@RequestParam(name = "maSanPham", required = false) List<Integer> dsMaSanPham,
-                           Principal principal, RedirectAttributes redirect) {
+                           HttpServletRequest request, Principal principal, RedirectAttributes redirect) {
         int soDong = gioHangService.xoa(principal.getName(), dsMaSanPham);
         if (soDong > 0) {
             redirect.addFlashAttribute("thongBao", "Đã xóa " + soDong + " sản phẩm khỏi giỏ hàng.");
         }
-        return VE_GIO_HANG;
+        return veGioHang(request);
+    }
+
+    /** Xóa xong quay lại giỏ hàng, giữ đường dẫn "Tài khoản của tôi" nếu trước đó vào từ trang tài khoản. */
+    private static String veGioHang(HttpServletRequest request) {
+        String trangTruoc = request.getHeader("Referer");
+        return trangTruoc != null && trangTruoc.contains("tu=" + TU_TAI_KHOAN)
+                ? VE_GIO_HANG + "?tu=" + TU_TAI_KHOAN : VE_GIO_HANG;
     }
 }

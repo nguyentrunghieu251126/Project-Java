@@ -64,12 +64,17 @@
               <i class="bi bi-person-circle" aria-hidden="true"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end account-dropdown" aria-labelledby="customerAccountMenu">
-              <li>
-                <a class="dropdown-item account-overview-link" th:href="@{/tai-khoan}">
-                  <i class="bi bi-person-lines-fill" aria-hidden="true"></i> Tổng quan tài khoản
-                </a>
-              </li>
+              <!-- TV3: menu tài khoản kiểu FPT Shop, mỗi mục trỏ tới trang có sẵn trong project -->
+              <li><a class="dropdown-item account-overview-link" th:href="@{/}"><i class="bi bi-house-door" aria-hidden="true"></i> Trang chủ</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/don-hang}"><i class="bi bi-box-seam" aria-hidden="true"></i> Đơn hàng của tôi</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/gio-hang}"><i class="bi bi-cart3" aria-hidden="true"></i> Giỏ hàng</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/uu-dai}"><i class="bi bi-gift" aria-hidden="true"></i> Ưu đãi của tôi</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/diem-thuong}"><i class="bi bi-coin" aria-hidden="true"></i> Điểm thưởng</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/diem-thuong/lich-su}"><i class="bi bi-clock-history" aria-hidden="true"></i> Lịch sử điểm thưởng</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/bao-hanh}"><i class="bi bi-shield-check" aria-hidden="true"></i> Thông tin bảo hành</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/ho-so} + '#so-dia-chi'"><i class="bi bi-geo-alt" aria-hidden="true"></i> Sổ địa chỉ nhận hàng</a></li>
               <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan}"><i class="bi bi-person" aria-hidden="true"></i> Tài khoản của tôi</a></li>
               <li>
                 <form th:action="@{/dang-xuat}" method="post" class="m-0">
                   <button type="submit" class="dropdown-item account-logout">
@@ -164,7 +169,7 @@
 
 <!--
   TV3 – KH16 xem đơn/hóa đơn, KH17 theo dõi đơn, KH18 hủy đơn, KH22 đánh giá sản phẩm.
-  Model: hoSo, ct (ChiTietDonHangKhach). Nút "In hóa đơn" dùng window.print(); CSS @media print chỉ giữ phần hóa đơn.
+  Model: hoSo, ct (ChiTietDonHangKhach).
 -->
 <main class="account-page mh-page" id="chi-tiet-don-hang" th:with="d=${ct.donHang()}, maHien=${ct.maHien()}">
   <div class="container account-shell">
@@ -196,7 +201,7 @@
              th:attr="aria-current=${trangTaiKhoan == 'tong-quan'} ? 'page' : null"><i class="bi bi-grid-1x2"></i><span>Tổng quan</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
           <a href="#" th:href="@{/don-hang}" th:classappend="${menuTaiKhoan == 'don-hang'} ? 'active'"
              th:attr="aria-current=${menuTaiKhoan == 'don-hang'} ? 'page' : null"><i class="bi bi-box-seam"></i><span>Đơn hàng của tôi</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
-          <a href="#" th:href="@{/gio-hang}"><i class="bi bi-cart3"></i><span>Giỏ hàng</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+          <a href="#" th:href="@{/gio-hang(tu='tai-khoan')}"><i class="bi bi-cart3"></i><span>Giỏ hàng</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
         </section>
         <a class="mh-point-card" href="#" th:href="@{/tai-khoan/diem-thuong}" th:classappend="${menuTaiKhoan == 'diem-thuong'} ? 'active'">
           <span class="mh-point-card-title">Điểm thưởng của bạn</span>
@@ -215,7 +220,8 @@
              th:attr="aria-current=${trangTaiKhoan == 'ho-so' or menuTaiKhoan == 'ho-so'} ? 'page' : null"><i class="bi bi-person-vcard"></i><span>Hồ sơ cá nhân</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
           <a href="#" th:href="@{/tai-khoan/ho-so} + '#so-dia-chi'"><i class="bi bi-geo-alt"></i><span>Sổ địa chỉ nhận hàng</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
           <!-- TV4: KH20 – KH21 -->
-          <a href="#" th:href="@{/bao-hanh-doi-tra}"><i class="bi bi-shield-check"></i><span>Thông tin bảo hành &amp; đổi trả</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+          <a href="#" th:href="@{/tai-khoan/bao-hanh}" th:classappend="${menuTaiKhoan == 'bao-hanh'} ? 'active'"
+             th:attr="aria-current=${menuTaiKhoan == 'bao-hanh'} ? 'page' : null"><i class="bi bi-shield-check"></i><span>Thông tin bảo hành</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
           <a href="#" th:href="@{/tai-khoan/doi-mat-khau}" th:classappend="${trangTaiKhoan == 'doi-mat-khau'} ? 'active'"
              th:attr="aria-current=${trangTaiKhoan == 'doi-mat-khau'} ? 'page' : null"><i class="bi bi-shield-lock"></i><span>Đổi mật khẩu</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
         </section>
@@ -235,7 +241,6 @@
             <p th:text="${'Đặt lúc ' + #temporals.format(d.ngayDat, 'HH:mm, dd/MM/yyyy') + (d.ngayGiao != null ? ' · Giao thành công ' + #temporals.format(d.ngayGiao, 'HH:mm, dd/MM/yyyy') : '')}">Đặt lúc</p>
           </div>
           <div class="mh-detail-actions">
-            <button type="button" class="mh-btn-outline" data-in-hoa-don><i class="bi bi-printer"></i> In hóa đơn</button>
             <form th:if="${ct.duocDanhGia() or ct.daHuy()}" method="post" class="mh-inline-form"
                   th:action="@{/don-hang/{id}/mua-lai(id=${d.maDonHang})}">
               <button type="submit" class="mh-btn-outline"><i class="bi bi-arrow-repeat"></i> Mua lại</button>
@@ -287,7 +292,7 @@
 
           <div class="mh-table-wrap" id="san-pham">
             <table class="mh-table">
-              <thead><tr><th>Sản phẩm</th><th class="so">Đơn giá</th><th class="so">SL</th><th class="so">Thành tiền</th><th class="mh-no-print" th:if="${ct.duocDanhGia()}"></th></tr></thead>
+              <thead><tr><th>Sản phẩm</th><th class="so">Đơn giá</th><th class="so">SL</th><th class="so">Thành tiền</th><th th:if="${ct.duocDanhGia()}"></th></tr></thead>
               <tbody>
                 <tr th:each="c : ${ct.chiTiet()}" th:with="sp=${c.sanPham}">
                   <td><div class="mh-table-product">
@@ -298,7 +303,7 @@
                   <td class="so" data-label="Đơn giá" th:text="${#numbers.formatDecimal(c.donGia, 1, 'POINT', 0, 'COMMA')} + '₫'">0₫</td>
                   <td class="so" data-label="SL" th:text="${c.soLuong}">1</td>
                   <td class="so" data-label="Thành tiền"><strong th:text="${#numbers.formatDecimal(c.thanhTien, 1, 'POINT', 0, 'COMMA')} + '₫'">0₫</strong></td>
-                  <td class="mh-no-print mh-review-cell" th:if="${ct.duocDanhGia()}">
+                  <td class="mh-review-cell" th:if="${ct.duocDanhGia()}">
                     <span class="mh-reviewed" th:if="${ct.daDanhGia(sp.maSanPham)}" th:title="|Bạn đã đánh giá ${ct.soSao(sp.maSanPham)} sao|">
                       <span class="mh-stars-static" th:text="${#strings.repeat('★', ct.soSao(sp.maSanPham)) + #strings.repeat('☆', 5 - ct.soSao(sp.maSanPham))}">★★★★★</span> Đã đánh giá</span>
                     <button type="button" class="mh-btn-primary mh-btn-sm" th:unless="${ct.daDanhGia(sp.maSanPham)}"
@@ -325,7 +330,6 @@
           </dl>
           <p class="mh-earn mh-earn-invoice" th:if="${ct.diemTichLuy() > 0}"><i class="bi bi-coin"></i>
             <th:block th:text="${ct.daHuy()} ? |Đơn đã hủy: ${ct.diemTichLuy()} điểm tích từ đơn đã được thu hồi| : |Đơn này được tích ${ct.diemTichLuy()} điểm thưởng|">Tích điểm</th:block></p>
-          <p class="mh-invoice-thanks">Cảm ơn quý khách đã mua sắm tại PDMJV!</p>
         </section>
 
       </div>

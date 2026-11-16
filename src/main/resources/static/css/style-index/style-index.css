@@ -1724,7 +1724,7 @@ a {
   .header .account-menu:hover > .account-dropdown {
     display: block;
     top: 100%;
-    right: 0;
+    right: -40px; /* lệch sang phải một chút so với icon tài khoản */
     left: auto;
     animation: accountMenuShow 0.25s ease-out both;
   }

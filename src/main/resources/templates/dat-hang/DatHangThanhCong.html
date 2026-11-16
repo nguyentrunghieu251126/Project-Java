@@ -64,12 +64,17 @@
               <i class="bi bi-person-circle" aria-hidden="true"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end account-dropdown" aria-labelledby="customerAccountMenu">
-              <li>
-                <a class="dropdown-item account-overview-link" th:href="@{/tai-khoan}">
-                  <i class="bi bi-person-lines-fill" aria-hidden="true"></i> Tổng quan tài khoản
-                </a>
-              </li>
+              <!-- TV3: menu tài khoản kiểu FPT Shop, mỗi mục trỏ tới trang có sẵn trong project -->
+              <li><a class="dropdown-item account-overview-link" th:href="@{/}"><i class="bi bi-house-door" aria-hidden="true"></i> Trang chủ</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/don-hang}"><i class="bi bi-box-seam" aria-hidden="true"></i> Đơn hàng của tôi</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/gio-hang}"><i class="bi bi-cart3" aria-hidden="true"></i> Giỏ hàng</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/uu-dai}"><i class="bi bi-gift" aria-hidden="true"></i> Ưu đãi của tôi</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/diem-thuong}"><i class="bi bi-coin" aria-hidden="true"></i> Điểm thưởng</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/diem-thuong/lich-su}"><i class="bi bi-clock-history" aria-hidden="true"></i> Lịch sử điểm thưởng</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/bao-hanh}"><i class="bi bi-shield-check" aria-hidden="true"></i> Thông tin bảo hành</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/ho-so} + '#so-dia-chi'"><i class="bi bi-geo-alt" aria-hidden="true"></i> Sổ địa chỉ nhận hàng</a></li>
               <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan}"><i class="bi bi-person" aria-hidden="true"></i> Tài khoản của tôi</a></li>
               <li>
                 <form th:action="@{/dang-xuat}" method="post" class="m-0">
                   <button type="submit" class="dropdown-item account-logout">

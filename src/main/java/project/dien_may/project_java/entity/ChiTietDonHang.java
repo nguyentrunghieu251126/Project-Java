@@ -33,4 +33,8 @@ public class ChiTietDonHang {
 
     @Column(name = "ThanhTien", nullable = false, precision = 18)
     private BigDecimal thanhTien;
+
+    /** TV3 – số IMEI/Seri của sản phẩm giao cho khách; null khi chưa ghi nhận. */
+    @Column(name = "SoSeri", length = 50)
+    private String soSeri;
 }

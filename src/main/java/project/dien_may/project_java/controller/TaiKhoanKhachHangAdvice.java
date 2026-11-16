@@ -13,7 +13,7 @@ import java.security.Principal;
  * mà không phải sửa HoSoTaiKhoanController của TV2.
  */
 @ControllerAdvice(assignableTypes = { HoSoTaiKhoanController.class, DonHangController.class,
-        DiaChiController.class, DiemThuongController.class })
+        DiaChiController.class, DiemThuongController.class, BaoHanhTaiKhoanController.class })
 public class TaiKhoanKhachHangAdvice {
 
     private final DiemThuongService diemThuongService;
