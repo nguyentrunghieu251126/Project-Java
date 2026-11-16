@@ -42,14 +42,6 @@ document.querySelectorAll(".filter-tabs .nav-link").forEach((tab) => {
   });
 });
 
-// Đăng ký nhận tin
-document.getElementById("newsletterForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  toastMsg.textContent = "Đăng ký thành công! Voucher đã được gửi tới email của bạn.";
-  toast.show();
-  e.target.reset();
-});
-
 // Nút lên đầu trang
 const backToTop = document.getElementById("backToTop");
 window.addEventListener("scroll", () => {
