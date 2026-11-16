@@ -72,7 +72,7 @@
               <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/diem-thuong}"><i class="bi bi-coin" aria-hidden="true"></i> Điểm thưởng</a></li>
               <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/diem-thuong/lich-su}"><i class="bi bi-clock-history" aria-hidden="true"></i> Lịch sử điểm thưởng</a></li>
               <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/bao-hanh}"><i class="bi bi-shield-check" aria-hidden="true"></i> Thông tin bảo hành</a></li>
-              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/ho-so} + '#so-dia-chi'"><i class="bi bi-geo-alt" aria-hidden="true"></i> Sổ địa chỉ nhận hàng</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/dia-chi}"><i class="bi bi-geo-alt" aria-hidden="true"></i> Sổ địa chỉ nhận hàng</a></li>
               <li><hr class="dropdown-divider" /></li>
               <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan}"><i class="bi bi-person" aria-hidden="true"></i> Tài khoản của tôi</a></li>
               <li>
@@ -210,7 +210,7 @@
         <!-- Chỉ hiện địa chỉ đang chọn; bấm vào để mở danh sách (modal #modalDiaChi) -->
         <section class="mh-card" id="dia-chi-nhan">
           <div class="mh-card-head"><h2 class="mh-card-title"><i class="bi bi-geo-alt-fill mh-icon-red"></i> Địa chỉ nhận hàng</h2>
-            <a class="account-inline-link" href="#" th:href="@{/tai-khoan/ho-so} + '#so-dia-chi'">Quản lý sổ địa chỉ</a></div>
+            <a class="account-inline-link" href="#" th:href="@{/tai-khoan/dia-chi}">Quản lý sổ địa chỉ</a></div>
 
           <th:block th:each="dc : ${dsDiaChi}" th:if="${dc.maDiaChi == datHangForm.maDiaChi}">
             <button type="button" class="mh-address-picked" data-bs-toggle="modal" data-bs-target="#modalDiaChi">

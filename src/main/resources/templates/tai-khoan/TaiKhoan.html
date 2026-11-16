@@ -70,7 +70,7 @@
               <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/diem-thuong}"><i class="bi bi-coin" aria-hidden="true"></i> Điểm thưởng</a></li>
               <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/diem-thuong/lich-su}"><i class="bi bi-clock-history" aria-hidden="true"></i> Lịch sử điểm thưởng</a></li>
               <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/bao-hanh}"><i class="bi bi-shield-check" aria-hidden="true"></i> Thông tin bảo hành</a></li>
-              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/ho-so} + '#so-dia-chi'"><i class="bi bi-geo-alt" aria-hidden="true"></i> Sổ địa chỉ nhận hàng</a></li>
+              <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan/dia-chi}"><i class="bi bi-geo-alt" aria-hidden="true"></i> Sổ địa chỉ nhận hàng</a></li>
               <li><hr class="dropdown-divider" /></li>
               <li><a class="dropdown-item account-overview-link" th:href="@{/tai-khoan}"><i class="bi bi-person" aria-hidden="true"></i> Tài khoản của tôi</a></li>
               <li>
@@ -202,7 +202,8 @@
         <section class="account-side-links">
           <a href="#" th:href="@{/tai-khoan/ho-so}" th:classappend="${trangTaiKhoan == 'ho-so' or menuTaiKhoan == 'ho-so'} ? 'active'"
              th:attr="aria-current=${trangTaiKhoan == 'ho-so' or menuTaiKhoan == 'ho-so'} ? 'page' : null"><i class="bi bi-person-vcard"></i><span>Hồ sơ cá nhân</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
-          <a href="#" th:href="@{/tai-khoan/ho-so} + '#so-dia-chi'"><i class="bi bi-geo-alt"></i><span>Sổ địa chỉ nhận hàng</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
+          <a href="#" th:href="@{/tai-khoan/dia-chi}" th:classappend="${menuTaiKhoan == 'dia-chi'} ? 'active'"
+             th:attr="aria-current=${menuTaiKhoan == 'dia-chi'} ? 'page' : null"><i class="bi bi-geo-alt"></i><span>Sổ địa chỉ nhận hàng</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
           <!-- TV4: KH20 – KH21 -->
           <a href="#" th:href="@{/tai-khoan/bao-hanh}" th:classappend="${menuTaiKhoan == 'bao-hanh'} ? 'active'"
              th:attr="aria-current=${menuTaiKhoan == 'bao-hanh'} ? 'page' : null"><i class="bi bi-shield-check"></i><span>Thông tin bảo hành</span><i class="bi bi-chevron-right account-nav-arrow"></i></a>
@@ -309,7 +310,7 @@
         <!-- Ho so: KH04 - sua ho ten, SDT, dia chi mac dinh; email khong duoc sua. -->
         <div th:if="${trangTaiKhoan == 'ho-so'}">
           <div class="account-heading"><div><div class="account-eyebrow"><i class="bi bi-person-vcard"></i> QUẢN LÝ HỒ SƠ</div>
-            <h1>Thông tin cá nhân</h1><p>Chỉnh sửa thông tin liên hệ và sổ địa chỉ giao hàng.</p></div></div>
+            <h1>Thông tin cá nhân</h1><p>Chỉnh sửa họ tên và số điện thoại liên hệ.</p></div></div>
           <section class="account-panel">
             <div class="account-panel-head"><div><h2>Hồ sơ của tôi</h2><p>Thông tin được lưu trực tiếp vào tài khoản của bạn.</p></div>
               <span class="account-chip"><i class="bi bi-patch-check"></i> Khách hàng</span></div>
@@ -326,41 +327,13 @@
                   <small>Không bắt buộc. Nếu nhập, dùng 10 chữ số bắt đầu bằng 0.</small>
                   <div class="account-field-error" th:if="${#fields.hasErrors('soDienThoai')}" th:errors="*{soDienThoai}" role="alert"></div></div>
               </div>
-              <!-- TV3: địa chỉ quản lý ở "Sổ địa chỉ giao hàng" bên dưới; giữ ẩn để lưu hồ sơ không làm mất địa chỉ mặc định -->
+              <!-- TV3: địa chỉ quản lý ở trang riêng /tai-khoan/dia-chi; giữ ẩn để lưu hồ sơ không làm mất địa chỉ mặc định -->
               <input type="hidden" th:field="*{diaChi}" />
               <div class="account-form-actions"><button type="submit" class="account-primary"><i class="bi bi-check2-circle"></i> Lưu thay đổi</button>
                 <a class="account-secondary" th:href="@{/tai-khoan}">Quay về tổng quan</a></div>
             </form>
           </section>
 
-          <!-- TV3: sổ địa chỉ giao hàng (bảng SoDiaChi) – thêm / sửa / xóa / đặt mặc định -->
-          <section class="account-panel mh-page" id="so-dia-chi">
-            <div class="account-panel-head"><div><h2>Sổ địa chỉ giao hàng</h2><p>Chọn nhanh địa chỉ nhận hàng khi thanh toán. Tối đa 10 địa chỉ.</p></div>
-              <a class="account-primary mh-btn-sm" th:href="@{/tai-khoan/dia-chi/them(quayLai='/tai-khoan/ho-so')}"><i class="bi bi-plus-lg"></i> Thêm địa chỉ</a></div>
-            <div class="mh-address-book">
-              <div class="mh-address-card" th:each="dc : ${soDiaChi}" th:classappend="${dc.laMacDinh} ? 'is-default'">
-                <div class="mh-address-card-body">
-                  <div class="mh-option-head"><strong th:text="${dc.tenNguoiNhan}">Họ tên</strong><span class="mh-sep">·</span>
-                    <span th:text="${dc.soDienThoai}">SĐT</span>
-                    <span class="mh-badge-soft" th:if="${dc.laMacDinh}">Mặc định</span>
-                    <span class="mh-badge-type"><i class="bi" th:classappend="${dc.loaiDiaChi == 'Văn phòng'} ? 'bi-building' : 'bi-house-door'"></i>
-                      <th:block th:text="${dc.loaiDiaChi}">Nhà riêng</th:block></span></div>
-                  <small th:text="${dc.diaChiDayDu}">Địa chỉ</small>
-                </div>
-                <div class="mh-address-actions">
-                  <a class="mh-option-link" th:href="@{/tai-khoan/dia-chi/{id}/sua(id=${dc.maDiaChi},quayLai='/tai-khoan/ho-so')}">Sửa</a>
-                  <form th:unless="${dc.laMacDinh}" method="post" th:action="@{/tai-khoan/dia-chi/{id}/mac-dinh(id=${dc.maDiaChi})}">
-                    <input type="hidden" name="quayLai" value="/tai-khoan/ho-so" />
-                    <button type="submit" class="mh-option-link">Đặt mặc định</button></form>
-                  <form method="post" th:action="@{/tai-khoan/dia-chi/{id}/xoa(id=${dc.maDiaChi})}" onsubmit="return confirm('Xóa địa chỉ này khỏi sổ địa chỉ?');">
-                    <input type="hidden" name="quayLai" value="/tai-khoan/ho-so" />
-                    <button type="submit" class="mh-option-link mh-link-red">Xóa</button></form>
-                </div>
-              </div>
-              <p class="mh-hint" th:if="${#lists.isEmpty(soDiaChi)}"><i class="bi bi-info-circle"></i> Bạn chưa có địa chỉ nào trong sổ.</p>
-              <a class="mh-add-address" th:href="@{/tai-khoan/dia-chi/them(quayLai='/tai-khoan/ho-so')}"><i class="bi bi-plus-circle"></i> Thêm địa chỉ mới</a>
-            </div>
-          </section>
           <div class="account-security-hint"><i class="bi bi-shield-lock"></i><span>Muốn đổi mật khẩu đăng nhập?</span><a th:href="@{/tai-khoan/doi-mat-khau}">Đổi mật khẩu <i class="bi bi-arrow-right"></i></a></div>
         </div>
 
