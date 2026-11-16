@@ -123,7 +123,7 @@
     font-size: 1.25rem;
   }
 
-  /* --- Danh mục, sản phẩm, đăng ký nhận tin --- */
+  /* --- Danh mục, sản phẩm --- */
   .category span {
     width: 56px;
     height: 56px;
@@ -135,9 +135,6 @@
   .product-img {
     height: 110px;
     font-size: 3.2rem;
-  }
-  .newsletter {
-    padding: 22px;
   }
 }
 

@@ -1465,38 +1465,6 @@ a {
   background: var(--primary);
 }
 
-/* ===== Thương hiệu ===== */
-.brand {
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 18px 8px;
-  text-align: center;
-  font-weight: 800;
-  color: var(--muted);
-  letter-spacing: 1px;
-  transition: all 0.25s;
-}
-.brand:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-  box-shadow: var(--shadow);
-}
-
-/* ===== Newsletter ===== */
-.newsletter {
-  background: var(--accent);
-  border-radius: var(--radius);
-  padding: 28px 32px;
-}
-.newsletter .form-control {
-  border: none;
-  padding: 12px 18px;
-  border-radius: 50px 0 0 50px;
-}
-.newsletter .btn {
-  border-radius: 0 50px 50px 0;
-}
-
 /* ===== Footer ===== */
 .footer {
   background: #111827;
