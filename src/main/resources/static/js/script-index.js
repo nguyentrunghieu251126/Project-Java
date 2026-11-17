@@ -108,29 +108,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
   setTimeout(dongThongBao, 3000);
 });
-// Flash sale
 (function () {
-  const luoi = document.getElementById("flashSaleGrid");
-  const nutTruoc = document.getElementById("flashSalePrev");
-  const nutSau = document.getElementById("flashSaleNext");
-  if (!luoi || !nutTruoc || !nutSau) return;
-
-  function buocTruot() {
-    const the = luoi.firstElementChild;
-    if (!the) return luoi.clientWidth;
-    const khoangCach = parseFloat(getComputedStyle(luoi).columnGap) || 0;
-    return the.getBoundingClientRect().width + khoangCach;
-  }
-
-  function capNhatNut() {
-    const toiDa = luoi.scrollWidth - luoi.clientWidth;
-    nutTruoc.disabled = luoi.scrollLeft <= 1;
-    nutSau.disabled = luoi.scrollLeft >= toiDa - 1;
-  }
-
-  nutTruoc.addEventListener("click", () => luoi.scrollBy({ left: -buocTruot(), behavior: "smooth" }));
-  nutSau.addEventListener("click", () => luoi.scrollBy({ left: buocTruot(), behavior: "smooth" }));
-  luoi.addEventListener("scroll", capNhatNut, { passive: true });
-  window.addEventListener("resize", capNhatNut);
-  capNhatNut();
+  function khoiTaoCarousel(gridId, prevId, nextId) {
+    const track = document.getElementById(gridId);
+    const prev = document.getElementById(prevId);
+    const next = document.getElementById(nextId);
+    if (!track || !prev || !next) return;
+    const visibleCards = () => [...track.children].filter((card) =>
+        !card.hidden && getComputedStyle(card).display !== 'none');
+    function capNhatNut() {
+      const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+      const isScrollable = maxScroll > 3;
+      prev.hidden = !isScrollable;
+      next.hidden = !isScrollable;
+      prev.disabled = track.scrollLeft <= 2;
+      next.disabled = track.scrollLeft >= maxScroll - 2;}
+    function buocTruot() {
+      const cards = visibleCards();
+      if (cards.length < 2) return track.clientWidth;
+      return Math.abs(cards[1].offsetLeft - cards[0].offsetLeft) || track.clientWidth;}
+    function chuyenHuong(direction) {
+      track.scrollBy({
+        left: direction * buocTruot(),
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+      });
+    }
+    prev.addEventListener('click', () => chuyenHuong(-1));
+    next.addEventListener('click', () => chuyenHuong(1));
+    track.addEventListener('scroll', capNhatNut, { passive: true });
+    window.addEventListener('resize', capNhatNut);
+    track.addEventListener('product-carousel-filter', () => {
+      track.scrollLeft = 0;
+      requestAnimationFrame(capNhatNut);
+    });
+    window.addEventListener('load', capNhatNut);
+    requestAnimationFrame(capNhatNut);}
+  khoiTaoCarousel('flashSaleGrid', 'flashSalePrev', 'flashSaleNext');
+  khoiTaoCarousel('bestSellerGrid', 'bestSellerPrev', 'bestSellerNext');
 })();
