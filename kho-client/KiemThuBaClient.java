@@ -11,10 +11,9 @@ public class KiemThuBaClient {
             new Thread(() -> {
                 String clientName = "ClientDemo-" + id;
                 try (
-                        Socket socket = new Socket("localhost", 8888);
+                        Socket socket = new Socket("localhost", 9090);
                         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                        PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)
-                ) {
+                        PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
                     System.out.println("[" + clientName + "] Ket noi thanh cong. Server: " + reader.readLine());
 
                     Thread.sleep(id * 50);
