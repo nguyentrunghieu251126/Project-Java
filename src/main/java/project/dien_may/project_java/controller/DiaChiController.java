@@ -19,7 +19,8 @@ import java.security.Principal;
 
 /**
  * TV3 – sổ địa chỉ: thêm, sửa, xóa, đặt mặc định (bảng SoDiaChi), theo ý tưởng Project-Website.
- * quayLai: trang quay về sau khi lưu (trang Thanh toán hoặc trang Hồ sơ); chỉ nhận đường dẫn trong website.
+ * GET /tai-khoan/dia-chi: trang "Sổ địa chỉ nhận hàng" riêng (tách khỏi trang Hồ sơ cá nhân).
+ * quayLai: trang quay về sau khi lưu (trang Thanh toán hoặc trang Sổ địa chỉ); chỉ nhận đường dẫn trong website.
  * Nằm dưới /tai-khoan/** nên SecurityConfig chỉ cho KHACH_HANG.
  */
 @Controller
@@ -27,7 +28,8 @@ import java.security.Principal;
 public class DiaChiController {
 
     private static final String VIEW = "tai-khoan/DiaChi";
-    private static final String MAC_DINH_QUAY_LAI = "/tai-khoan/ho-so";
+    private static final String VIEW_SO_DIA_CHI = "tai-khoan/SoDiaChi";
+    private static final String MAC_DINH_QUAY_LAI = "/tai-khoan/dia-chi";
 
     private final SoDiaChiService soDiaChiService;
     private final HoSoTaiKhoanService hoSoTaiKhoanService;
@@ -40,6 +42,16 @@ public class DiaChiController {
     @InitBinder("diaChiForm")
     public void catKhoangTrang(WebDataBinder binder) {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+    }
+
+    /** Trang "Sổ địa chỉ nhận hàng" riêng, tách khỏi trang Hồ sơ cá nhân. */
+    @GetMapping
+    public String soDiaChi(Principal principal, Model model) {
+        String email = principal.getName();
+        model.addAttribute("menuTaiKhoan", "dia-chi");
+        model.addAttribute("hoSo", hoSoTaiKhoanService.layHoSo(email));
+        model.addAttribute("soDiaChi", soDiaChiService.danhSach(email));
+        return VIEW_SO_DIA_CHI;
     }
 
     @GetMapping("/them")
@@ -113,7 +125,7 @@ public class DiaChiController {
     }
 
     private String hienForm(Model model, Principal principal, DiaChiForm form, String quayLai) {
-        model.addAttribute("menuTaiKhoan", "ho-so");
+        model.addAttribute("menuTaiKhoan", "dia-chi");
         model.addAttribute("hoSo", hoSoTaiKhoanService.layHoSo(principal.getName()));
         model.addAttribute("diaChiForm", form);
         model.addAttribute("dsThanhPho", TinhThanh.THANH_PHO);
@@ -122,7 +134,7 @@ public class DiaChiController {
         return VIEW;
     }
 
-    /** Trang Thanh toán dùng thongBao / loi; trang Hồ sơ (TV2) dùng thongBaoThanhCong / thongBaoLoi. */
+    /** Trang Thanh toán dùng thongBao / loi; trang tài khoản (Sổ địa chỉ, Hồ sơ) dùng thongBaoThanhCong / thongBaoLoi. */
     private static void baoThanhCong(RedirectAttributes redirect, String quayLai, String noiDung) {
         redirect.addFlashAttribute(duongDanVe(quayLai).startsWith("/dat-hang") ? "thongBao" : "thongBaoThanhCong", noiDung);
     }
