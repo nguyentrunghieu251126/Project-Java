@@ -22,16 +22,12 @@ public class SanPhamNoiBatService {
         this.chiTietSanPhamService = chiTietSanPhamService;
         this.danhGiaRepository = danhGiaRepository;
     }
-
-    // Danh sách đề xuất: 5 sản phẩm đang kinh doanh có mã mới nhất.
     @Transactional(readOnly = true)
     public List<SanPhamNoiBat> laySanPhamNoiBat() {
-        List<SanPham> danhSach = sanPhamRepository.findTop5ByDangKinhDoanhTrueOrderByMaSanPhamDesc();
+        List<SanPham> danhSach = sanPhamRepository.findTop10ByDangKinhDoanhTrueOrderByMaSanPhamDesc();
         Map<Integer, ThongKeDanhGia> thongKe = layThongKeDanhGia(danhSach);
         return danhSach.stream().map(sp -> chuyenThanhThe(sp, false, thongKe)).toList();
     }
-
-    // Bán chạy thật: xếp theo tổng số lượng trong đơn đã giao.
     @Transactional(readOnly = true)
     public List<SanPhamNoiBat> laySanPhamBanChay() {
         List<Integer> maBanChay = sanPhamRepository.layMaSanPhamBanChay();
@@ -50,10 +46,10 @@ public class SanPhamNoiBatService {
                 banChayThucTe.add(ma);
             }
         }
-        if (ketQua.size() < 4) {
-            for (SanPham sp : sanPhamRepository.findTop4ByDangKinhDoanhTrueOrderByMaSanPhamDesc()) {
+        if (ketQua.size() < 10) {
+            for (SanPham sp : sanPhamRepository.findTop10ByDangKinhDoanhTrueOrderByMaSanPhamDesc()) {
                 if (daThem.add(sp.getMaSanPham())) ketQua.add(sp);
-                if (ketQua.size() == 4) break;
+                if (ketQua.size() == 10) break;
             }
         }
         Map<Integer, ThongKeDanhGia> thongKe = layThongKeDanhGia(ketQua);

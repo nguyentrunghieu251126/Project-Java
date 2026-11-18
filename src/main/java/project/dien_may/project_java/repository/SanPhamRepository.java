@@ -43,8 +43,9 @@ public interface SanPhamRepository
     List<SanPham> findTop5ByDangKinhDoanhTrueOrderByMaSanPhamDesc();
     // TV2: bo sung san pham de xuat neu doanh so thuc te chua du 4.
     List<SanPham> findTop4ByDangKinhDoanhTrueOrderByMaSanPhamDesc();
-    // TV2: luot ban thuc tu cac don DA_GIAO, khong lay don huy/cho xac nhan.
-    @Query(value = "SELECT TOP (4) ct.MaSanPham "
+    // Trang chủ: tối đa 10 sản phẩm đang kinh doanh cho mỗi carousel.
+    List<SanPham> findTop10ByDangKinhDoanhTrueOrderByMaSanPhamDesc();
+    @Query(value = "SELECT TOP (10) ct.MaSanPham "
             + "FROM dbo.ChiTietDonHang ct "
             + "JOIN dbo.DonHang dh ON dh.MaDonHang = ct.MaDonHang "
             + "JOIN dbo.SanPham sp ON sp.MaSanPham = ct.MaSanPham "

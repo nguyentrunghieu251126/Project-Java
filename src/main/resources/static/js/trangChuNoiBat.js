@@ -19,5 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (visible) count++;
     });
     if (empty) empty.hidden = count > 0;
+    grid.dispatchEvent(new Event('product-carousel-filter'));
   });
 });

@@ -20,6 +20,9 @@
     height: 260px;
     margin-right: 16px;
   }
+  .product-carousel {
+    --carousel-items: 4;
+  }
 }
 
 /* ===== Tablet (≤ 991.98px) ===== */
@@ -50,6 +53,26 @@
   }
   .hero .hero-cats span {
     display: none;
+  }
+  .product-carousel {
+    --carousel-items: 3;
+    --carousel-gap: 12px;
+  }
+  .product-carousel .product-img {
+    height: 160px;
+  }
+  .flash-sale-prev,
+  .best-seller-prev {
+    left: -13px;
+  }
+  .flash-sale-next,
+  .best-seller-next {
+    right: -13px;
+  }
+}
+@media (max-width: 767.98px) {
+  .product-carousel {
+    --carousel-items: 2;
   }
 }
 
@@ -136,6 +159,112 @@
     height: 110px;
     font-size: 3.2rem;
   }
+  .flash-sale {
+    padding: 17px 13px;
+    border-radius: 17px;
+  }
+  .flash-sale > .d-flex:first-child {
+    padding-bottom: 12px;
+  }
+  .flash-sale h3 {
+    font-size: 19px;
+  }
+  .countdown {
+    padding: 4px 6px;
+    font-size: 10px;
+  }
+  .countdown span {
+    min-width: 25px;
+    min-height: 24px;
+    padding: 2px 4px;
+  }
+  .section-box:has(> .best-seller-carousel) {
+    padding: 18px 13px 20px;
+    border-radius: 17px;
+  }
+  .section-box:has(> .best-seller-carousel) > .d-flex:first-child {
+    padding-bottom: 11px;
+  }
+  .section-box:has(> .best-seller-carousel) .section-title {
+    font-size: 18px;
+  }
+  .section-box:has(> .best-seller-carousel) .filter-tabs .nav-link {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+  .product-carousel {
+    --carousel-gap: 9px;
+  }
+  .product-carousel-track {
+    padding: 5px 2px 10px;
+  }
+  .product-carousel .product-card {
+    padding: 9px;
+    border-radius: 12px;
+  }
+  .product-carousel .product-img {
+    height: 125px;
+    margin: 13px 0 9px;
+    padding: 7px;
+    border-radius: 9px;
+  }
+  .product-carousel .product-card h6 {
+    min-height: 2.9em;
+    height: 2.9em;
+    font-size: 11.5px;
+    line-height: 1.45;
+    margin-bottom: 5px;
+  }
+  .product-carousel .product-brand {
+    margin-bottom: 7px;
+    font-size: 10px;
+  }
+  .product-carousel .price {
+    font-size: 13px;
+    letter-spacing: -.25px;
+  }
+  .product-carousel .old-price {
+    min-height: 15px;
+    font-size: 10px;
+  }
+  .product-carousel .rating {
+    margin: 6px 0 8px;
+    font-size: 10px;
+  }
+  .product-carousel .product-actions {
+    gap: 5px;
+  }
+  .product-carousel .product-actions .buy-now-button {
+    height: 35px;
+    padding: 5px 2px;
+    font-size: 10.5px;
+  }
+  .product-carousel .product-actions .add-to-cart-button {
+    flex-basis: 32px;
+    height: 35px;
+    font-size: 17px;
+  }
+  .product-carousel .discount,
+  .product-carousel .badge-hot {
+    top: 8px;
+    left: 8px;
+    padding: 4px 7px;
+    font-size: 10px;
+  }
+  .product-carousel-nav {
+    top: 41%;
+    width: 36px;
+    height: 36px;
+    font-size: 17px;
+  }
+  .flash-sale-prev,
+  .best-seller-prev {
+    left: -12px;
+  }
+  .flash-sale-next,
+  .best-seller-next {
+    right: -12px;
+  }
 }
 
 /* May tinh (>= 992px): bo loc la khung trang ben trai. */
@@ -166,5 +295,45 @@
 @media (max-width: 575.98px) {
   #product-list .product-sort-label {
     width: 100%;
+  }
+}
+@media (hover: hover) {
+  .product-carousel:hover .product-carousel-nav:not([hidden]),
+  .product-carousel:focus-within .product-carousel-nav:not([hidden]) {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(-50%) scale(1);
+  }
+  .product-carousel:hover .product-carousel-nav:hover:not(:disabled),
+  .product-carousel:focus-within .product-carousel-nav:hover:not(:disabled) {
+    transform: translateY(-50%) scale(1.07);
+  }
+  .product-carousel:hover .product-carousel-nav:disabled:not([hidden]),
+  .product-carousel:focus-within .product-carousel-nav:disabled:not([hidden]) {
+    opacity: .36;
+    pointer-events: none;
+  }
+}
+@media (hover: none) {
+  .product-carousel .product-carousel-nav:not([hidden]) {
+    opacity: .95;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(-50%) scale(1);
+  }
+  .product-carousel .product-carousel-nav:disabled:not([hidden]) {
+    opacity: .36;
+    pointer-events: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .product-carousel-track {
+    scroll-behavior: auto;
+  }
+  .product-carousel .product-card,
+  .product-carousel .product-img .product-photo,
+  .product-carousel-nav {
+    transition: none;
   }
 }
