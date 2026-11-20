@@ -19,10 +19,8 @@ import project.dien_may.project_java.entity.TinhTrangKhuyenMai;
 import project.dien_may.project_java.repository.KhuyenMaiRepository;
 import project.dien_may.project_java.service.admin.KhuyenMaiAdminService;
 import project.dien_may.project_java.service.admin.NghiepVuException;
-
 import java.time.LocalDate;
 
-/** Quản lý khuyến mãi (QT07). */
 @Controller
 @RequestMapping("/admin/khuyen-mai")
 public class AdminKhuyenMaiController {
@@ -41,9 +39,9 @@ public class AdminKhuyenMaiController {
 
     @GetMapping
     public String danhSach(@RequestParam(required = false) String tuKhoa,
-                           @RequestParam(required = false) TinhTrangKhuyenMai tinhTrang,
-                           @RequestParam(defaultValue = "1") int trang,
-                           Model model) {
+            @RequestParam(required = false) TinhTrangKhuyenMai tinhTrang,
+            @RequestParam(defaultValue = "1") int trang,
+            Model model) {
         model.addAttribute("trang", khuyenMaiRepository.timKiem(tuKhoa, tinhTrang == null ? null : tinhTrang.name(),
                 LocalDate.now(), PhanTrang.tao(trang, Sort.by(Sort.Direction.DESC, "ngayBatDau", "maKhuyenMai"))));
         model.addAttribute("tuKhoa", tuKhoa);
@@ -59,7 +57,7 @@ public class AdminKhuyenMaiController {
 
     @PostMapping("/them")
     public String them(@Valid @ModelAttribute("form") KhuyenMaiForm form, BindingResult ketQua, Model model,
-                       RedirectAttributes redirect) {
+            RedirectAttributes redirect) {
         form.setMaKhuyenMai(null);
         khuyenMaiService.kiemTra(form, ketQua);
         if (ketQua.hasErrors()) {
@@ -82,7 +80,7 @@ public class AdminKhuyenMaiController {
 
     @PostMapping("/{ma}/sua")
     public String sua(@PathVariable Integer ma, @Valid @ModelAttribute("form") KhuyenMaiForm form, BindingResult ketQua,
-                      Model model, RedirectAttributes redirect) {
+            Model model, RedirectAttributes redirect) {
         form.setMaKhuyenMai(ma);
         khuyenMaiService.kiemTra(form, ketQua);
         if (ketQua.hasErrors()) {

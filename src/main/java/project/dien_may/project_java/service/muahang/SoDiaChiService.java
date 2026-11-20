@@ -9,18 +9,11 @@ import project.dien_may.project_java.entity.TaiKhoan;
 import project.dien_may.project_java.repository.SoDiaChiRepository;
 import project.dien_may.project_java.repository.TaiKhoanRepository;
 import project.dien_may.project_java.service.admin.NghiepVuException;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * TV3 – sổ địa chỉ giao hàng (thêm, sửa, xóa, đặt mặc định), theo ý tưởng Project-Website.
- * Địa chỉ mặc định được chép sang TaiKhoan.DiaChi để trang hồ sơ (TV2) luôn hiển thị đúng.
- */
 @Service
 public class SoDiaChiService {
-
-    /** DonHang.DiaChiGiaoHang chỉ chứa 255 ký tự. */
     private static final int DO_DAI_TOI_DA = 255;
     public static final int SO_DIA_CHI_TOI_DA = 10;
 
@@ -32,7 +25,6 @@ public class SoDiaChiService {
         this.taiKhoanRepository = taiKhoanRepository;
     }
 
-    /** Sổ còn trống mà hồ sơ đã có đủ SĐT + địa chỉ thì tự chép thành địa chỉ mặc định đầu tiên. */
     @Transactional
     public List<SoDiaChi> danhSach(String email) {
         if (soDiaChiRepository.demCuaKhach(email) == 0) {
@@ -62,7 +54,6 @@ public class SoDiaChiService {
                 .orElseThrow(() -> new NghiepVuException("Địa chỉ không tồn tại hoặc đã bị xóa."));
     }
 
-    /** Form trống cho địa chỉ mới: điền sẵn họ tên, SĐT trong hồ sơ; sổ trống thì đặt mặc định luôn. */
     @Transactional(readOnly = true)
     public DiaChiForm formMoi(String email) {
         TaiKhoan tk = layTaiKhoan(email);
@@ -73,7 +64,6 @@ public class SoDiaChiService {
         return form;
     }
 
-    /** Thêm (maDiaChi null) hoặc sửa địa chỉ. @return mã địa chỉ vừa lưu */
     @Transactional
     public Integer luu(String email, DiaChiForm form) {
         String khuVuc = form.getKhuVuc() == null ? "" : form.getKhuVuc().trim();
@@ -90,11 +80,11 @@ public class SoDiaChiService {
             throw new NghiepVuException("Sổ địa chỉ chỉ lưu tối đa " + SO_DIA_CHI_TOI_DA + " địa chỉ.");
         }
         TaiKhoan tk = layTaiKhoan(email);
-        // Địa chỉ đầu tiên luôn là mặc định; địa chỉ đang mặc định không tự bỏ mặc định được
+
         boolean macDinh = form.isLaMacDinh() || soLuong == 0 || (cu != null && cu.isLaMacDinh());
         if (macDinh) {
             soDiaChiRepository.boMacDinh(tk.getMaTaiKhoan(), cu == null ? null : cu.getMaDiaChi());
-            tk = layTaiKhoan(email); // câu UPDATE ở trên làm mới bộ nhớ đệm, nạp lại thực thể
+            tk = layTaiKhoan(email);
         }
         SoDiaChi dc = cu == null ? new SoDiaChi() : timCuaKhach(email, cu.getMaDiaChi());
         if (cu == null) {
@@ -126,7 +116,6 @@ public class SoDiaChiService {
         layTaiKhoan(email).setDiaChi(moi.getDiaChiDayDu());
     }
 
-    /** Xóa địa chỉ mặc định thì địa chỉ đầu tiên còn lại thành mặc định (như Project-Website). */
     @Transactional
     public void xoa(String email, Integer maDiaChi) {
         SoDiaChi dc = timCuaKhach(email, maDiaChi);

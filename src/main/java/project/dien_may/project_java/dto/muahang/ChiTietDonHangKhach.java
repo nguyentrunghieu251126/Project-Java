@@ -11,45 +11,41 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-/** TV3 – KH16 – KH18, KH22: dữ liệu trang chi tiết đơn / hóa đơn. */
 public record ChiTietDonHangKhach(
         DonHang donHang,
         List<ChiTietDonHang> chiTiet,
         ThanhToan thanhToan,
         List<BuocDonHang> cacBuoc,
         Map<Integer, Integer> soSaoDaDanhGia,
-        List<LichSuDiemThuong> lichSuDiem
-) {
-    /** Điểm thưởng đã dùng để giảm giá cho đơn (bản ghi TRU đầu tiên khi đặt). */
+        List<LichSuDiemThuong> lichSuDiem) {
     public int diemDaDung() {
         return lichSuDiem.stream().filter(l -> l.getLoaiGiaoDich() == LoaiGiaoDichDiem.TRU
-                && l.getMoTa() != null && l.getMoTa().startsWith(QuyTacDiemThuong.MO_TA_DUNG)).mapToInt(LichSuDiemThuong::getSoDiem).sum();
+                && l.getMoTa() != null && l.getMoTa().startsWith(QuyTacDiemThuong.MO_TA_DUNG))
+                .mapToInt(LichSuDiemThuong::getSoDiem).sum();
     }
 
     public BigDecimal tienGiamBangDiem() {
         return QuyTacDiemThuong.tienGiam(diemDaDung());
     }
 
-    /** Điểm tích được từ đơn (bản ghi CONG khi đặt). */
     public int diemTichLuy() {
         return lichSuDiem.stream().filter(l -> l.getLoaiGiaoDich() == LoaiGiaoDichDiem.CONG
-                && l.getMoTa() != null && l.getMoTa().startsWith(QuyTacDiemThuong.MO_TA_TICH)).mapToInt(LichSuDiemThuong::getSoDiem).sum();
+                && l.getMoTa() != null && l.getMoTa().startsWith(QuyTacDiemThuong.MO_TA_TICH))
+                .mapToInt(LichSuDiemThuong::getSoDiem).sum();
     }
 
-    /** Mã hiển thị dạng DH000031. */
     public String maHien() {
         return String.format("DH%06d", donHang.getMaDonHang());
     }
 
-    /** Thời gian giao dự kiến theo tỉnh / thành trong địa chỉ giao hàng của đơn. */
     public ThoiGianGiaoHang giaoHang() {
         return ThoiGianGiaoHang.theoDiaChi(donHang.getDiaChiGiaoHang());
     }
 
-    /** Ngày nhận dự kiến (tính từ ngày đặt); null khi đơn đã giao xong hoặc đã hủy. */
     public String ngayNhanDuKien() {
         TrangThaiDonHang tt = donHang.getTrangThai();
-        if (tt == TrangThaiDonHang.DA_HUY || tt == TrangThaiDonHang.DA_GIAO || donHang.getNgayGiao() != null || donHang.getNgayDat() == null) {
+        if (tt == TrangThaiDonHang.DA_HUY || tt == TrangThaiDonHang.DA_GIAO || donHang.getNgayGiao() != null
+                || donHang.getNgayDat() == null) {
             return null;
         }
         return giaoHang().khoangNgay(donHang.getNgayDat().toLocalDate());

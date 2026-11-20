@@ -2,7 +2,6 @@ package project.dien_may.project_java.dto.muahang;
 
 import java.math.BigDecimal;
 
-/** TV3 – một dòng giỏ hàng để hiển thị (giá theo giá hiện tại của sản phẩm). */
 public record DongGioHang(
         Integer maSanPham,
         String tenSanPham,
@@ -13,9 +12,7 @@ public record DongGioHang(
         int soLuong,
         int tonKho,
         boolean dangKinhDoanh,
-        String danhMuc
-) {
-    /** Dùng cho ưu đãi thanh toán chỉ áp dụng với laptop. */
+        String danhMuc) {
     public boolean laLaptop() {
         return danhMuc != null && danhMuc.trim().equalsIgnoreCase("Laptop");
     }
@@ -26,7 +23,6 @@ public record DongGioHang(
         return donGia.multiply(BigDecimal.valueOf(soLuong));
     }
 
-    /** Còn bán và đủ hàng cho số lượng đang chọn. */
     public boolean muaDuoc() {
         return dangKinhDoanh && tonKho >= soLuong && soLuong > 0;
     }
@@ -39,7 +35,6 @@ public record DongGioHang(
         return !hetHang() && tonKho <= NGUONG_SAP_HET;
     }
 
-    /** Số lượng tối đa được chọn trên ô số lượng. */
     public int toiDa() {
         return Math.max(tonKho, 1);
     }

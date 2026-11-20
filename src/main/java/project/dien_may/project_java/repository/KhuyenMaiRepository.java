@@ -10,8 +10,6 @@ import project.dien_may.project_java.entity.KhuyenMai;
 import java.time.LocalDate;
 
 public interface KhuyenMaiRepository extends JpaRepository<KhuyenMai, Integer> {
-
-    /** tinhTrang nhận tên của TinhTrangKhuyenMai; điều kiện phải khớp KhuyenMai.getTinhTrang(). */
     @Query("""
             SELECT k FROM KhuyenMai k
             WHERE (:tuKhoa IS NULL OR k.tenKhuyenMai LIKE CONCAT('%', :tuKhoa, '%')
@@ -29,9 +27,9 @@ public interface KhuyenMaiRepository extends JpaRepository<KhuyenMai, Integer> {
                        AND (k.soLuotToiDa IS NULL OR k.soLuotDaDung < k.soLuotToiDa)))
             """)
     Page<KhuyenMai> timKiem(@Param("tuKhoa") String tuKhoa,
-                            @Param("tinhTrang") String tinhTrang,
-                            @Param("homNay") LocalDate homNay,
-                            Pageable pageable);
+            @Param("tinhTrang") String tinhTrang,
+            @Param("homNay") LocalDate homNay,
+            Pageable pageable);
 
     boolean existsByMaGiamGiaIgnoreCase(String maGiamGia);
 

@@ -13,18 +13,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 
-/**
- * Nạp lại quyền từ CSDL ở mỗi request, vì quyền trong session chỉ được chụp lúc đăng nhập.
- * Nhờ vậy thay đổi ở màn hình phân quyền có hiệu lực ngay, và tài khoản bị khóa hoặc xóa
- * bị đăng xuất ngay thay vì dùng tiếp được đến khi hết phiên.
- *
- * Không khai báo @Component: nếu là bean, Spring Boot sẽ đăng ký thêm một lần ngoài chuỗi Security.
- */
 public class DongBoTaiKhoanFilter extends OncePerRequestFilter {
-
     private final UserDetailsService userDetailsService;
     private final SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
@@ -47,6 +38,7 @@ public class DongBoTaiKhoanFilter extends OncePerRequestFilter {
             return;
         }
 
+        // Đọc lại tài khoản của người dùng từ sql
         UserDetails taiKhoan = taiLai(hienTai.getName());
         if (taiKhoan == null || !taiKhoan.isEnabled()) {
             logoutHandler.logout(request, response, hienTai);
@@ -54,7 +46,7 @@ public class DongBoTaiKhoanFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Chỉ thay trong request này, không lưu vào session: request sau lại đọc từ CSDL
+        // Cập nhật lại quyền mới nhất của tài khoản từ sql
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(UsernamePasswordAuthenticationToken.authenticated(
                 taiKhoan, null, taiKhoan.getAuthorities()));
@@ -62,6 +54,7 @@ public class DongBoTaiKhoanFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
+    // Đọc lại dữ liệu
     private UserDetails taiLai(String email) {
         try {
             return userDetailsService.loadUserByUsername(email);

@@ -11,12 +11,10 @@ import project.dien_may.project_java.entity.KhuyenMai;
 import project.dien_may.project_java.entity.TrangThaiDonHang;
 import project.dien_may.project_java.repository.DonHangKhachHangRepository;
 import project.dien_may.project_java.repository.KhuyenMaiKhachHangRepository;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-/** TV3 – dữ liệu trang Tổng quan tài khoản: đơn hàng gần đây, ưu đãi, thông tin bảo hành. */
 @Service
 public class TongQuanTaiKhoanService {
 
@@ -29,7 +27,7 @@ public class TongQuanTaiKhoanService {
     private final KhuyenMaiKhachHangRepository khuyenMaiRepository;
 
     public TongQuanTaiKhoanService(DonHangKhachHangService donHangService, DonHangKhachHangRepository donHangRepository,
-                                   KhuyenMaiKhachHangRepository khuyenMaiRepository) {
+            KhuyenMaiKhachHangRepository khuyenMaiRepository) {
         this.donHangService = donHangService;
         this.donHangRepository = donHangRepository;
         this.khuyenMaiRepository = khuyenMaiRepository;
@@ -40,7 +38,6 @@ public class TongQuanTaiKhoanService {
         return donHangService.layLichSu(email, null, null, 1).getContent().stream().limit(SO_DON_GAN_DAY).toList();
     }
 
-    /** Mã giảm giá đang dùng được, mã gần hết hạn trước. */
     @Transactional(readOnly = true)
     public List<MaUuDai> uuDai(int soLuong) {
         return khuyenMaiRepository.dangChay(LocalDate.now()).stream().limit(soLuong).map(this::chuyenMa).toList();
@@ -56,7 +53,6 @@ public class TongQuanTaiKhoanService {
         var d = ct.getDonHang();
         LocalDate ngayNhan = (d.getNgayGiao() != null ? d.getNgayGiao() : d.getNgayDat()).toLocalDate();
         var sp = ct.getSanPham();
-        // Bảo hành chính hãng + mở rộng, khớp trang /tai-khoan/bao-hanh
         int soThang = (sp.getThoiGianBaoHanh() == null ? 0 : sp.getThoiGianBaoHanh())
                 + (sp.getThoiGianBaoHanhMoRong() == null ? 0 : sp.getThoiGianBaoHanhMoRong());
         return new BaoHanhSanPham(d.getMaDonHang(), ct.getSanPham().getTenSanPham(), ct.getSanPham().getHinhAnh(),

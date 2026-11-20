@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import project.dien_may.project_java.service.TonKhoService;
 import project.dien_may.project_java.service.TonKhoKhongDuException;
 
-import jakarta.annotation.PostConstruct; 
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -15,7 +15,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Locale;
 
-@Component 
+@Component
 public class TraCuuKhoServer {
     private static final int DEFAULT_PORT = 8888;
     private final TonKhoService tonKhoService;
@@ -44,7 +44,7 @@ public class TraCuuKhoServer {
         return DEFAULT_PORT;
     }
 
-    @PostConstruct 
+    @PostConstruct
     public void start() {
         if (running) {
             return;
@@ -68,14 +68,15 @@ public class TraCuuKhoServer {
         }, "SocketServer-Thread").start();
     }
 
-    @PreDestroy 
+    @PreDestroy
     public void stop() {
         running = false;
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     private static class ClientHandler implements Runnable {
@@ -92,8 +93,7 @@ public class TraCuuKhoServer {
             String clientThread = Thread.currentThread().getName();
             try (
                     BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)
-            ) {
+                    PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
                 writer.println("CHAO MUNG DEN VOI SERVER KHO DIEN MAY");
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -150,7 +150,8 @@ public class TraCuuKhoServer {
             } finally {
                 try {
                     socket.close();
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
     }

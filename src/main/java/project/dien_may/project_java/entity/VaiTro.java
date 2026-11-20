@@ -28,9 +28,7 @@ public class VaiTro {
     private String tenVaiTro;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "VaiTro_Quyen", schema = "dbo",
-            joinColumns = @JoinColumn(name = "MaVaiTro"),
-            inverseJoinColumns = @JoinColumn(name = "MaQuyen"))
+    @JoinTable(name = "VaiTro_Quyen", schema = "dbo", joinColumns = @JoinColumn(name = "MaVaiTro"), inverseJoinColumns = @JoinColumn(name = "MaQuyen"))
     private Set<Quyen> dsQuyen = new HashSet<>();
 
     public VaiTro() {

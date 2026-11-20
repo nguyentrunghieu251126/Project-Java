@@ -1,18 +1,12 @@
 package project.dien_may.project_java.config;
 
 import org.springframework.security.core.GrantedAuthority;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Các tab của menu khu quản lý theo đúng thứ tự hiển thị ở admin/layout.html, kèm quyền mở được tab.
- * Dùng để đưa người dùng tới tab đầu tiên họ được phép xem khi đăng nhập hoặc vào /admin.
- * Thêm, bớt hay đổi thứ tự mục trên menu thì sửa danh sách này cho khớp.
- */
 public final class TabKhuQuanLy {
 
     public static final String TONG_QUAN = "/admin";
@@ -38,7 +32,7 @@ public final class TabKhuQuanLy {
     private TabKhuQuanLy() {
     }
 
-    /** Đường dẫn tab đầu tiên mở được; rỗng khi không được cấp tab nào. */
+    // Trỏ vào tab đầu tiên khi tài khoản người dùng là nhân viên kho hay admin
     public static Optional<String> tabDauTien(Collection<? extends GrantedAuthority> dsQuyen) {
         Set<String> coQuyen = dsQuyen.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
         return DS_TAB.stream()

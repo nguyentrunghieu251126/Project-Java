@@ -166,7 +166,6 @@ public class ChiTietSanPhamService {
         return anh.isEmpty() ? null : anh.get(0);
     }
 
-    // lam moi anh
     @Transactional(readOnly = true)
     public Map<Integer, String> layAnhSanPhamDaXem(List<Integer> maSanPham) {
         Map<Integer, String> ketQua = new java.util.LinkedHashMap<>();

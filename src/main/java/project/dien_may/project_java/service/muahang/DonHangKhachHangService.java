@@ -20,17 +20,14 @@ import project.dien_may.project_java.repository.TaiKhoanRepository;
 import project.dien_may.project_java.repository.ThanhToanRepository;
 import project.dien_may.project_java.repository.TonKhoMuaHangRepository;
 import project.dien_may.project_java.service.admin.NghiepVuException;
-
 import java.util.*;
 
-/** TV3 – KH16 xem đơn, KH17 theo dõi, KH18 hủy + hoàn tồn kho, KH19 lịch sử mua hàng, KH22 đánh giá. */
 @Service
 public class DonHangKhachHangService {
 
     public static final int SO_DON_MOI_TRANG = 5;
     public static final String TAB_TAT_CA = "TAT_CA";
 
-    /** Tab lọc trên trang lịch sử; "Đang xử lý" gộp hai trạng thái ở khâu kho. */
     private static final Map<String, List<TrangThaiDonHang>> TAB = new LinkedHashMap<>();
     private static final Map<String, String> NHAN_TAB = new LinkedHashMap<>();
 
@@ -49,7 +46,6 @@ public class DonHangKhachHangService {
         NHAN_TAB.put("DA_HUY", "Đã hủy");
     }
 
-    /** Các bước theo dõi (không gồm DA_HUY), theo thứ tự xử lý. */
     private static final List<TrangThaiDonHang> CAC_BUOC = List.of(TrangThaiDonHang.CHO_XAC_NHAN,
             TrangThaiDonHang.DA_XAC_NHAN, TrangThaiDonHang.DA_XUAT_KHO, TrangThaiDonHang.DANG_GIAO,
             TrangThaiDonHang.DA_GIAO);
@@ -63,12 +59,12 @@ public class DonHangKhachHangService {
     private final DiemThuongService diemThuongService;
 
     public DonHangKhachHangService(DonHangKhachHangRepository donHangRepository,
-                                   ThanhToanRepository thanhToanRepository,
-                                   DanhGiaKhachHangRepository danhGiaRepository,
-                                   TonKhoMuaHangRepository tonKhoRepository,
-                                   KhuyenMaiKhachHangRepository khuyenMaiRepository,
-                                   TaiKhoanRepository taiKhoanRepository,
-                                   DiemThuongService diemThuongService) {
+            ThanhToanRepository thanhToanRepository,
+            DanhGiaKhachHangRepository danhGiaRepository,
+            TonKhoMuaHangRepository tonKhoRepository,
+            KhuyenMaiKhachHangRepository khuyenMaiRepository,
+            TaiKhoanRepository taiKhoanRepository,
+            DiemThuongService diemThuongService) {
         this.donHangRepository = donHangRepository;
         this.thanhToanRepository = thanhToanRepository;
         this.danhGiaRepository = danhGiaRepository;
@@ -94,14 +90,14 @@ public class DonHangKhachHangService {
         return ketQua;
     }
 
-    /** @param trang số trang trên URL, tính từ 1 */
     @Transactional(readOnly = true)
     public Page<DonHangTomTat> layLichSu(String email, String tab, String tuKhoa, int trang) {
         String tuKhoaSach = tuKhoa == null || tuKhoa.isBlank() ? null : tuKhoa.trim();
         Integer maDon = null;
         if (tuKhoaSach != null) {
             String so = tuKhoaSach.replaceFirst("(?i)^#?DH0*", "");
-            if (so.matches("\\d{1,9}")) maDon = Integer.valueOf(so);
+            if (so.matches("\\d{1,9}"))
+                maDon = Integer.valueOf(so);
         }
         Pageable trangYeuCau = PageRequest.of(Math.max(trang, 1) - 1, SO_DON_MOI_TRANG);
         Page<DonHang> page = donHangRepository.timCuaKhach(email, TAB.get(chuanHoaTab(tab)), tuKhoaSach, maDon,
@@ -134,12 +130,12 @@ public class DonHangKhachHangService {
                 diemThuongService.theoDon(maDon));
     }
 
-    /** KH18: chỉ hủy khi đơn còn chờ xác nhận; hoàn tồn kho, hoàn lượt mã giảm giá và tiền (nếu đã trả). */
     @Transactional
     public void huyDon(String email, Integer maDon) {
         DonHang donHang = timDon(email, maDon);
         if (donHang.getTrangThai() != TrangThaiDonHang.CHO_XAC_NHAN
-                || donHangRepository.huyNeuDangCho(maDon, TrangThaiDonHang.CHO_XAC_NHAN, TrangThaiDonHang.DA_HUY) == 0) {
+                || donHangRepository.huyNeuDangCho(maDon, TrangThaiDonHang.CHO_XAC_NHAN,
+                        TrangThaiDonHang.DA_HUY) == 0) {
             throw new NghiepVuException("Đơn #DH" + String.format("%06d", maDon)
                     + " đã được cửa hàng xác nhận nên không thể hủy. Vui lòng gọi hotline 1800 1234 để được hỗ trợ.");
         }
@@ -155,11 +151,9 @@ public class DonHangKhachHangService {
                 tt.setTrangThai(TrangThaiThanhToan.DA_HOAN_TIEN);
             }
         });
-        // Điểm thưởng: hoàn điểm đã dùng, thu hồi điểm đã tích từ đơn này
         diemThuongService.hoanKhiHuy(donHang);
     }
 
-    /** KH22: mỗi khách đánh giá một sản phẩm một lần, chỉ với sản phẩm trong đơn đã giao. */
     @Transactional
     public void danhGia(String email, Integer maDon, Integer maSanPham, Integer soSao, String noiDung) {
         if (soSao == null || soSao < 1 || soSao > 5) {
@@ -190,11 +184,10 @@ public class DonHangKhachHangService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    /** CSDL chỉ lưu ngày đặt và ngày giao nên các bước giữa không có giờ cụ thể. */
     private static List<BuocDonHang> dungCacBuoc(DonHang d) {
         int viTri = CAC_BUOC.indexOf(d.getTrangThai());
-        String[] ten = {"Đặt hàng", "Đã xác nhận", "Đã xuất kho", "Đang giao", "Đã giao"};
-        String[] icon = {"bi-receipt", "bi-check2", "bi-box-seam", "bi-truck", "bi-house-check"};
+        String[] ten = { "Đặt hàng", "Đã xác nhận", "Đã xuất kho", "Đang giao", "Đã giao" };
+        String[] icon = { "bi-receipt", "bi-check2", "bi-box-seam", "bi-truck", "bi-house-check" };
         List<BuocDonHang> ketQua = new ArrayList<>();
         for (int i = 0; i < CAC_BUOC.size(); i++) {
             boolean xong = viTri >= i;

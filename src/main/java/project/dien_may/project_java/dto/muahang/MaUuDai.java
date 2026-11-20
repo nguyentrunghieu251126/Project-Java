@@ -1,11 +1,9 @@
 package project.dien_may.project_java.dto.muahang;
 
 import project.dien_may.project_java.entity.LoaiGiamGia;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-/** TV3 – KH15: một mã giảm giá hiển thị trong hộp chọn mã, kèm số tiền giảm tính trên đơn hiện tại. */
 public record MaUuDai(
         String maGiamGia,
         String tenKhuyenMai,
@@ -16,14 +14,11 @@ public record MaUuDai(
         Integer soLuotConLai,
         boolean dungDuoc,
         BigDecimal tienGiam,
-        boolean totNhat
-) {
-    /** Mã đã dùng hết lượt (còn lại 0). */
+        boolean totNhat) {
     public boolean hetLuot() {
         return soLuotConLai != null && soLuotConLai <= 0;
     }
 
-    /** Số ngày còn lại đến hết hạn (0 = hết hạn hôm nay). */
     public long soNgayConLai() {
         return java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), ngayKetThuc);
     }
@@ -37,7 +32,6 @@ public record MaUuDai(
         return loai == LoaiGiamGia.PHAN_TRAM;
     }
 
-    /** Chữ to trên cuống vé: "15%" hoặc "250K" / "1TR". */
     public String nhanNgan() {
         if (phanTram()) {
             return giaTriGiam.stripTrailingZeros().toPlainString() + "%";

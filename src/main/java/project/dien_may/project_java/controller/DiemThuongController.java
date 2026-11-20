@@ -9,20 +9,12 @@ import project.dien_may.project_java.dto.muahang.MaUuDai;
 import project.dien_may.project_java.service.HoSoTaiKhoanService;
 import project.dien_may.project_java.service.muahang.DiemThuongService;
 import project.dien_may.project_java.service.muahang.TongQuanTaiKhoanService;
-
 import java.security.Principal;
 import java.util.List;
 
-/**
- * TV3 – 3 trang riêng của khu điểm thưởng:
- * /tai-khoan/diem-thuong (số điểm, cách tích / dùng, thể lệ),
- * /tai-khoan/diem-thuong/lich-su (lịch sử cộng / trừ điểm, lọc theo loại),
- * /tai-khoan/uu-dai (mã giảm giá đang dùng được, lọc theo kiểu giảm).
- */
 @Controller
 @RequestMapping("/tai-khoan")
 public class DiemThuongController {
-
     private static final int SO_UU_DAI_TOI_DA = 50;
     private static final int SO_GIAO_DICH_GAN_DAY = 3;
 
@@ -31,7 +23,7 @@ public class DiemThuongController {
     private final HoSoTaiKhoanService hoSoTaiKhoanService;
 
     public DiemThuongController(DiemThuongService diemThuongService, TongQuanTaiKhoanService tongQuanService,
-                                HoSoTaiKhoanService hoSoTaiKhoanService) {
+            HoSoTaiKhoanService hoSoTaiKhoanService) {
         this.diemThuongService = diemThuongService;
         this.tongQuanService = tongQuanService;
         this.hoSoTaiKhoanService = hoSoTaiKhoanService;
@@ -49,7 +41,7 @@ public class DiemThuongController {
 
     @GetMapping("/diem-thuong/lich-su")
     public String lichSuDiem(@RequestParam(required = false) String loai,
-                             @RequestParam(defaultValue = "1") int trang, Principal principal, Model model) {
+            @RequestParam(defaultValue = "1") int trang, Principal principal, Model model) {
         String email = principal.getName();
         model.addAttribute("menuTaiKhoan", "lich-su-diem");
         model.addAttribute("hoSo", hoSoTaiKhoanService.layHoSo(email));

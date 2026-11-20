@@ -41,7 +41,6 @@ public class SanPham {
     @Column(name = "ThoiGianBaoHanh", nullable = false)
     private Integer thoiGianBaoHanh = 12;
 
-    /** TV3 – số tháng bảo hành mở rộng, tính tiếp sau bảo hành chính hãng. */
     @Column(name = "ThoiGianBaoHanhMoRong", nullable = false)
     private Integer thoiGianBaoHanhMoRong = 0;
 
@@ -55,7 +54,6 @@ public class SanPham {
     @Column(name = "DangKinhDoanh", nullable = false)
     private boolean dangKinhDoanh = true;
 
-    // Để null khi tạo mới: Spring Data dựa vào version null để nhận biết bản ghi mới.
     @Version
     @Column(name = "PhienBan", nullable = false)
     private Integer phienBan;

@@ -47,7 +47,6 @@ public class KhuyenMaiForm {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate ngayKetThuc;
 
-    /** Để trống: không giới hạn. */
     @Min(value = 1, message = "Số lượt tối đa phải lớn hơn 0.")
     private Integer soLuotToiDa;
 

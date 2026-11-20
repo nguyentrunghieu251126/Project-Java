@@ -11,11 +11,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import project.dien_may.project_java.entity.TaiKhoan;
 import project.dien_may.project_java.service.admin.NghiepVuException;
 import project.dien_may.project_java.service.admin.PhanQuyenService;
-
 import java.util.List;
 import java.util.Set;
 
-/** Phân quyền theo chức năng (QT16): cho toàn thể nhân viên và cho từng nhân viên. */
 @Controller
 @RequestMapping("/admin/phan-quyen")
 public class AdminPhanQuyenController {
@@ -36,7 +34,7 @@ public class AdminPhanQuyenController {
 
     @PostMapping
     public String luuToanThe(@RequestParam(name = "quyen", required = false) List<Integer> dsMaQuyen,
-                             RedirectAttributes redirect) {
+            RedirectAttributes redirect) {
         try {
             phanQuyenService.capNhatToanTheNhanVien(dsMaQuyen == null ? List.of() : dsMaQuyen);
             redirect.addFlashAttribute("thongBao", "Đã lưu phân quyền. Thay đổi có hiệu lực ngay lập tức.");
@@ -64,8 +62,8 @@ public class AdminPhanQuyenController {
 
     @PostMapping("/nhan-vien/{ma}")
     public String luuNhanVien(@PathVariable Integer ma,
-                              @RequestParam(name = "quyen", required = false) List<Integer> dsMaQuyen,
-                              RedirectAttributes redirect) {
+            @RequestParam(name = "quyen", required = false) List<Integer> dsMaQuyen,
+            RedirectAttributes redirect) {
         try {
             phanQuyenService.capNhatNhanVien(ma, dsMaQuyen == null ? List.of() : dsMaQuyen);
             redirect.addFlashAttribute("thongBao", "Đã lưu quyền của nhân viên. Thay đổi có hiệu lực ngay lập tức.");

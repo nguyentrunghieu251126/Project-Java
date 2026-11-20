@@ -11,7 +11,6 @@ import project.dien_may.project_java.service.SanPhamService;
 import project.dien_may.project_java.service.SanPhamNoiBatService;
 import project.dien_may.project_java.service.ChiTietSanPhamService;
 import project.dien_may.project_java.dto.SanPhamNoiBat;
-
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -21,21 +20,19 @@ import java.util.List;
 
 @Controller
 public class HomeController {
-
-    // Do dai toi da cua tu khoa tim kiem (khop maxlength cua o tim kiem tren Header)
     private static final int DO_DAI_TU_KHOA_TOI_DA = 100;
 
     private final SanPhamService sanPhamService;
     private final SanPhamNoiBatService sanPhamNoiBatService;
     private final ChiTietSanPhamService chiTietSanPhamService;
 
-    public HomeController(SanPhamService sanPhamService, SanPhamNoiBatService sanPhamNoiBatService, ChiTietSanPhamService chiTietSanPhamService) {
+    public HomeController(SanPhamService sanPhamService, SanPhamNoiBatService sanPhamNoiBatService,
+            ChiTietSanPhamService chiTietSanPhamService) {
         this.sanPhamService = sanPhamService;
         this.sanPhamNoiBatService = sanPhamNoiBatService;
         this.chiTietSanPhamService = chiTietSanPhamService;
     }
 
-    // Trang chu: tim kiem, loc (danh muc, thuong hieu, khoang gia), sap xep va phan trang
     @GetMapping("/")
     public String Index(
             @RequestParam(name = "trang", defaultValue = "0") String trangText,
@@ -45,10 +42,8 @@ public class HomeController {
             @RequestParam(name = "thuongHieu", required = false) List<String> thuongHieuText,
             @RequestParam(name = "giaTu", required = false) String giaTuText,
             @RequestParam(name = "giaDen", required = false) String giaDenText,
-            Model model
-    ) {
+            Model model) {
 
-        // Kiem tra va chuan hoa tham so (tham so sai thi bo qua, khong bao loi 400)
         int trang = docSoTrang(trangText);
         String sapXep = sanPhamService.chuanHoaSapXep(sapXepText);
         String tuKhoa = chuanHoaTuKhoa(tuKhoaText);
@@ -56,14 +51,12 @@ public class HomeController {
         BigDecimal giaTu = docGia(giaTuText);
         BigDecimal giaDen = docGia(giaDenText);
 
-        // Gia toi thieu lon hon gia toi da thi doi cho hai gia tri
         if (giaTu != null && giaDen != null && giaTu.compareTo(giaDen) > 0) {
             BigDecimal tam = giaTu;
             giaTu = giaDen;
             giaDen = tam;
         }
 
-        // Gia tri mac dinh de Index.html luon hien thi duoc, ke ca khi truy van loi
         model.addAttribute("maDanhMuc", maDanhMuc);
         model.addAttribute("sapXep", sapXep);
         model.addAttribute("tuKhoa", tuKhoa);
@@ -75,7 +68,6 @@ public class HomeController {
         model.addAttribute("khoangGiaNhanh", Collections.emptyList());
         model.addAttribute("giaThanhKeoToiThieu", BigDecimal.ZERO);
         model.addAttribute("giaThanhKeoToiDa", BigDecimal.ZERO);
-        // Các khung trang chủ có mặc định rỗng khi SQL Server chưa có dữ liệu.
         model.addAttribute("danhSachNoiBat", Collections.<SanPhamNoiBat>emptyList());
         model.addAttribute("danhSachBanChay", Collections.<SanPhamNoiBat>emptyList());
         model.addAttribute("tieuDeDanhSach", "Tất cả sản phẩm");
@@ -86,31 +78,23 @@ public class HomeController {
         model.addAttribute("chuoiKhongGia", "");
 
         try {
-            // Du lieu do vao bo loc, lay tu SQL Server
             List<DanhMuc> danhSachDanhMuc = sanPhamService.layDanhSachDanhMuc();
-            // Dang chon danh muc thi chi hien thuong hieu cua danh muc do
             List<String> danhSachThuongHieu = sanPhamService.layDanhSachThuongHieu(maDanhMuc);
-            // Chi nhan thuong hieu co trong danh sach hien thi, dung dung chu hoa chu thuong
             List<String> thuongHieuDaChon = locThuongHieuHopLe(thuongHieuText, danhSachThuongHieu);
-            // Tim kiem + loc + sap xep + phan trang trong mot lan truy van
-            Page<SanPham> ketQua = sanPhamService.timKiemVaLoc(tuKhoa, maDanhMuc, thuongHieuDaChon, giaTu, giaDen, trang, sapXep);
-            // Trang vuot qua gioi han thi quay ve trang dau
+            Page<SanPham> ketQua = sanPhamService.timKiemVaLoc(tuKhoa, maDanhMuc, thuongHieuDaChon, giaTu, giaDen,
+                    trang, sapXep);
             if (ketQua.getTotalPages() > 0 && trang >= ketQua.getTotalPages()) {
                 trang = 0;
                 ketQua = sanPhamService.timKiemVaLoc(tuKhoa, maDanhMuc, thuongHieuDaChon, giaTu, giaDen, trang, sapXep);
             }
-
-            // Ten danh muc dang chon (neu co) de lam tieu de danh sach
             String tenDanhMuc = null;
             if (maDanhMuc != null) {
                 tenDanhMuc = sanPhamService.timDanhMucTheoMa(maDanhMuc).map(DanhMuc::getTenDanhMuc).orElse(null);
             }
-
-            // Truyen du lieu sang Index.html
             model.addAttribute("danhSachSanPham", ketQua.getContent());
-            // Ánh xạ ảnh đúng mã model chỉ cho danh sách, không sửa layout trang chủ.
             java.util.Map<Integer, String> anhDanhSachSanPham = new java.util.LinkedHashMap<>();
-            for (SanPham sp : ketQua.getContent()) {anhDanhSachSanPham.put(sp.getMaSanPham(), chiTietSanPhamService.layAnhDaiDien(sp));
+            for (SanPham sp : ketQua.getContent()) {
+                anhDanhSachSanPham.put(sp.getMaSanPham(), chiTietSanPhamService.layAnhDaiDien(sp));
             }
             model.addAttribute("anhDanhSachSanPham", anhDanhSachSanPham);
             model.addAttribute("trangHienTai", trang);
@@ -125,18 +109,17 @@ public class HomeController {
             model.addAttribute("giaThanhKeoToiDa", sanPhamService.layGiaThanhKeoToiDa());
 
             model.addAttribute("tieuDeDanhSach", taoTieuDe(tuKhoa, tenDanhMuc));
-            model.addAttribute("coBoLoc", !tuKhoa.isEmpty() || maDanhMuc != null || !thuongHieuDaChon.isEmpty() || giaTu != null || giaDen != null);
-
-            // Cac chuoi query de giu dieu kien khi phan trang, doi sap xep, doi danh muc, doi gia
+            model.addAttribute("coBoLoc", !tuKhoa.isEmpty() || maDanhMuc != null || !thuongHieuDaChon.isEmpty()
+                    || giaTu != null || giaDen != null);
             String phanTuKhoa = tuKhoa.isEmpty() ? "" : "&tuKhoa=" + maHoa(tuKhoa);
             String phanDanhMuc = maDanhMuc == null ? "" : "&maDanhMuc=" + maDanhMuc;
             String phanThuongHieu = taoPhanThuongHieu(thuongHieuDaChon);
-            String phanGia = (giaTu == null ? "" : "&giaTu=" + giaTu.toPlainString()) + (giaDen == null ? "" : "&giaDen=" + giaDen.toPlainString());
+            String phanGia = (giaTu == null ? "" : "&giaTu=" + giaTu.toPlainString())
+                    + (giaDen == null ? "" : "&giaDen=" + giaDen.toPlainString());
             String phanSapXep = "&sapXep=" + sapXep;
 
             model.addAttribute("chuoiLoc", phanTuKhoa + phanDanhMuc + phanThuongHieu + phanGia + phanSapXep);
             model.addAttribute("chuoiKhongSapXep", phanTuKhoa + phanDanhMuc + phanThuongHieu + phanGia);
-            // Doi danh muc thi bo thuong hieu da chon (thuong hieu phu thuoc danh muc)
             model.addAttribute("chuoiKhongDanhMuc", phanTuKhoa + phanGia + phanSapXep);
             model.addAttribute("chuoiKhongGia", phanTuKhoa + phanDanhMuc + phanThuongHieu + phanSapXep);
 
@@ -145,8 +128,7 @@ public class HomeController {
             model.addAttribute("trangHienTai", 0);
             model.addAttribute("tongSoTrang", 0);
             model.addAttribute("tongSoSanPham", 0);
-            model.addAttribute("loiSanPham", "Không thể tải danh sách sản phẩm. Vui lòng thử lại sau."
-            );
+            model.addAttribute("loiSanPham", "Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.");
         }
         try {
             model.addAttribute("danhSachNoiBat", sanPhamNoiBatService.laySanPhamNoiBat());
@@ -157,7 +139,6 @@ public class HomeController {
         return "Index";
     }
 
-    // So trang: khong phai so hoac am thi ve trang dau
     private int docSoTrang(String giaTri) {
         try {
             int trang = Integer.parseInt(giaTri.trim());
@@ -167,7 +148,6 @@ public class HomeController {
         }
     }
 
-    // Ma danh muc: khong phai so nguyen duong thi bo qua
     private Integer docSoNguyenDuong(String giaTri) {
         if (giaTri == null || giaTri.isBlank()) {
             return null;
@@ -179,7 +159,7 @@ public class HomeController {
             return null;
         }
     }
-    // Gia: chi nhan so nguyen khong am, gia tri la thi bo qua
+
     private BigDecimal docGia(String giaTri) {
         if (giaTri == null || giaTri.isBlank()) {
             return null;
@@ -191,7 +171,7 @@ public class HomeController {
         }
         return new BigDecimal(chuoi);
     }
-    // Tu khoa: bo khoang trang thua, gioi han do dai
+
     private String chuanHoaTuKhoa(String tuKhoa) {
         String chuan = sanPhamService.chuanHoaTuKhoa(tuKhoa);
 
@@ -202,7 +182,6 @@ public class HomeController {
         return chuan;
     }
 
-    // Giu lai thuong hieu co trong danh sach hien thi, lay dung ten goc trong SQL
     private List<String> locThuongHieuHopLe(List<String> duocChon, List<String> choPhep) {
         List<String> ketQua = new ArrayList<>();
         if (duocChon == null) {
@@ -220,7 +199,7 @@ public class HomeController {
         }
         return ketQua;
     }
-    // Tieu de khu vuc danh sach
+
     private String taoTieuDe(String tuKhoa, String tenDanhMuc) {
         if (!tuKhoa.isEmpty()) {
             return "Kết quả tìm kiếm cho \"" + tuKhoa + "\"";
@@ -238,6 +217,7 @@ public class HomeController {
         }
         return sb.toString();
     }
+
     private String maHoa(String giaTri) {
         return URLEncoder.encode(giaTri, StandardCharsets.UTF_8);
     }

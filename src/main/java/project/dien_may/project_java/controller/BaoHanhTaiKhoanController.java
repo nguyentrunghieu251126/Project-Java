@@ -16,10 +16,6 @@ import project.dien_may.project_java.service.muahang.BaoHanhTaiKhoanService;
 import java.security.Principal;
 import java.time.LocalDate;
 
-/**
- * TV3 – /tai-khoan/bao-hanh: thông tin bảo hành các sản phẩm khách đã nhận, nằm trong khu "Tài khoản của tôi".
- * Lọc theo thời gian mua, sắp xếp theo ngày mua / ngày hết hạn; gửi yêu cầu bảo hành từ ô "Xem chi tiết".
- */
 @Controller
 @RequestMapping("/tai-khoan/bao-hanh")
 public class BaoHanhTaiKhoanController {
@@ -34,11 +30,10 @@ public class BaoHanhTaiKhoanController {
 
     @GetMapping
     public String trang(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tuNgay,
-                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate denNgay,
-                        @RequestParam(required = false) String sapXep,
-                        Principal principal, Model model) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate denNgay,
+            @RequestParam(required = false) String sapXep,
+            Principal principal, Model model) {
         String email = principal.getName();
-        // Nhập ngược khoảng ngày thì đổi chỗ cho đúng.
         if (tuNgay != null && denNgay != null && tuNgay.isAfter(denNgay)) {
             LocalDate tam = tuNgay;
             tuNgay = denNgay;
@@ -54,11 +49,10 @@ public class BaoHanhTaiKhoanController {
         return "tai-khoan/BaoHanh";
     }
 
-    /** Gửi yêu cầu bảo hành: tạo phiếu "Chờ tiếp nhận" để nhân viên kho xử lý ở /admin/kho/bao-hanh. */
     @PostMapping("/yeu-cau")
     public String guiYeuCau(@RequestParam(required = false) Integer maChiTiet,
-                            @RequestParam(required = false) String moTaLoi,
-                            Principal principal, RedirectAttributes redirect) {
+            @RequestParam(required = false) String moTaLoi,
+            Principal principal, RedirectAttributes redirect) {
         try {
             PhieuBaoHanh phieu = baoHanhService.guiYeuCau(principal.getName(), maChiTiet, moTaLoi);
             redirect.addFlashAttribute("thongBao", "Đã gửi yêu cầu bảo hành #" + phieu.getMaPhieuBaoHanh()
@@ -67,7 +61,6 @@ public class BaoHanhTaiKhoanController {
             redirect.addFlashAttribute("loi", e.getMessage());
             redirect.addFlashAttribute("moTaLoiCu", moTaLoi);
         }
-        // Mở lại đúng sản phẩm vừa thao tác
         redirect.addFlashAttribute("moChiTiet", maChiTiet);
         return "redirect:/tai-khoan/bao-hanh" + (maChiTiet == null ? "" : "#bh-" + maChiTiet);
     }

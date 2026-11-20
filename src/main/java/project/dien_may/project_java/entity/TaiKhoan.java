@@ -35,16 +35,12 @@ public class TaiKhoan {
     @Column(name = "TrangThai", nullable = false)
     private boolean trangThai = true;
 
-    @Column(name = "NgayTao",
-            nullable = false,
-            insertable = false,
-            updatable = false)
+    @Column(name = "NgayTao", nullable = false, insertable = false, updatable = false)
     private LocalDateTime ngayTao;
 
     public TaiKhoan() {
     }
 
-    /** Chữ cái đầu của hai từ cuối trong họ tên, hiển thị thay ảnh đại diện. */
     public String getChuVietTat() {
         String[] tu = hoTen.trim().split("\\s+");
         String ketQua = tu[tu.length - 1].substring(0, 1);

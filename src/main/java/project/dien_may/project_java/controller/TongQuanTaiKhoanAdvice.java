@@ -5,10 +5,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import project.dien_may.project_java.service.muahang.TongQuanTaiKhoanService;
-
 import java.security.Principal;
 
-/** TV3 – nạp "Đơn hàng gần đây", "Ưu đãi dành riêng cho bạn", "Thông tin bảo hành" cho trang Tổng quan (/tai-khoan). */
 @ControllerAdvice(assignableTypes = HoSoTaiKhoanController.class)
 public class TongQuanTaiKhoanAdvice {
 

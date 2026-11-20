@@ -36,16 +36,18 @@ public class HoSoTaiKhoanController {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
     }
 
-    @GetMapping({"", "/"})
+    @GetMapping({ "", "/" })
     public String tongQuan(Principal principal, Model model) {
-        if (!napHoSo(model, principal)) return VIEW;
+        if (!napHoSo(model, principal))
+            return VIEW;
         model.addAttribute("trangTaiKhoan", "tong-quan");
         return VIEW;
     }
 
     @GetMapping("/ho-so")
     public String hoSo(Principal principal, Model model) {
-        if (!napHoSo(model, principal)) return VIEW;
+        if (!napHoSo(model, principal))
+            return VIEW;
         model.addAttribute("trangTaiKhoan", "ho-so");
         ThongTinHoSo hoSo = (ThongTinHoSo) model.getAttribute("hoSo");
         CapNhatTaiKhoanForm form = new CapNhatTaiKhoanForm();
@@ -58,11 +60,13 @@ public class HoSoTaiKhoanController {
 
     @PostMapping("/ho-so")
     public String luuHoSo(@Valid @ModelAttribute("capNhatTaiKhoanForm") CapNhatTaiKhoanForm form,
-                          BindingResult bindingResult,
-                          Principal principal, Model model, RedirectAttributes redirect) {
+            BindingResult bindingResult,
+            Principal principal, Model model, RedirectAttributes redirect) {
         model.addAttribute("trangTaiKhoan", "ho-so");
-        if (!napHoSo(model, principal)) return VIEW;
-        if (bindingResult.hasErrors() || model.getAttribute("hoSo") == null) return VIEW;
+        if (!napHoSo(model, principal))
+            return VIEW;
+        if (bindingResult.hasErrors() || model.getAttribute("hoSo") == null)
+            return VIEW;
         try {
             hoSoTaiKhoanService.capNhatHoSo(principal.getName(), form);
             redirect.addFlashAttribute("thongBaoThanhCong", "Cập nhật hồ sơ và địa chỉ mặc định thành công.");
@@ -79,7 +83,8 @@ public class HoSoTaiKhoanController {
 
     @GetMapping("/doi-mat-khau")
     public String doiMatKhau(Principal principal, Model model) {
-        if (!napHoSo(model, principal)) return VIEW;
+        if (!napHoSo(model, principal))
+            return VIEW;
         model.addAttribute("trangTaiKhoan", "doi-mat-khau");
         model.addAttribute("doiMatKhauTaiKhoanForm", new DoiMatKhauTaiKhoanForm());
         return VIEW;
@@ -87,15 +92,17 @@ public class HoSoTaiKhoanController {
 
     @PostMapping("/doi-mat-khau")
     public String luuMatKhau(@Valid @ModelAttribute("doiMatKhauTaiKhoanForm") DoiMatKhauTaiKhoanForm form,
-                            BindingResult bindingResult, Principal principal,
-                            Model model, RedirectAttributes redirect) {
+            BindingResult bindingResult, Principal principal,
+            Model model, RedirectAttributes redirect) {
         model.addAttribute("trangTaiKhoan", "doi-mat-khau");
-        if (!napHoSo(model, principal)) return VIEW;
+        if (!napHoSo(model, principal))
+            return VIEW;
         if (form.getMatKhauMoi() != null && form.getXacNhanMatKhau() != null
                 && !form.getMatKhauMoi().equals(form.getXacNhanMatKhau())) {
             bindingResult.rejectValue("xacNhanMatKhau", "khongKhop", "Xác nhận mật khẩu mới không khớp.");
         }
-        if (bindingResult.hasErrors() || model.getAttribute("hoSo") == null) return VIEW;
+        if (bindingResult.hasErrors() || model.getAttribute("hoSo") == null)
+            return VIEW;
         try {
             KetQuaDoiMatKhau ketQua = hoSoTaiKhoanService.doiMatKhau(
                     principal.getName(), form.getMatKhauHienTai(), form.getMatKhauMoi());
@@ -120,7 +127,8 @@ public class HoSoTaiKhoanController {
     }
 
     private boolean napHoSo(Model model, Principal principal) {
-        if (principal == null) return false;
+        if (principal == null)
+            return false;
         try {
             model.addAttribute("hoSo", hoSoTaiKhoanService.layHoSo(principal.getName()));
         } catch (IllegalStateException e) {

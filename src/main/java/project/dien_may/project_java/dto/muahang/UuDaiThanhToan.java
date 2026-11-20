@@ -8,23 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * TV3 – ưu đãi lần đầu theo phương thức thanh toán (ý tưởng từ trang thanh toán của các chuỗi điện máy).
- * Mỗi tài khoản được dùng ưu đãi của một phương thức MỘT lần; đơn đã dùng ưu đãi mà bị hủy thì được dùng lại.
- * Nếu đơn khớp nhiều điều kiện, lấy điều kiện giảm nhiều nhất.
- */
 public final class UuDaiThanhToan {
-
-    /**
-     * Một điều kiện ưu đãi.
-     *
-     * @param moTa       chữ hiển thị
-     * @param donToiThieu giá trị tối thiểu (của cả đơn, hoặc của phần laptop nếu chiLaptop)
-     * @param chiLaptop  chỉ tính trên sản phẩm thuộc danh mục Laptop
-     * @param tienGiam   giảm thẳng (0 nếu giảm theo %)
-     * @param phanTram   % giảm (0 nếu giảm thẳng)
-     * @param toiDa      mức giảm tối đa khi giảm theo %
-     */
     public record DieuKien(String moTa, long donToiThieu, boolean chiLaptop, long tienGiam, int phanTram, long toiDa) {
 
         BigDecimal tinh(BigDecimal tamTinh, BigDecimal tienLaptop) {
@@ -33,14 +17,14 @@ public final class UuDaiThanhToan {
                 return BigDecimal.ZERO;
             }
             if (phanTram > 0) {
-                BigDecimal giam = coSo.multiply(BigDecimal.valueOf(phanTram)).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
+                BigDecimal giam = coSo.multiply(BigDecimal.valueOf(phanTram)).divide(BigDecimal.valueOf(100), 0,
+                        RoundingMode.HALF_UP);
                 return giam.min(BigDecimal.valueOf(toiDa));
             }
             return BigDecimal.valueOf(tienGiam).min(tamTinh);
         }
     }
 
-    /** Kết quả cho một đơn: điều kiện được áp dụng (null nếu không đủ) và số tiền giảm. */
     public record KetQua(DieuKien dieuKien, BigDecimal tienGiam) {
         public static final KetQua KHONG = new KetQua(null, BigDecimal.ZERO);
 
@@ -71,7 +55,6 @@ public final class UuDaiThanhToan {
         return DIEU_KIEN.getOrDefault(pt, List.of());
     }
 
-    /** Chọn điều kiện giảm nhiều nhất cho đơn. */
     public static KetQua tinh(PhuongThucThanhToan pt, BigDecimal tamTinh, BigDecimal tienLaptop) {
         return dieuKien(pt).stream()
                 .map(dk -> new KetQua(dk, dk.tinh(tamTinh, tienLaptop)))

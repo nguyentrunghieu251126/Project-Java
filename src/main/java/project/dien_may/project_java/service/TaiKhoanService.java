@@ -21,7 +21,8 @@ public class TaiKhoanService {
     private final VaiTroRepository vaiTroRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public TaiKhoanService(TaiKhoanRepository taiKhoanRepository, VaiTroRepository vaiTroRepository, PasswordEncoder passwordEncoder) {
+    public TaiKhoanService(TaiKhoanRepository taiKhoanRepository, VaiTroRepository vaiTroRepository,
+            PasswordEncoder passwordEncoder) {
 
         this.taiKhoanRepository = taiKhoanRepository;
         this.vaiTroRepository = vaiTroRepository;
@@ -35,8 +36,7 @@ public class TaiKhoanService {
             return false;
         }
 
-        return taiKhoanRepository.daTonTaiEmail(email.trim().toLowerCase(Locale.ROOT)
-        );
+        return taiKhoanRepository.daTonTaiEmail(email.trim().toLowerCase(Locale.ROOT));
     }
 
     @Transactional
@@ -44,34 +44,29 @@ public class TaiKhoanService {
 
         String email = form.getEmail().trim().toLowerCase(Locale.ROOT);
 
-        if (taiKhoanRepository.daTonTaiEmail(email)) {throw new IllegalArgumentException("Email đã được sử dụng.");
+        if (taiKhoanRepository.daTonTaiEmail(email)) {
+            throw new IllegalArgumentException("Email đã được sử dụng.");
         }
 
-        VaiTro khachHang = vaiTroRepository.findByTenVaiTro("KHACH_HANG").orElseThrow(() -> new IllegalStateException("Không tìm thấy vai trò KHACH_HANG."));
+        VaiTro khachHang = vaiTroRepository.findByTenVaiTro("KHACH_HANG")
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy vai trò KHACH_HANG."));
         TaiKhoan taiKhoan = new TaiKhoan();
         taiKhoan.setHoTen(form.getHoTen().trim());
         taiKhoan.setEmail(email);
         String soDienThoai = form.getSoDienThoai();
-        taiKhoan.setSoDienThoai(soDienThoai == null || soDienThoai.isBlank() ? null : soDienThoai.trim()
-        );
-        taiKhoan.setMatKhau(passwordEncoder.encode(form.getMatKhau())
-        );
+        taiKhoan.setSoDienThoai(soDienThoai == null || soDienThoai.isBlank() ? null : soDienThoai.trim());
+        taiKhoan.setMatKhau(passwordEncoder.encode(form.getMatKhau()));
         taiKhoan.setVaiTro(khachHang);
         taiKhoan.setTrangThai(true);
         taiKhoanRepository.save(taiKhoan);
     }
 
-    /** Kết quả của chức năng quên mật khẩu. */
     public enum KetQuaDatLaiMatKhau {
         THANH_CONG,
         SAI_THONG_TIN,
         TRUNG_MAT_KHAU_CU
     }
 
-    /**
-     * Quên mật khẩu: chỉ đổi khi email tồn tại, tài khoản đang hoạt động và số điện thoại khớp.
-     * Không phân biệt sai email hay sai số điện thoại để người ngoài không dò được tài khoản.
-     */
     @Transactional
     public KetQuaDatLaiMatKhau datLaiMatKhau(String email, String soDienThoai, String matKhauMoi) {
 

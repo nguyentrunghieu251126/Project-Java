@@ -14,15 +14,8 @@ import project.dien_may.project_java.entity.SoDiaChi;
 import project.dien_may.project_java.service.HoSoTaiKhoanService;
 import project.dien_may.project_java.service.admin.NghiepVuException;
 import project.dien_may.project_java.service.muahang.SoDiaChiService;
-
 import java.security.Principal;
 
-/**
- * TV3 – sổ địa chỉ: thêm, sửa, xóa, đặt mặc định (bảng SoDiaChi), theo ý tưởng Project-Website.
- * GET /tai-khoan/dia-chi: trang "Sổ địa chỉ nhận hàng" riêng (tách khỏi trang Hồ sơ cá nhân).
- * quayLai: trang quay về sau khi lưu (trang Thanh toán hoặc trang Sổ địa chỉ); chỉ nhận đường dẫn trong website.
- * Nằm dưới /tai-khoan/** nên SecurityConfig chỉ cho KHACH_HANG.
- */
 @Controller
 @RequestMapping("/tai-khoan/dia-chi")
 public class DiaChiController {
@@ -44,7 +37,6 @@ public class DiaChiController {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
     }
 
-    /** Trang "Sổ địa chỉ nhận hàng" riêng, tách khỏi trang Hồ sơ cá nhân. */
     @GetMapping
     public String soDiaChi(Principal principal, Model model) {
         String email = principal.getName();
@@ -61,7 +53,7 @@ public class DiaChiController {
 
     @GetMapping("/{maDiaChi}/sua")
     public String formSua(@PathVariable Integer maDiaChi, @RequestParam(required = false) String quayLai,
-                          Principal principal, Model model, RedirectAttributes redirect) {
+            Principal principal, Model model, RedirectAttributes redirect) {
         try {
             SoDiaChi dc = soDiaChiService.timCuaKhach(principal.getName(), maDiaChi);
             return hienForm(model, principal, DiaChiForm.tu(dc), quayLai);
@@ -73,8 +65,8 @@ public class DiaChiController {
 
     @PostMapping("/luu")
     public String luu(@Valid @ModelAttribute("diaChiForm") DiaChiForm form, BindingResult ketQua,
-                      @RequestParam(required = false) String quayLai,
-                      Principal principal, Model model, RedirectAttributes redirect) {
+            @RequestParam(required = false) String quayLai,
+            Principal principal, Model model, RedirectAttributes redirect) {
         if (ketQua.hasErrors()) {
             return hienForm(model, principal, form, quayLai);
         }
@@ -88,7 +80,6 @@ public class DiaChiController {
         String ve = duongDanVe(quayLai);
         String thongBao = form.getMaDiaChi() == null ? "Đã thêm địa chỉ mới." : "Đã cập nhật địa chỉ.";
         if (ve.startsWith("/dat-hang")) {
-            // Quay lại trang Thanh toán: chọn sẵn địa chỉ vừa lưu
             ve = ve.replaceAll("([?&])diaChi=\\d*&?", "$1").replaceAll("[?&]$", "");
             ve += (ve.contains("?") ? "&" : "?") + "diaChi=" + ma;
             redirect.addFlashAttribute("thongBao", thongBao + " Địa chỉ đã được chọn để giao hàng.");
@@ -100,7 +91,7 @@ public class DiaChiController {
 
     @PostMapping("/{maDiaChi}/mac-dinh")
     public String datMacDinh(@PathVariable Integer maDiaChi, @RequestParam(required = false) String quayLai,
-                             Principal principal, RedirectAttributes redirect) {
+            Principal principal, RedirectAttributes redirect) {
         try {
             soDiaChiService.datMacDinh(principal.getName(), maDiaChi);
             baoThanhCong(redirect, quayLai, "Đã đặt làm địa chỉ mặc định.");
@@ -112,7 +103,7 @@ public class DiaChiController {
 
     @PostMapping("/{maDiaChi}/xoa")
     public String xoa(@PathVariable Integer maDiaChi, @RequestParam(required = false) String quayLai,
-                      Principal principal, RedirectAttributes redirect) {
+            Principal principal, RedirectAttributes redirect) {
         try {
             soDiaChiService.xoa(principal.getName(), maDiaChi);
             baoThanhCong(redirect, quayLai, "Đã xóa địa chỉ.");
@@ -120,7 +111,6 @@ public class DiaChiController {
             baoLoi(redirect, quayLai, e.getMessage());
         }
         String ve = duongDanVe(quayLai);
-        // Vừa xóa địa chỉ đang chọn ở trang Thanh toán: bỏ tham số diaChi để chọn lại mặc định
         return "redirect:" + ve.replaceAll("([?&])diaChi=\\d*&?", "$1").replaceAll("[?&]$", "");
     }
 
@@ -134,16 +124,15 @@ public class DiaChiController {
         return VIEW;
     }
 
-    /** Trang Thanh toán dùng thongBao / loi; trang tài khoản (Sổ địa chỉ, Hồ sơ) dùng thongBaoThanhCong / thongBaoLoi. */
     private static void baoThanhCong(RedirectAttributes redirect, String quayLai, String noiDung) {
-        redirect.addFlashAttribute(duongDanVe(quayLai).startsWith("/dat-hang") ? "thongBao" : "thongBaoThanhCong", noiDung);
+        redirect.addFlashAttribute(duongDanVe(quayLai).startsWith("/dat-hang") ? "thongBao" : "thongBaoThanhCong",
+                noiDung);
     }
 
     private static void baoLoi(RedirectAttributes redirect, String quayLai, String noiDung) {
         redirect.addFlashAttribute(duongDanVe(quayLai).startsWith("/dat-hang") ? "loi" : "thongBaoLoi", noiDung);
     }
 
-    /** Chỉ quay về trang Thanh toán hoặc trang tài khoản trong website (chống chuyển hướng ra ngoài). */
     static String duongDanVe(String quayLai) {
         if (quayLai != null && !quayLai.startsWith("//")
                 && (quayLai.startsWith("/dat-hang") || quayLai.startsWith("/tai-khoan"))) {

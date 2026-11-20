@@ -26,13 +26,11 @@ import project.dien_may.project_java.service.admin.KhoAdminService;
 import project.dien_may.project_java.service.admin.KhoAdminService.KetQuaNhap;
 import project.dien_may.project_java.service.admin.NghiepVuException;
 import project.dien_may.project_java.service.admin.PhieuNhapService;
-
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.Map;
 
-/** Đơn hàng (QT17), tồn kho (QT18), duyệt yêu cầu nhập hàng (QT19 – QT21). */
 @Controller
 @RequestMapping("/admin/kho")
 public class AdminKhoController {
@@ -47,9 +45,9 @@ public class AdminKhoController {
     private final PhieuNhapService phieuNhapService;
 
     public AdminKhoController(KhoAdminService khoService, DonHangRepository donHangRepository,
-                              ChiTietDonHangRepository chiTietDonHangRepository, SanPhamRepository sanPhamRepository,
-                              DanhMucRepository danhMucRepository, YeuCauNhapHangRepository yeuCauRepository,
-                              PhieuXuatRepository phieuXuatRepository, PhieuNhapService phieuNhapService) {
+            ChiTietDonHangRepository chiTietDonHangRepository, SanPhamRepository sanPhamRepository,
+            DanhMucRepository danhMucRepository, YeuCauNhapHangRepository yeuCauRepository,
+            PhieuXuatRepository phieuXuatRepository, PhieuNhapService phieuNhapService) {
         this.khoService = khoService;
         this.donHangRepository = donHangRepository;
         this.chiTietDonHangRepository = chiTietDonHangRepository;
@@ -62,11 +60,11 @@ public class AdminKhoController {
 
     @GetMapping("/don-hang")
     public String donHang(@RequestParam(required = false) String tuKhoa,
-                          @RequestParam(required = false) TrangThaiDonHang trangThai,
-                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tuNgay,
-                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate denNgay,
-                          @RequestParam(defaultValue = "1") int trang,
-                          Model model) {
+            @RequestParam(required = false) TrangThaiDonHang trangThai,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tuNgay,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate denNgay,
+            @RequestParam(defaultValue = "1") int trang,
+            Model model) {
         Map<TrangThaiDonHang, Long> soDon = new EnumMap<>(TrangThaiDonHang.class);
         for (TrangThaiDonHang t : TrangThaiDonHang.values()) {
             soDon.put(t, 0L);
@@ -88,17 +86,16 @@ public class AdminKhoController {
         model.addAttribute("donHang", donHangRepository.findById(ma)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
         model.addAttribute("dsChiTiet", chiTietDonHangRepository.findByDonHangMaDonHang(ma));
-        // TV4: phiếu xuất của đơn (null khi chưa xuất kho)
         model.addAttribute("phieuXuat", phieuXuatRepository.findByDonHangMaDonHang(ma).orElse(null));
         return "admin/kho/don-hang-chi-tiet";
     }
 
     @GetMapping("/ton-kho")
     public String tonKho(@RequestParam(required = false) String tuKhoa,
-                         @RequestParam(required = false) Integer maDanhMuc,
-                         @RequestParam(required = false) TinhTrangTonKho tinhTrang,
-                         @RequestParam(defaultValue = "1") int trang,
-                         Model model) {
+            @RequestParam(required = false) Integer maDanhMuc,
+            @RequestParam(required = false) TinhTrangTonKho tinhTrang,
+            @RequestParam(defaultValue = "1") int trang,
+            Model model) {
         model.addAttribute("trang", sanPhamRepository.timKiem(tuKhoa, maDanhMuc, null, null,
                 tinhTrang == null ? null : tinhTrang.name(),
                 PhanTrang.tao(trang, Sort.by("soLuong", "maSanPham"))));
@@ -112,8 +109,8 @@ public class AdminKhoController {
 
     @PostMapping("/ton-kho/{ma}/yeu-cau-nhap")
     public String lapYeuCauNhap(@PathVariable Integer ma, @RequestParam(required = false) Integer soLuong,
-                                @RequestParam(required = false) String quayVe,
-                                Principal nguoiDung, RedirectAttributes redirect) {
+            @RequestParam(required = false) String quayVe,
+            Principal nguoiDung, RedirectAttributes redirect) {
         try {
             KetQuaNhap ketQua = khoService.lapYeuCauNhap(ma, soLuong, nguoiDung.getName());
             redirect.addFlashAttribute("thongBao", ketQua.daDuyet()
@@ -122,14 +119,13 @@ public class AdminKhoController {
         } catch (NghiepVuException e) {
             redirect.addFlashAttribute("loi", e.getMessage());
         }
-        // Chỉ nhận đúng giá trị đã biết để không bị lợi dụng chuyển hướng sang trang khác
         return "bao-cao".equals(quayVe) ? "redirect:/admin/bao-cao/ton-kho" : "redirect:/admin/kho/ton-kho";
     }
 
     @GetMapping("/yeu-cau-nhap")
     public String yeuCauNhap(@RequestParam(required = false) TrangThaiYeuCauNhap trangThai,
-                             @RequestParam(defaultValue = "1") int trang,
-                             Model model) {
+            @RequestParam(defaultValue = "1") int trang,
+            Model model) {
         model.addAttribute("trang", yeuCauRepository.timKiem(trangThai,
                 PhanTrang.tao(trang, Sort.by(Sort.Direction.DESC, "ngayYeuCau", "maYeuCauNhap"))));
         model.addAttribute("trangThai", trangThai);
@@ -142,7 +138,6 @@ public class AdminKhoController {
     public String chiTietYeuCau(@PathVariable Integer ma, Model model) {
         model.addAttribute("yeuCau", yeuCauRepository.findById(ma)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-        // TV4 (NVK10): phiếu nhập đã lập (null nếu chưa) và giá nhập gợi ý cho form lập phiếu
         model.addAttribute("phieuNhap", phieuNhapService.timTheoYeuCau(ma));
         model.addAttribute("giaNhapGoiY", phieuNhapService.giaNhapGoiY(ma));
         return "admin/kho/yeu-cau-nhap-chi-tiet";
@@ -161,7 +156,7 @@ public class AdminKhoController {
 
     @PostMapping("/yeu-cau-nhap/{ma}/tu-choi")
     public String tuChoi(@PathVariable Integer ma, @RequestParam(required = false) String lyDo, Principal nguoiDung,
-                         RedirectAttributes redirect) {
+            RedirectAttributes redirect) {
         try {
             khoService.tuChoi(ma, nguoiDung.getName(), lyDo);
             redirect.addFlashAttribute("thongBao", "Đã từ chối yêu cầu nhập hàng #" + ma + ".");

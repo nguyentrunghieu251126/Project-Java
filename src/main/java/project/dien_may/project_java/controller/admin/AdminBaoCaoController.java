@@ -14,7 +14,6 @@ import project.dien_may.project_java.service.admin.BaoCaoService;
 import java.time.LocalDate;
 import java.util.List;
 
-/** Báo cáo doanh thu, sản phẩm bán chạy, tồn kho (QT09 – QT11). */
 @Controller
 @RequestMapping("/admin/bao-cao")
 public class AdminBaoCaoController {
@@ -24,7 +23,7 @@ public class AdminBaoCaoController {
     private final ChiTietYeuCauNhapHangRepository chiTietYeuCauRepository;
 
     public AdminBaoCaoController(BaoCaoService baoCaoService, DanhMucRepository danhMucRepository,
-                                 ChiTietYeuCauNhapHangRepository chiTietYeuCauRepository) {
+            ChiTietYeuCauNhapHangRepository chiTietYeuCauRepository) {
         this.baoCaoService = baoCaoService;
         this.danhMucRepository = danhMucRepository;
         this.chiTietYeuCauRepository = chiTietYeuCauRepository;
@@ -32,12 +31,11 @@ public class AdminBaoCaoController {
 
     @GetMapping("/doanh-thu")
     public String doanhThu(@RequestParam(defaultValue = "nam") String tab,
-                           @RequestParam(required = false) Integer nam,
-                           @RequestParam(required = false) Integer thang,
-                           Model model) {
+            @RequestParam(required = false) Integer nam,
+            @RequestParam(required = false) Integer thang,
+            Model model) {
         LocalDate homNay = LocalDate.now();
         List<Integer> dsNam = baoCaoService.dsNam();
-        // dsNam đi từ năm hiện tại về năm cũ nhất; năm ngoài khoảng này thì đưa về biên gần nhất
         int namXem = nam == null ? homNay.getYear()
                 : Math.clamp(nam, dsNam.get(dsNam.size() - 1), dsNam.get(0));
         int thangToiDa = namXem == homNay.getYear() ? homNay.getMonthValue() : 12;
@@ -58,11 +56,12 @@ public class AdminBaoCaoController {
     }
 
     @GetMapping("/ban-chay")
-    public String banChay(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tuNgay,
-                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate denNgay,
-                          @RequestParam(required = false) Integer maDanhMuc,
-                          @RequestParam(defaultValue = "10") int top,
-                          Model model) {
+    public String banChay(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tuNgay,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate denNgay,
+            @RequestParam(required = false) Integer maDanhMuc,
+            @RequestParam(defaultValue = "10") int top,
+            Model model) {
         KhoangNgay khoang = KhoangNgay.tu(tuNgay, denNgay);
         int soLuong = Math.clamp(top, 1, 100);
         model.addAttribute("tuNgay", khoang.tu());
@@ -77,12 +76,11 @@ public class AdminBaoCaoController {
     @GetMapping("/ton-kho")
     public String tonKho(Model model) {
         model.addAttribute("baoCao", baoCaoService.tonKho());
-        // Sản phẩm đã có phiếu chờ duyệt thì không lập thêm phiếu, chỉ báo đang chờ
-        model.addAttribute("dangChoDuyet", chiTietYeuCauRepository.maSanPhamTheoTrangThai(TrangThaiYeuCauNhap.CHO_DUYET));
+        model.addAttribute("dangChoDuyet",
+                chiTietYeuCauRepository.maSanPhamTheoTrangThai(TrangThaiYeuCauNhap.CHO_DUYET));
         return "admin/bao-cao/ton-kho";
     }
 
-    /** Mặc định sáu tháng gần nhất; nhập ngược chiều thì tự đảo lại. */
     private record KhoangNgay(LocalDate tu, LocalDate den) {
 
         static KhoangNgay tu(LocalDate tuNgay, LocalDate denNgay) {

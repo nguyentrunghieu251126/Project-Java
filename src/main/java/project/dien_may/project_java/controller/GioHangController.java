@@ -11,7 +11,6 @@ import project.dien_may.project_java.repository.SanPhamRepository;
 import project.dien_may.project_java.service.ChiTietSanPhamService;
 import project.dien_may.project_java.service.admin.NghiepVuException;
 import project.dien_may.project_java.service.muahang.GioHangService;
-
 import java.security.Principal;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** TV3 – KH11: giỏ hàng. Quyền KHACH_HANG đã khai báo trong SecurityConfig (/gio-hang/**). */
 @Controller
 @RequestMapping("/gio-hang")
 public class GioHangController {
@@ -34,20 +32,18 @@ public class GioHangController {
     private final ChiTietSanPhamService chiTietSanPhamService;
 
     public GioHangController(GioHangService gioHangService, SanPhamRepository sanPhamRepository,
-                             ChiTietSanPhamService chiTietSanPhamService) {
+            ChiTietSanPhamService chiTietSanPhamService) {
         this.gioHangService = gioHangService;
         this.sanPhamRepository = sanPhamRepository;
         this.chiTietSanPhamService = chiTietSanPhamService;
     }
 
-    /** chon: danh sách mã sản phẩm được tick sẵn (sau khi "Mua lại"); rỗng thì tick mọi dòng mua được. */
     @GetMapping
     public String gioHang(@RequestParam(name = "chon", required = false) List<Integer> chon,
-                          @RequestParam(name = "tu", required = false) String tu,
-                          Principal principal, Model model) {
+            @RequestParam(name = "tu", required = false) String tu,
+            Principal principal, Model model) {
         List<DongGioHang> dong = gioHangService.layGioHang(principal.getName());
         Set<Integer> trongGio = dong.stream().map(DongGioHang::maSanPham).collect(Collectors.toSet());
-        // Gợi ý mua kèm: sản phẩm mới nhất còn hàng, chưa có trong giỏ (phần lớn là phụ kiện)
         List<SanPham> goiY = sanPhamRepository.findTop5ByDangKinhDoanhTrueOrderByMaSanPhamDesc().stream()
                 .filter(sp -> !trongGio.contains(sp.getMaSanPham()) && sp.getSoLuong() > 0)
                 .limit(SO_GOI_Y).toList();
@@ -57,21 +53,16 @@ public class GioHangController {
         model.addAttribute("dsChon", chon == null ? List.of() : chon);
         model.addAttribute("goiY", goiY);
         model.addAttribute("anhGoiY", anhGoiY);
-        // Vào từ menu trang tài khoản (?tu=tai-khoan): đường dẫn hiện "Tài khoản của tôi › Giỏ hàng"
         model.addAttribute("tuTaiKhoan", TU_TAI_KHOAN.equals(tu));
         return VIEW;
     }
 
-    /**
-     * Form thường (không có JavaScript): muaNgay = true thì sang thẳng thanh toán với riêng sản phẩm này,
-     * ngược lại thêm vào giỏ rồi quay về đúng trang khách đang xem.
-     */
     @PostMapping("/them")
     public String them(@RequestParam Integer maSanPham,
-                       @RequestParam(defaultValue = "1") int soLuong,
-                       @RequestParam(defaultValue = "false") boolean muaNgay,
-                       @RequestHeader(name = "Referer", required = false) String trangTruoc,
-                       HttpServletRequest request, Principal principal, RedirectAttributes redirect) {
+            @RequestParam(defaultValue = "1") int soLuong,
+            @RequestParam(defaultValue = "false") boolean muaNgay,
+            @RequestHeader(name = "Referer", required = false) String trangTruoc,
+            HttpServletRequest request, Principal principal, RedirectAttributes redirect) {
         try {
             String ten = gioHangService.them(principal.getName(), maSanPham, soLuong);
             if (muaNgay) {
@@ -80,7 +71,6 @@ public class GioHangController {
             redirect.addFlashAttribute("thongBao", "Đã thêm " + ten + " vào giỏ hàng.");
         } catch (NghiepVuException e) {
             if (muaNgay && e.getMessage() != null && e.getMessage().startsWith("Giỏ hàng đã có")) {
-                // Đã đủ số lượng trong giỏ: vẫn cho mua ngay sản phẩm này
                 return "redirect:/dat-hang?sanPham=" + maSanPham;
             }
             redirect.addFlashAttribute("loi", e.getMessage());
@@ -88,15 +78,11 @@ public class GioHangController {
         return "redirect:" + duongDanQuayLai(trangTruoc, request);
     }
 
-    /**
-     * TV3: nút giỏ hàng trên thẻ sản phẩm gọi bằng fetch (gioHangNhanh.js) để khách ở nguyên trang.
-     * Trả về thông báo và số sản phẩm mới trong giỏ để cập nhật huy hiệu trên header.
-     */
     @PostMapping("/them-nhanh")
     @ResponseBody
     public Map<String, Object> themNhanh(@RequestParam Integer maSanPham,
-                                         @RequestParam(defaultValue = "1") int soLuong,
-                                         Principal principal) {
+            @RequestParam(defaultValue = "1") int soLuong,
+            Principal principal) {
         Map<String, Object> ketQua = new LinkedHashMap<>();
         try {
             String ten = gioHangService.them(principal.getName(), maSanPham, soLuong);
@@ -110,7 +96,6 @@ public class GioHangController {
         return ketQua;
     }
 
-    /** Chỉ quay về trang trong cùng website (chống chuyển hướng ra ngoài); không rõ thì về giỏ hàng. */
     private static String duongDanQuayLai(String trangTruoc, HttpServletRequest request) {
         String goc = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         if (trangTruoc != null && trangTruoc.startsWith(goc)) {
@@ -126,11 +111,10 @@ public class GioHangController {
         return "/gio-hang";
     }
 
-    /** Gọi bằng fetch từ nút +/-; trả về số lượng thực tế sau khi giới hạn theo tồn kho. */
     @PostMapping("/cap-nhat")
     @ResponseBody
     public Map<String, Object> capNhat(@RequestParam Integer maSanPham, @RequestParam int soLuong,
-                                       Principal principal) {
+            Principal principal) {
         Map<String, Object> ketQua = new LinkedHashMap<>();
         try {
             ketQua.put("soLuong", gioHangService.capNhatSoLuong(principal.getName(), maSanPham, soLuong));
@@ -145,7 +129,7 @@ public class GioHangController {
 
     @PostMapping("/xoa")
     public String xoa(@RequestParam Integer maSanPham, HttpServletRequest request, Principal principal,
-                      RedirectAttributes redirect) {
+            RedirectAttributes redirect) {
         gioHangService.xoa(principal.getName(), List.of(maSanPham));
         redirect.addFlashAttribute("thongBao", "Đã xóa sản phẩm khỏi giỏ hàng.");
         return veGioHang(request);
@@ -153,7 +137,7 @@ public class GioHangController {
 
     @PostMapping("/xoa-nhieu")
     public String xoaNhieu(@RequestParam(name = "maSanPham", required = false) List<Integer> dsMaSanPham,
-                           HttpServletRequest request, Principal principal, RedirectAttributes redirect) {
+            HttpServletRequest request, Principal principal, RedirectAttributes redirect) {
         int soDong = gioHangService.xoa(principal.getName(), dsMaSanPham);
         if (soDong > 0) {
             redirect.addFlashAttribute("thongBao", "Đã xóa " + soDong + " sản phẩm khỏi giỏ hàng.");
@@ -161,10 +145,10 @@ public class GioHangController {
         return veGioHang(request);
     }
 
-    /** Xóa xong quay lại giỏ hàng, giữ đường dẫn "Tài khoản của tôi" nếu trước đó vào từ trang tài khoản. */
     private static String veGioHang(HttpServletRequest request) {
         String trangTruoc = request.getHeader("Referer");
         return trangTruoc != null && trangTruoc.contains("tu=" + TU_TAI_KHOAN)
-                ? VE_GIO_HANG + "?tu=" + TU_TAI_KHOAN : VE_GIO_HANG;
+                ? VE_GIO_HANG + "?tu=" + TU_TAI_KHOAN
+                : VE_GIO_HANG;
     }
 }

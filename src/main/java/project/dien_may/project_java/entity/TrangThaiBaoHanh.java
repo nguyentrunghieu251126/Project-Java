@@ -3,7 +3,6 @@ package project.dien_may.project_java.entity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/** Giá trị khớp ràng buộc CK_PBH_TrangThai trong CSDL. */
 @Getter
 @RequiredArgsConstructor
 public enum TrangThaiBaoHanh {

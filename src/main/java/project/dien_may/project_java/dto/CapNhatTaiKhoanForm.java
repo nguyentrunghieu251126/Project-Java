@@ -16,10 +16,27 @@ public class CapNhatTaiKhoanForm {
     @Size(max = 255, message = "Địa chỉ không được vượt quá 255 ký tự.")
     private String diaChi;
 
-    public String getHoTen() { return hoTen; }
-    public void setHoTen(String hoTen) { this.hoTen = hoTen; }
-    public String getSoDienThoai() { return soDienThoai; }
-    public void setSoDienThoai(String soDienThoai) { this.soDienThoai = soDienThoai; }
-    public String getDiaChi() { return diaChi; }
-    public void setDiaChi(String diaChi) { this.diaChi = diaChi; }
+    public String getHoTen() {
+        return hoTen;
+    }
+
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
+    }
+
+    public String getSoDienThoai() {
+        return soDienThoai;
+    }
+
+    public void setSoDienThoai(String soDienThoai) {
+        this.soDienThoai = soDienThoai;
+    }
+
+    public String getDiaChi() {
+        return diaChi;
+    }
+
+    public void setDiaChi(String diaChi) {
+        this.diaChi = diaChi;
+    }
 }

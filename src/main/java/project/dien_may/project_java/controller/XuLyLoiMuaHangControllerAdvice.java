@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 
-/** TV3 – NFR10: lỗi CSDL ở phần mua hàng hiển thị trang lỗi thân thiện, không lộ SQL. */
-@ControllerAdvice(assignableTypes = {GioHangController.class, DatHangController.class, DonHangController.class})
+@ControllerAdvice(assignableTypes = { GioHangController.class, DatHangController.class, DonHangController.class })
 public class XuLyLoiMuaHangControllerAdvice {
 
     private static final Logger log = LoggerFactory.getLogger(XuLyLoiMuaHangControllerAdvice.class);

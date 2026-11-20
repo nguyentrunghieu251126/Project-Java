@@ -29,7 +29,7 @@ public class SanPhamService {
     private final DanhMucRepository danhMucRepository;
 
     public SanPhamService(SanPhamRepository sanPhamRepository,
-                          DanhMucRepository danhMucRepository) {
+            DanhMucRepository danhMucRepository) {
         this.sanPhamRepository = sanPhamRepository;
         this.danhMucRepository = danhMucRepository;
     }
@@ -57,8 +57,7 @@ public class SanPhamService {
 
         return sanPhamRepository
                 .findByTenSanPhamContainingIgnoreCaseAndDangKinhDoanhTrue(
-                        tuKhoa.trim()
-                );
+                        tuKhoa.trim());
     }
 
     // Lay chi tiet san pham theo ma
@@ -74,8 +73,7 @@ public class SanPhamService {
     // Lay danh sach san pham co phan trang va sap xep
     public Page<SanPham> laySanPhamPhanTrang(
             int trang,
-            String sapXep
-    ) {
+            String sapXep) {
 
         // Kiem tra so trang
         if (trang < 0) {
@@ -104,8 +102,7 @@ public class SanPhamService {
         PageRequest pageRequest = PageRequest.of(
                 trang,
                 SO_SAN_PHAM_MOI_TRANG,
-                sort
-        );
+                sort);
 
         return sanPhamRepository.findByDangKinhDoanhTrue(pageRequest);
     }
@@ -114,8 +111,7 @@ public class SanPhamService {
     public Page<SanPham> locSanPhamTheoDanhMuc(
             Integer maDanhMuc,
             int trang,
-            String sapXep
-    ) {
+            String sapXep) {
         if (maDanhMuc == null || maDanhMuc <= 0) {
             throw new IllegalArgumentException("Mã danh mục không hợp lệ");
         }
@@ -137,17 +133,17 @@ public class SanPhamService {
         return sanPhamRepository.findByDanhMuc_MaDanhMucAndDangKinhDoanhTrue(maDanhMuc, pageRequest);
     }
 
-    // ====================  TIM KIEM, LOC, SAP XEP ====================
-
     public String chuanHoaTuKhoa(String tuKhoa) {
         if (tuKhoa == null) {
             return "";
         }
         return tuKhoa.trim().replaceAll("\\s+", " ");
     }
+
     public List<DanhMuc> layDanhSachDanhMuc() {
         return danhMucRepository.findAll(Sort.by("tenDanhMuc").ascending());
     }
+
     public Optional<DanhMuc> timDanhMucTheoMa(Integer maDanhMuc) {
         if (maDanhMuc == null || maDanhMuc <= 0) {
             return Optional.empty();
@@ -159,7 +155,9 @@ public class SanPhamService {
     public List<String> layDanhSachThuongHieu() {
         return sanPhamRepository.layDanhSachThuongHieu();
     }
-    public Page<SanPham> timKiemVaLoc(String tuKhoa, Integer maDanhMuc, List<String> thuongHieu, BigDecimal giaTu, BigDecimal giaDen, int trang, String sapXep) {
+
+    public Page<SanPham> timKiemVaLoc(String tuKhoa, Integer maDanhMuc, List<String> thuongHieu, BigDecimal giaTu,
+            BigDecimal giaDen, int trang, String sapXep) {
         if (trang < 0) {
             trang = 0;
         }
@@ -167,7 +165,8 @@ public class SanPhamService {
         return sanPhamRepository.findAll(taoDieuKien(tuKhoa, maDanhMuc, thuongHieu, giaTu, giaDen), pageRequest);
     }
 
-    // Chi cho phep 4 kieu sap xep hop le, them ma san pham de thu tu on dinh khi phan trang
+    // Chi cho phep 4 kieu sap xep hop le, them ma san pham de thu tu on dinh khi
+    // phan trang
     private Sort taoSapXep(String sapXep) {
         Sort sort;
         if ("ten-giam".equals(sapXep)) {
@@ -182,13 +181,13 @@ public class SanPhamService {
 
         return sort.and(Sort.by("maSanPham").ascending());
     }
+
     private Specification<SanPham> taoDieuKien(
             String tuKhoa,
             Integer maDanhMuc,
             List<String> thuongHieu,
             BigDecimal giaTu,
-            BigDecimal giaDen
-    ) {
+            BigDecimal giaDen) {
         String tuKhoaChuan = chuanHoaTuKhoa(tuKhoa);
         List<String> thuongHieuChuan = chuanHoaDanhSachThuongHieu(thuongHieu);
 
@@ -217,7 +216,7 @@ public class SanPhamService {
             return cb.and(dieuKien.toArray(new Predicate[0]));
         };
     }
-    // ==================== HO TRO BO LOC ====================
+
     public String chuanHoaSapXep(String sapXep) {
         if ("ten-giam".equals(sapXep)
                 || "gia-tang".equals(sapXep)
@@ -227,6 +226,7 @@ public class SanPhamService {
 
         return "ten-tang";
     }
+
     public List<String> layDanhSachThuongHieu(Integer maDanhMuc) {
         if (maDanhMuc == null || maDanhMuc <= 0) {
             return sanPhamRepository.layDanhSachThuongHieu();
@@ -245,6 +245,7 @@ public class SanPhamService {
         return gia.divide(BigDecimal.valueOf(1000), 0, RoundingMode.FLOOR)
                 .multiply(BigDecimal.valueOf(1000));
     }
+
     public BigDecimal layGiaThanhKeoToiDa() {
         BigDecimal gia = sanPhamRepository.layGiaCaoNhat();
 
@@ -274,8 +275,7 @@ public class SanPhamService {
             Long giaTu,
             Long giaDen,
             BigDecimal giaTuChon,
-            BigDecimal giaDenChon
-    ) {
+            BigDecimal giaDenChon) {
         boolean dangChon = bangNhau(giaTu, giaTuChon) && bangNhau(giaDen, giaDenChon);
 
         return new KhoangGiaNhanh(nhan, giaTu, giaDen, dangChon);
@@ -310,6 +310,7 @@ public class SanPhamService {
 
         return ketQua;
     }
+
     private String thoatKyTuLike(String giaTri) {
         return giaTri
                 .replace("\\", "\\\\")

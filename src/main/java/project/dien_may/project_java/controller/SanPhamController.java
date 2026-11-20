@@ -29,7 +29,6 @@ public class SanPhamController {
         return "redirect:/#product-list";
     }
 
-    // Chỉ trả về đường dẫn ảnh của các sản phẩm đã xem. Không thay đổi SQL.
     @GetMapping("/san-pham/anh-da-xem")
     @ResponseBody
     public Map<Integer, String> anhDaXem(@RequestParam(name = "maSanPham", required = false) List<Integer> maSanPham) {
@@ -38,7 +37,7 @@ public class SanPhamController {
 
     @GetMapping("/san-pham/{maSanPham}")
     public String chiTietSanPham(@PathVariable Integer maSanPham,
-                                 Model model, HttpServletResponse response) {
+            Model model, HttpServletResponse response) {
         Optional<SanPham> optional = chiTietSanPhamService.laySanPham(maSanPham);
         if (optional.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -47,7 +46,8 @@ public class SanPhamController {
         SanPham sanPham = optional.get();
         List<DanhGiaHienThi> danhGia = chiTietSanPhamService.layDanhGia(maSanPham);
         Map<Integer, Integer> soLuongTheoSao = new LinkedHashMap<>();
-        for (int soSao = 5; soSao >= 1; soSao--) soLuongTheoSao.put(soSao, 0);
+        for (int soSao = 5; soSao >= 1; soSao--)
+            soLuongTheoSao.put(soSao, 0);
         int tongDiem = 0;
         for (DanhGiaHienThi dg : danhGia) {
             if (dg.soSao() != null && soLuongTheoSao.containsKey(dg.soSao())) {

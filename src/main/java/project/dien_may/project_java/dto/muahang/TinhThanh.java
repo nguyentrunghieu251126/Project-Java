@@ -3,7 +3,6 @@ package project.dien_may.project_java.dto.muahang;
 import java.util.ArrayList;
 import java.util.List;
 
-/** TV3 – danh sách 34 tỉnh / thành phố (sau sắp xếp năm 2025), dùng cho ô "Tỉnh / Thành phố" của sổ địa chỉ. */
 public final class TinhThanh {
 
     public static final List<String> THANH_PHO = List.of(

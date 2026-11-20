@@ -12,7 +12,6 @@ import project.dien_may.project_java.service.admin.NghiepVuException;
 
 import java.security.Principal;
 
-/** TV4 – Nhân viên kho tiếp nhận và xử lý bảo hành (NVK11, NVK13), đổi trả (NVK12, NVK14). */
 @Controller
 @RequestMapping("/admin/kho")
 public class AdminBaoHanhDoiTraController {
@@ -25,11 +24,9 @@ public class AdminBaoHanhDoiTraController {
         this.service = service;
     }
 
-    // ===== Bảo hành =====
-
     @GetMapping("/bao-hanh")
     public String baoHanh(@RequestParam(required = false) TrangThaiBaoHanh trangThai,
-                          @RequestParam(defaultValue = "1") int trang, Model model) {
+            @RequestParam(defaultValue = "1") int trang, Model model) {
         model.addAttribute("trang", service.timBaoHanh(trangThai, PhanTrang.tao(trang, MOI_NHAT)));
         model.addAttribute("trangThai", trangThai);
         model.addAttribute("dsTrangThai", TrangThaiBaoHanh.values());
@@ -47,7 +44,7 @@ public class AdminBaoHanhDoiTraController {
 
     @PostMapping("/bao-hanh/{ma}/hoan-thanh")
     public String hoanThanhBaoHanh(@PathVariable Integer ma, @RequestParam(required = false) String ketQua,
-                                   Principal nguoiDung, RedirectAttributes redirect) {
+            Principal nguoiDung, RedirectAttributes redirect) {
         return thucHien(redirect, "redirect:/admin/kho/bao-hanh", () -> {
             service.hoanThanhBaoHanh(ma, nguoiDung.getName(), ketQua);
             return "Đã hoàn thành phiếu bảo hành #" + ma + ".";
@@ -56,18 +53,16 @@ public class AdminBaoHanhDoiTraController {
 
     @PostMapping("/bao-hanh/{ma}/tu-choi")
     public String tuChoiBaoHanh(@PathVariable Integer ma, @RequestParam(required = false) String ketQua,
-                                Principal nguoiDung, RedirectAttributes redirect) {
+            Principal nguoiDung, RedirectAttributes redirect) {
         return thucHien(redirect, "redirect:/admin/kho/bao-hanh", () -> {
             service.tuChoiBaoHanh(ma, nguoiDung.getName(), ketQua);
             return "Đã từ chối phiếu bảo hành #" + ma + ".";
         });
     }
 
-    // ===== Đổi trả =====
-
     @GetMapping("/doi-tra")
     public String doiTra(@RequestParam(required = false) TrangThaiDoiTra trangThai,
-                         @RequestParam(defaultValue = "1") int trang, Model model) {
+            @RequestParam(defaultValue = "1") int trang, Model model) {
         model.addAttribute("trang", service.timDoiTra(trangThai, PhanTrang.tao(trang, MOI_NHAT)));
         model.addAttribute("trangThai", trangThai);
         model.addAttribute("dsTrangThai", TrangThaiDoiTra.values());
@@ -85,7 +80,7 @@ public class AdminBaoHanhDoiTraController {
 
     @PostMapping("/doi-tra/{ma}/hoan-thanh")
     public String hoanThanhDoiTra(@PathVariable Integer ma, @RequestParam(required = false) String ketQua,
-                                  Principal nguoiDung, RedirectAttributes redirect) {
+            Principal nguoiDung, RedirectAttributes redirect) {
         return thucHien(redirect, "redirect:/admin/kho/doi-tra", () -> {
             service.hoanThanhDoiTra(ma, nguoiDung.getName(), ketQua);
             return "Đã hoàn thành phiếu đổi trả #" + ma + ".";
@@ -94,7 +89,7 @@ public class AdminBaoHanhDoiTraController {
 
     @PostMapping("/doi-tra/{ma}/tu-choi")
     public String tuChoiDoiTra(@PathVariable Integer ma, @RequestParam(required = false) String ketQua,
-                               Principal nguoiDung, RedirectAttributes redirect) {
+            Principal nguoiDung, RedirectAttributes redirect) {
         return thucHien(redirect, "redirect:/admin/kho/doi-tra", () -> {
             service.tuChoiDoiTra(ma, nguoiDung.getName(), ketQua);
             return "Đã từ chối phiếu đổi trả #" + ma + ".";

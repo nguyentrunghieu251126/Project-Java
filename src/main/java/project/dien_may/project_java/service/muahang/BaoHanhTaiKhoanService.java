@@ -13,7 +13,6 @@ import project.dien_may.project_java.entity.TrangThaiDonHang;
 import project.dien_may.project_java.repository.ChiTietDonHangRepository;
 import project.dien_may.project_java.repository.PhieuBaoHanhRepository;
 import project.dien_may.project_java.service.admin.NghiepVuException;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -22,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** TV3 – trang "Thông tin bảo hành" trong khu tài khoản: chỉ xem, không gửi yêu cầu. */
 @Service
 public class BaoHanhTaiKhoanService {
 
@@ -30,15 +28,13 @@ public class BaoHanhTaiKhoanService {
     public static final String HET_HAN_GAN_NHAT = "bao-hanh-gan-nhat";
     public static final String HET_HAN_XA_NHAT = "bao-hanh-xa-nhat";
     public static final int TOI_DA_KY_TU = 1000;
-
-    /** Phiếu chưa được nhân viên tiếp nhận thì không cho gửi thêm yêu cầu cho cùng sản phẩm. */
     private static final Set<TrangThaiBaoHanh> CHO_TIEP_NHAN = Set.of(TrangThaiBaoHanh.CHO_TIEP_NHAN);
 
     private final ChiTietDonHangRepository chiTietDonHangRepository;
     private final PhieuBaoHanhRepository phieuBaoHanhRepository;
 
     public BaoHanhTaiKhoanService(ChiTietDonHangRepository chiTietDonHangRepository,
-                                  PhieuBaoHanhRepository phieuBaoHanhRepository) {
+            PhieuBaoHanhRepository phieuBaoHanhRepository) {
         this.chiTietDonHangRepository = chiTietDonHangRepository;
         this.phieuBaoHanhRepository = phieuBaoHanhRepository;
     }
@@ -47,15 +43,11 @@ public class BaoHanhTaiKhoanService {
         return HET_HAN_GAN_NHAT.equals(sapXep) || HET_HAN_XA_NHAT.equals(sapXep) ? sapXep : MUA_GAN_NHAT;
     }
 
-    /**
-     * Sản phẩm thuộc các đơn đã giao của khách, lọc theo ngày mua (tuNgay / denNgay có thể null).
-     * Sắp xếp: mua gần nhất, ngày hết hạn bảo hành gần nhất hoặc xa nhất.
-     */
     @Transactional(readOnly = true)
     public List<ThongTinBaoHanh> danhSach(String email, LocalDate tuNgay, LocalDate denNgay, String sapXep) {
         List<PhieuBaoHanh> tatCaPhieu = phieuBaoHanhRepository
                 .findByChiTietDonHangDonHangTaiKhoanEmailIgnoreCaseOrderByNgayYeuCauDesc(email);
-        // Nạp sẵn nhân viên tiếp nhận để trang hiển thị tên, không phụ thuộc open-in-view.
+
         tatCaPhieu.forEach(p -> Hibernate.initialize(p.getNhanVien()));
         Map<Integer, List<PhieuBaoHanh>> phieuTheoSanPham = tatCaPhieu.stream()
                 .collect(Collectors.groupingBy(p -> p.getChiTietDonHang().getMaChiTietDonHang()));
@@ -73,10 +65,6 @@ public class BaoHanhTaiKhoanService {
                 .toList();
     }
 
-    /**
-     * Khách gửi yêu cầu bảo hành từ ô "Xem chi tiết". Tạo phiếu CHO_TIEP_NHAN trong bảng PhieuBaoHanh,
-     * nhân viên kho tiếp nhận / xử lý ở /admin/kho/bao-hanh. Hạn tính cả bảo hành mở rộng, khớp trang này.
-     */
     @Transactional
     public PhieuBaoHanh guiYeuCau(String email, Integer maChiTiet, String moTaLoi) {
         String moTa = moTaLoi == null ? "" : moTaLoi.trim();
@@ -87,7 +75,7 @@ public class BaoHanhTaiKhoanService {
             throw new NghiepVuException("Mô tả lỗi không được vượt quá " + TOI_DA_KY_TU + " ký tự.");
         }
         ChiTietDonHang ct = maChiTiet == null ? null : chiTietDonHangRepository.findById(maChiTiet).orElse(null);
-        // Chỉ sản phẩm thuộc đơn của chính khách đang đăng nhập (chặn sửa mã trên form).
+
         if (ct == null || !ct.getDonHang().getTaiKhoan().getEmail().equalsIgnoreCase(email)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
@@ -98,7 +86,7 @@ public class BaoHanhTaiKhoanService {
         if (!tt.conHan()) {
             throw new NghiepVuException("Sản phẩm " + tt.tenSanPham() + " đã hết hạn bảo hành.");
         }
-        // Chỉ chặn khi còn phiếu chờ tiếp nhận; phiếu đã được nhân viên tiếp nhận thì vẫn cho gửi yêu cầu mới.
+
         if (phieuBaoHanhRepository.existsByChiTietDonHangMaChiTietDonHangAndTrangThaiIn(maChiTiet, CHO_TIEP_NHAN)) {
             throw new NghiepVuException("Sản phẩm này đang có yêu cầu bảo hành chờ nhân viên tiếp nhận.");
         }
@@ -117,7 +105,6 @@ public class BaoHanhTaiKhoanService {
     private ThongTinBaoHanh chuyen(ChiTietDonHang ct, List<PhieuBaoHanh> lichSu) {
         var d = ct.getDonHang();
         var sp = ct.getSanPham();
-        // Đơn đã giao luôn có NgayGiao; phòng dữ liệu cũ thiếu thì lấy ngày đặt.
         LocalDateTime ngayNhan = d.getNgayGiao() != null ? d.getNgayGiao() : d.getNgayDat();
         int chinhHang = sp.getThoiGianBaoHanh() == null ? 0 : sp.getThoiGianBaoHanh();
         int moRong = sp.getThoiGianBaoHanhMoRong() == null ? 0 : sp.getThoiGianBaoHanhMoRong();

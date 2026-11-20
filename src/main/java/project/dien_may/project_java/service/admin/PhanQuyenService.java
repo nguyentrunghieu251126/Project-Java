@@ -13,7 +13,6 @@ import project.dien_may.project_java.repository.QuyenRepository;
 import project.dien_may.project_java.repository.TaiKhoanQuyenRepository;
 import project.dien_may.project_java.repository.TaiKhoanRepository;
 import project.dien_may.project_java.repository.VaiTroRepository;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -24,13 +23,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Quản trị viên mặc nhiên có mọi quyền. Nhân viên kho nhận quyền của vai trò (áp dụng cho toàn thể nhân viên),
- * sau đó từng người có thể được cấp thêm hoặc thu hồi riêng. Quyền của khách hàng không chỉnh ở đây.
- */
 @Service
 public class PhanQuyenService {
-
     private static final String VAI_TRO_QUAN_TRI = "QUAN_TRI";
     private static final String VAI_TRO_NHAN_VIEN = "NHAN_VIEN_KHO";
     private static final String QUYEN_TONG_QUAN = "TONGQUAN_XEM";
@@ -41,14 +35,13 @@ public class PhanQuyenService {
     private final TaiKhoanQuyenRepository taiKhoanQuyenRepository;
 
     public PhanQuyenService(VaiTroRepository vaiTroRepository, QuyenRepository quyenRepository,
-                            TaiKhoanRepository taiKhoanRepository, TaiKhoanQuyenRepository taiKhoanQuyenRepository) {
+            TaiKhoanRepository taiKhoanRepository, TaiKhoanQuyenRepository taiKhoanQuyenRepository) {
         this.vaiTroRepository = vaiTroRepository;
         this.quyenRepository = quyenRepository;
         this.taiKhoanRepository = taiKhoanRepository;
         this.taiKhoanQuyenRepository = taiKhoanQuyenRepository;
     }
 
-    /** Quyền gom theo nhóm chức năng, theo thứ tự MaQuyen; Tổng quan đứng đầu như trên menu. */
     @Transactional(readOnly = true)
     public Map<String, List<Quyen>> quyenTheoNhom() {
         return quyenRepository.findAll(Sort.by("maQuyen")).stream()
@@ -56,7 +49,6 @@ public class PhanQuyenService {
                 .collect(Collectors.groupingBy(Quyen::getNhomChucNang, LinkedHashMap::new, Collectors.toList()));
     }
 
-    /** Mã chức năng tài khoản này thực sự được dùng, sau khi áp dụng phần chỉnh riêng. */
     @Transactional(readOnly = true)
     public Set<String> quyenHieuLuc(TaiKhoan taiKhoan) {
         String tenVaiTro = taiKhoan.getVaiTro().getTenVaiTro();
@@ -81,7 +73,10 @@ public class PhanQuyenService {
         return maChucNang(vaiTroNhanVien().getDsQuyen());
     }
 
-    /** @param dsMaQuyen các quyền được tick; thay đổi có hiệu lực với mọi nhân viên, trừ phần đã chỉnh riêng */
+    /**
+     * @param dsMaQuyen các quyền được tick; thay đổi có hiệu lực với mọi nhân viên,
+     *                  trừ phần đã chỉnh riêng
+     */
     @Transactional
     public void capNhatToanTheNhanVien(Collection<Integer> dsMaQuyen) {
         Set<Quyen> moi = layQuyen(dsMaQuyen);
@@ -95,7 +90,10 @@ public class PhanQuyenService {
         return taiKhoanRepository.findByVaiTroTenVaiTroOrderByHoTenAsc(VAI_TRO_NHAN_VIEN);
     }
 
-    /** Chỉ nhân viên kho mới có phân quyền riêng; tài khoản khác coi như không tồn tại ở màn hình này. */
+    /**
+     * Chỉ nhân viên kho mới có phân quyền riêng; tài khoản khác coi như không tồn
+     * tại ở màn hình này.
+     */
     @Transactional(readOnly = true)
     public TaiKhoan nhanVien(Integer maTaiKhoan) {
         return taiKhoanRepository.findById(maTaiKhoan)
@@ -112,7 +110,8 @@ public class PhanQuyenService {
     }
 
     /**
-     * Chỉ lưu phần khác với quyền của vai trò, nên ô nào tick giống toàn thể thì người đó tiếp tục theo toàn thể.
+     * Chỉ lưu phần khác với quyền của vai trò, nên ô nào tick giống toàn thể thì
+     * người đó tiếp tục theo toàn thể.
      *
      * @param dsMaQuyen các quyền được tick cho nhân viên này
      */

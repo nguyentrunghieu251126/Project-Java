@@ -9,10 +9,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import project.dien_may.project_java.entity.PhieuXuat;
 import project.dien_may.project_java.service.admin.NghiepVuException;
 import project.dien_may.project_java.service.admin.XuLyDonHangService;
-
 import java.security.Principal;
 
-/** TV4 – Các nút xử lý trên trang chi tiết đơn hàng (NVK03 – NVK06). Quyền khai báo ở SecurityConfig. */
 @Controller
 @RequestMapping("/admin/kho/don-hang/{ma}")
 public class AdminXuLyDonHangController {
@@ -33,7 +31,7 @@ public class AdminXuLyDonHangController {
 
     @PostMapping("/xuat-kho")
     public String xuatKho(@PathVariable Integer ma, @RequestParam(required = false) String ghiChu,
-                          Principal nguoiDung, RedirectAttributes redirect) {
+            Principal nguoiDung, RedirectAttributes redirect) {
         return thucHien(ma, redirect, () -> {
             PhieuXuat phieu = xuLyDonHangService.xuatKho(ma, nguoiDung.getName(), ghiChu);
             return "Đã lập phiếu xuất #" + phieu.getMaPhieuXuat() + " cho đơn hàng #" + ma + ".";
@@ -56,7 +54,6 @@ public class AdminXuLyDonHangController {
         });
     }
 
-    /** Gom phần bắt lỗi nghiệp vụ dùng chung cho các nút. */
     private String thucHien(Integer ma, RedirectAttributes redirect, ThaoTac thaoTac) {
         try {
             redirect.addFlashAttribute("thongBao", thaoTac.chay());

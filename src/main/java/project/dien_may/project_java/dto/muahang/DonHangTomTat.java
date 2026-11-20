@@ -5,12 +5,9 @@ import project.dien_may.project_java.entity.DonHang;
 
 import java.util.List;
 
-/** TV3 – KH19: một thẻ đơn hàng trong lịch sử mua hàng (hiện tối đa 2 sản phẩm đầu). */
 public record DonHangTomTat(DonHang donHang, List<ChiTietDonHang> chiTiet) {
-
     public static final int SO_DONG_XEM_TRUOC = 2;
 
-    /** Mã hiển thị dạng DH000031. */
     public String maHien() {
         return String.format("DH%06d", donHang.getMaDonHang());
     }

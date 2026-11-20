@@ -3,7 +3,6 @@ package project.dien_may.project_java.entity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/** "Sắp hết" là còn hàng nhưng dưới MucTonToiThieu. */
 @Getter
 @RequiredArgsConstructor
 public enum TinhTrangTonKho {

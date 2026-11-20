@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import project.dien_may.project_java.entity.SanPham;
 import project.dien_may.project_java.service.SoSanhSanPhamService;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,14 +21,15 @@ public class SoSanhSanPhamController {
 
     @GetMapping("/so-sanh")
     public String soSanh(@RequestParam(name = "maSanPham", required = false) List<Integer> maSanPham,
-                         Model model) {
+            Model model) {
         var kq = soSanhSanPhamService.layDuLieu(maSanPham);
         List<Integer> ids = kq.sanPhamDaChon().stream().map(SanPham::getMaSanPham).toList();
         Map<Integer, String> themLink = new LinkedHashMap<>();
         Map<Integer, String> xoaLink = new LinkedHashMap<>();
         for (SanPham sp : kq.sanPhamDeXuat()) {
             List<Integer> ds = new ArrayList<>(ids);
-            if (ds.size() < 3) ds.add(sp.getMaSanPham());
+            if (ds.size() < 3)
+                ds.add(sp.getMaSanPham());
             themLink.put(sp.getMaSanPham(), duongDan(ds));
         }
         for (Integer id : ids) {
@@ -40,8 +40,6 @@ public class SoSanhSanPhamController {
         model.addAttribute("sanPhamDaChon", kq.sanPhamDaChon());
         model.addAttribute("sanPhamDeXuat", kq.sanPhamDeXuat());
         model.addAttribute("tenThongSo", kq.tenThongSo());
-        // KH10: moi hang co dung 2-3 gia tri theo thu tu sanPhamDaChon.
-        // View khong can truy cap Map hai tang bang bieu thuc Thymeleaf.
         List<List<String>> giaTriTheoDong = new ArrayList<>();
         for (String ten : kq.tenThongSo()) {
             List<String> giaTri = new ArrayList<>();
@@ -63,10 +61,12 @@ public class SoSanhSanPhamController {
     }
 
     private String duongDan(List<Integer> ids) {
-        if (ids.isEmpty()) return "/so-sanh";
+        if (ids.isEmpty())
+            return "/so-sanh";
         StringBuilder url = new StringBuilder("/so-sanh?");
         for (Integer id : ids) {
-            if (url.charAt(url.length() - 1) != '?') url.append('&');
+            if (url.charAt(url.length() - 1) != '?')
+                url.append('&');
             url.append("maSanPham=").append(id);
         }
         return url.toString();

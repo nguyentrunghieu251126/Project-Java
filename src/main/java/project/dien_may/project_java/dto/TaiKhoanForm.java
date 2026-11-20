@@ -33,9 +33,7 @@ public class TaiKhoanForm {
     @NotNull(message = "Vui lòng chọn vai trò.")
     private Integer maVaiTro;
 
-    /** Bắt buộc khi thêm mới; khi sửa, để trống nghĩa là giữ nguyên mật khẩu. */
-    @Pattern(regexp = "^$|^[\\x21-\\x7E]{8,72}$",
-            message = "Mật khẩu phải có từ 8 đến 72 ký tự, không dấu và không có khoảng trắng.")
+    @Pattern(regexp = "^$|^[\\x21-\\x7E]{8,72}$", message = "Mật khẩu phải có từ 8 đến 72 ký tự, không dấu và không có khoảng trắng.")
     private String matKhau;
 
     public static TaiKhoanForm tu(TaiKhoan tk) {

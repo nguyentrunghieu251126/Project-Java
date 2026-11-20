@@ -6,7 +6,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-/** Khớp ràng buộc CK_CTPN_Tien: ThanhTien = SoLuongNhap * DonGiaNhap. */
 @Entity
 @Table(name = "ChiTietPhieuNhap", schema = "dbo")
 @Getter

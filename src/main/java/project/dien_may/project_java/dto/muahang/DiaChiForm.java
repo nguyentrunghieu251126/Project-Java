@@ -7,12 +7,10 @@ import lombok.Getter;
 import lombok.Setter;
 import project.dien_may.project_java.entity.SoDiaChi;
 
-/** TV3 – form thêm / sửa địa chỉ trong sổ địa chỉ. */
 @Getter
 @Setter
 public class DiaChiForm {
 
-    /** null khi thêm mới. */
     private Integer maDiaChi;
 
     @NotBlank(message = "Vui lòng nhập họ tên người nhận.")

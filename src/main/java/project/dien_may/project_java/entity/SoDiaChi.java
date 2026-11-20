@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/** TV3 – sổ địa chỉ giao hàng của khách (bảng SoDiaChi, ý tưởng từ Project-Website). */
 @Entity
 @Table(name = "SoDiaChi", schema = "dbo")
 @Getter
@@ -33,11 +32,9 @@ public class SoDiaChi {
     @Column(name = "SoDienThoai", nullable = false, length = 15)
     private String soDienThoai;
 
-    /** Tỉnh / thành phố. */
     @Column(name = "KhuVuc", nullable = false, length = 50)
     private String khuVuc;
 
-    /** Số nhà, đường, phường / xã. */
     @Column(name = "DiaChiChiTiet", nullable = false, length = 200)
     private String diaChiChiTiet;
 
@@ -50,12 +47,10 @@ public class SoDiaChi {
     @Column(name = "NgayTao", nullable = false)
     private LocalDateTime ngayTao;
 
-    /** Địa chỉ đầy đủ, lưu vào DonHang.DiaChiGiaoHang khi đặt hàng. */
     public String getDiaChiDayDu() {
         return diaChiChiTiet + ", " + khuVuc;
     }
 
-    /** Thời gian giao dự kiến: càng xa cửa hàng (TP.HCM) càng lâu. */
     public ThoiGianGiaoHang getGiaoHang() {
         return ThoiGianGiaoHang.theoKhuVuc(khuVuc);
     }

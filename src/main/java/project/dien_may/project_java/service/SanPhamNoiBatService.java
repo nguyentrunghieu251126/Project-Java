@@ -15,19 +15,23 @@ public class SanPhamNoiBatService {
     private final ChiTietSanPhamService chiTietSanPhamService;
     private final DanhGiaRepository danhGiaRepository;
 
-    private record ThongKeDanhGia(long soLuot, String diem) {}
+    private record ThongKeDanhGia(long soLuot, String diem) {
+    }
 
-    public SanPhamNoiBatService(SanPhamRepository sanPhamRepository, ChiTietSanPhamService chiTietSanPhamService, DanhGiaRepository danhGiaRepository) {
+    public SanPhamNoiBatService(SanPhamRepository sanPhamRepository, ChiTietSanPhamService chiTietSanPhamService,
+            DanhGiaRepository danhGiaRepository) {
         this.sanPhamRepository = sanPhamRepository;
         this.chiTietSanPhamService = chiTietSanPhamService;
         this.danhGiaRepository = danhGiaRepository;
     }
+
     @Transactional(readOnly = true)
     public List<SanPhamNoiBat> laySanPhamNoiBat() {
         List<SanPham> danhSach = sanPhamRepository.findTop10ByDangKinhDoanhTrueOrderByMaSanPhamDesc();
         Map<Integer, ThongKeDanhGia> thongKe = layThongKeDanhGia(danhSach);
         return danhSach.stream().map(sp -> chuyenThanhThe(sp, false, thongKe)).toList();
     }
+
     @Transactional(readOnly = true)
     public List<SanPhamNoiBat> laySanPhamBanChay() {
         List<Integer> maBanChay = sanPhamRepository.layMaSanPhamBanChay();
@@ -48,8 +52,10 @@ public class SanPhamNoiBatService {
         }
         if (ketQua.size() < 10) {
             for (SanPham sp : sanPhamRepository.findTop10ByDangKinhDoanhTrueOrderByMaSanPhamDesc()) {
-                if (daThem.add(sp.getMaSanPham())) ketQua.add(sp);
-                if (ketQua.size() == 10) break;
+                if (daThem.add(sp.getMaSanPham()))
+                    ketQua.add(sp);
+                if (ketQua.size() == 10)
+                    break;
             }
         }
         Map<Integer, ThongKeDanhGia> thongKe = layThongKeDanhGia(ketQua);
@@ -58,11 +64,13 @@ public class SanPhamNoiBatService {
     }
 
     private Map<Integer, ThongKeDanhGia> layThongKeDanhGia(List<SanPham> sanPham) {
-        if (sanPham.isEmpty()) return Collections.emptyMap();
+        if (sanPham.isEmpty())
+            return Collections.emptyMap();
         List<Integer> maSanPham = sanPham.stream().map(SanPham::getMaSanPham).toList();
         Map<Integer, ThongKeDanhGia> ketQua = new HashMap<>();
         for (Object[] hang : danhGiaRepository.thongKeDanhGiaTheoSanPham(maSanPham)) {
-            if (hang[0] == null || hang[1] == null || hang[2] == null) continue;
+            if (hang[0] == null || hang[1] == null || hang[2] == null)
+                continue;
             int ma = ((Number) hang[0]).intValue();
             long soLuot = ((Number) hang[1]).longValue();
             double diem = ((Number) hang[2]).doubleValue();

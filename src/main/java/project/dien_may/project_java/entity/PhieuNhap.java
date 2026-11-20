@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/** NVK10: Phiếu nhập kho, lập cho yêu cầu nhập hàng đã được quản trị viên duyệt. */
 @Entity
 @Table(name = "PhieuNhap", schema = "dbo")
 @Getter
@@ -25,7 +24,6 @@ public class PhieuNhap {
     @JoinColumn(name = "MaYeuCauNhap", nullable = false)
     private YeuCauNhapHang yeuCau;
 
-    /** Nhân viên kho lập phiếu. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaTaiKhoan", nullable = false)
     private TaiKhoan taiKhoan;
@@ -39,7 +37,6 @@ public class PhieuNhap {
     @Column(name = "GhiChu", length = 500)
     private String ghiChu;
 
-    /** Quan hệ một – nhiều: một phiếu nhập có nhiều dòng sản phẩm. */
     @OneToMany(mappedBy = "phieuNhap", cascade = CascadeType.ALL)
     private List<ChiTietPhieuNhap> chiTiet = new ArrayList<>();
 }

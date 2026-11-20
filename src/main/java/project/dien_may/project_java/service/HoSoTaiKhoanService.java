@@ -18,8 +18,8 @@ public class HoSoTaiKhoanService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Chi tra ve cac cot can hien thi; khong dua MatKhau ra view.
-    public record ThongTinHoSo(String hoTen, String email, String soDienThoai, String diaChi) { }
+    public record ThongTinHoSo(String hoTen, String email, String soDienThoai, String diaChi) {
+    }
 
     public enum KetQuaDoiMatKhau {
         THANH_CONG, MAT_KHAU_HIEN_TAI_SAI, TRUNG_MAT_KHAU_CU
@@ -42,7 +42,7 @@ public class HoSoTaiKhoanService {
 
     @Transactional
     public KetQuaDoiMatKhau doiMatKhau(String emailDangNhap,
-                                      String matKhauHienTai, String matKhauMoi) {
+            String matKhauHienTai, String matKhauMoi) {
         TaiKhoan tk = taiKhoanHienTai(emailDangNhap);
         if (!passwordEncoder.matches(matKhauHienTai, tk.getMatKhau())) {
             return KetQuaDoiMatKhau.MAT_KHAU_HIEN_TAI_SAI;

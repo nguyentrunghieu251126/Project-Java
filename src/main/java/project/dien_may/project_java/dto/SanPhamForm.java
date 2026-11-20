@@ -17,15 +17,10 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class SanPhamForm {
-
     private Integer maSanPham;
-
-    /** Phiên bản lúc mở form, để phát hiện người khác đã sửa trong lúc đang nhập. */
     private Integer phienBan;
-
     @NotBlank(message = "Vui lòng nhập mã model.")
     @Size(max = 50, message = "Mã model không được vượt quá 50 ký tự.")
-    // Cột VARCHAR: chỉ nhận ký tự ASCII để không bị mất dấu khi lưu
     @Pattern(regexp = "^$|^[\\x21-\\x7E]+$", message = "Mã model không dấu và không có khoảng trắng.")
     private String maModel;
 
@@ -44,8 +39,6 @@ public class SanPhamForm {
     @DecimalMin(value = "0", message = "Đơn giá không được âm.")
     @Digits(integer = 15, fraction = 0, message = "Đơn giá phải là số nguyên, tối đa 15 chữ số.")
     private BigDecimal donGia;
-
-    /** Chỉ dùng khi thêm mới; sau đó tồn kho chỉ thay đổi qua phiếu nhập, phiếu xuất. */
     @Min(value = 0, message = "Số lượng không được âm.")
     @Max(value = 1000000, message = "Số lượng không được vượt quá 1.000.000.")
     private int soLuong;

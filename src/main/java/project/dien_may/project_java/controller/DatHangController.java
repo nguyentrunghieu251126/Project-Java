@@ -16,15 +16,10 @@ import project.dien_may.project_java.service.admin.NghiepVuException;
 import project.dien_may.project_java.service.muahang.DatHangService;
 import project.dien_may.project_java.service.muahang.DonHangKhachHangService;
 import project.dien_may.project_java.service.muahang.SoDiaChiService;
-
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * TV3 – KH12 – KH15: trang thanh toán, đặt hàng, trang đặt hàng thành công.
- * Địa chỉ nhận hàng chọn từ sổ địa chỉ (SoDiaChi); thêm / sửa / xóa địa chỉ ở DiaChiController.
- */
 @Controller
 @RequestMapping("/dat-hang")
 public class DatHangController {
@@ -37,17 +32,16 @@ public class DatHangController {
     private final SoDiaChiService soDiaChiService;
 
     public DatHangController(DatHangService datHangService, DonHangKhachHangService donHangService,
-                             SoDiaChiService soDiaChiService) {
+            SoDiaChiService soDiaChiService) {
         this.datHangService = datHangService;
         this.donHangService = donHangService;
         this.soDiaChiService = soDiaChiService;
     }
 
-    /** diaChi: địa chỉ vừa thêm / sửa ở trang Sổ địa chỉ thì chọn sẵn. */
     @GetMapping
     public String trangThanhToan(@RequestParam(name = "sanPham", required = false) List<Integer> dsChon,
-                                 @RequestParam(name = "diaChi", required = false) Integer maDiaChi,
-                                 Principal principal, Model model, RedirectAttributes redirect) {
+            @RequestParam(name = "diaChi", required = false) Integer maDiaChi,
+            Principal principal, Model model, RedirectAttributes redirect) {
         DatHangForm form = new DatHangForm();
         if (dsChon != null) {
             form.setSanPham(dsChon);
@@ -64,10 +58,9 @@ public class DatHangController {
 
     @PostMapping
     public String datHang(@Valid @ModelAttribute("datHangForm") DatHangForm form, BindingResult ketQua,
-                          Principal principal, Model model) {
+            Principal principal, Model model) {
         if (!ketQua.hasErrors()) {
             try {
-                // Người nhận lấy từ địa chỉ trong sổ (chỉ địa chỉ của chính khách)
                 SoDiaChi dc = soDiaChiService.timCuaKhach(principal.getName(), form.getMaDiaChi());
                 form.setHoTenNguoiNhan(dc.getTenNguoiNhan());
                 form.setSoDienThoaiNguoiNhan(dc.getSoDienThoai());
@@ -81,7 +74,6 @@ public class DatHangController {
                 model.addAttribute("loi", "Không thể đặt hàng lúc này. Vui lòng thử lại sau.");
             }
         }
-        // Lỗi: dữ liệu đã được rollback, nạp lại giỏ để hiển thị đúng tồn kho mới nhất
         return hienTrang(model, principal,
                 datHangService.layTrangThanhToan(principal.getName(), form.getSanPham()), form);
     }
@@ -97,13 +89,11 @@ public class DatHangController {
         boolean hopLe = form.getMaDiaChi() != null
                 && dsDiaChi.stream().anyMatch(d -> d.getMaDiaChi().equals(form.getMaDiaChi()));
         if (!hopLe) {
-            // Chưa chọn (hoặc địa chỉ vừa bị xóa): chọn địa chỉ mặc định, đã xếp đầu danh sách
             form.setMaDiaChi(dsDiaChi.isEmpty() ? null : dsDiaChi.get(0).getMaDiaChi());
         }
         model.addAttribute("trang", trang);
         model.addAttribute("datHangForm", form);
         model.addAttribute("dsDiaChi", dsDiaChi);
-        // Trang Sổ địa chỉ lưu xong sẽ quay lại đúng trang thanh toán này
         model.addAttribute("urlQuayLai", "/dat-hang?" + form.getSanPham().stream()
                 .map(ma -> "sanPham=" + ma).collect(Collectors.joining("&")));
         return VIEW;

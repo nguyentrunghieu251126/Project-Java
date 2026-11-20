@@ -21,7 +21,6 @@ import project.dien_may.project_java.repository.SanPhamRepository;
 import project.dien_may.project_java.service.admin.NghiepVuException;
 import project.dien_may.project_java.service.admin.SanPhamAdminService;
 
-/** Quản lý sản phẩm (QT03 – QT06). */
 @Controller
 @RequestMapping("/admin/san-pham")
 public class AdminSanPhamController {
@@ -34,7 +33,7 @@ public class AdminSanPhamController {
     private final DanhMucRepository danhMucRepository;
 
     public AdminSanPhamController(SanPhamAdminService sanPhamService, SanPhamRepository sanPhamRepository,
-                                  DanhMucRepository danhMucRepository) {
+            DanhMucRepository danhMucRepository) {
         this.sanPhamService = sanPhamService;
         this.sanPhamRepository = sanPhamRepository;
         this.danhMucRepository = danhMucRepository;
@@ -42,12 +41,12 @@ public class AdminSanPhamController {
 
     @GetMapping
     public String danhSach(@RequestParam(required = false) String tuKhoa,
-                           @RequestParam(required = false) Integer maDanhMuc,
-                           @RequestParam(required = false) String thuongHieu,
-                           @RequestParam(required = false) Boolean dangKinhDoanh,
-                           @RequestParam(required = false) TinhTrangTonKho tinhTrang,
-                           @RequestParam(defaultValue = "1") int trang,
-                           Model model) {
+            @RequestParam(required = false) Integer maDanhMuc,
+            @RequestParam(required = false) String thuongHieu,
+            @RequestParam(required = false) Boolean dangKinhDoanh,
+            @RequestParam(required = false) TinhTrangTonKho tinhTrang,
+            @RequestParam(defaultValue = "1") int trang,
+            Model model) {
         model.addAttribute("trang", sanPhamRepository.timKiem(tuKhoa, maDanhMuc, thuongHieu, dangKinhDoanh,
                 tinhTrang == null ? null : tinhTrang.name(),
                 PhanTrang.tao(trang, Sort.by(Sort.Direction.DESC, "maSanPham"))));
@@ -69,7 +68,7 @@ public class AdminSanPhamController {
 
     @PostMapping("/them")
     public String them(@Valid @ModelAttribute("form") SanPhamForm form, BindingResult ketQua, Model model,
-                       RedirectAttributes redirect) {
+            RedirectAttributes redirect) {
         form.setMaSanPham(null);
         sanPhamService.kiemTraTrung(form, ketQua);
         if (ketQua.hasErrors()) {
@@ -91,7 +90,7 @@ public class AdminSanPhamController {
 
     @PostMapping("/{ma}/sua")
     public String sua(@PathVariable Integer ma, @Valid @ModelAttribute("form") SanPhamForm form, BindingResult ketQua,
-                      Model model, RedirectAttributes redirect) {
+            Model model, RedirectAttributes redirect) {
         form.setMaSanPham(ma);
         sanPhamService.kiemTraTrung(form, ketQua);
         if (ketQua.hasErrors()) {

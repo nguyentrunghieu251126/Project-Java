@@ -3,7 +3,6 @@ package project.dien_may.project_java.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/** KH07: Chỉ đọc đánh giá hiện có; TV3 quản lý nghiệp vụ gửi đánh giá (KH22). */
 @Entity
 @Table(name = "DanhGia", schema = "dbo")
 public class DanhGia {
@@ -29,12 +28,30 @@ public class DanhGia {
     @Column(name = "NgayDanhGia", nullable = false, insertable = false, updatable = false)
     private LocalDateTime ngayDanhGia;
 
-    protected DanhGia() { }
+    protected DanhGia() {
+    }
 
-    public Integer getMaDanhGia() { return maDanhGia; }
-    public TaiKhoan getTaiKhoan() { return taiKhoan; }
-    public SanPham getSanPham() { return sanPham; }
-    public Integer getSoSao() { return soSao == null ? null : soSao.intValue(); }
-    public String getNoiDungDanhGia() { return noiDungDanhGia; }
-    public LocalDateTime getNgayDanhGia() { return ngayDanhGia; }
+    public Integer getMaDanhGia() {
+        return maDanhGia;
+    }
+
+    public TaiKhoan getTaiKhoan() {
+        return taiKhoan;
+    }
+
+    public SanPham getSanPham() {
+        return sanPham;
+    }
+
+    public Integer getSoSao() {
+        return soSao == null ? null : soSao.intValue();
+    }
+
+    public String getNoiDungDanhGia() {
+        return noiDungDanhGia;
+    }
+
+    public LocalDateTime getNgayDanhGia() {
+        return ngayDanhGia;
+    }
 }

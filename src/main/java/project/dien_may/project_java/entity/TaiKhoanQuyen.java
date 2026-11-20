@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Phần chỉnh riêng cho một nhân viên so với quyền của vai trò: cấp thêm hoặc thu hồi một quyền. */
 @Entity
 @Table(name = "TaiKhoan_Quyen", schema = "dbo")
 @Getter
@@ -26,7 +25,6 @@ public class TaiKhoanQuyen {
     @JoinColumn(name = "MaQuyen", nullable = false)
     private Quyen quyen;
 
-    /** true là cấp thêm, false là thu hồi. */
     @Column(name = "DuocCap", nullable = false)
     private boolean duocCap;
 

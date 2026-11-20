@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.util.UriComponentsBuilder;
 import project.dien_may.project_java.entity.TaiKhoan;
 import project.dien_may.project_java.repository.TaiKhoanRepository;
-
 import java.security.Principal;
 
-/** Phần dùng chung cho mọi trang khu quản lý. */
 @ControllerAdvice(basePackageClasses = AdminControllerAdvice.class)
 public class AdminControllerAdvice {
 
@@ -22,7 +20,6 @@ public class AdminControllerAdvice {
         this.taiKhoanRepository = taiKhoanRepository;
     }
 
-    /** Cắt khoảng trắng; chuỗi rỗng thành null, nên ô lọc để trống nghĩa là không lọc. */
     @InitBinder
     public void catKhoangTrang(WebDataBinder binder) {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
@@ -30,17 +27,18 @@ public class AdminControllerAdvice {
 
     @ModelAttribute("hoTenNguoiDung")
     public String hoTenNguoiDung(Principal principal) {
-        return principal == null ? "" : taiKhoanRepository.findByEmailIgnoreCase(principal.getName())
-                .map(TaiKhoan::getHoTen).orElse(principal.getName());
+        return principal == null ? ""
+                : taiKhoanRepository.findByEmailIgnoreCase(principal.getName())
+                        .map(TaiKhoan::getHoTen).orElse(principal.getName());
     }
 
     @ModelAttribute("tenVaiTro")
     public String tenVaiTro(Principal principal) {
-        return principal == null ? "" : taiKhoanRepository.findByEmailIgnoreCase(principal.getName())
-                .map(taiKhoan -> taiKhoan.getVaiTro().getTenHienThi()).orElse("");
+        return principal == null ? ""
+                : taiKhoanRepository.findByEmailIgnoreCase(principal.getName())
+                        .map(taiKhoan -> taiKhoan.getVaiTro().getTenHienThi()).orElse("");
     }
 
-    /** URL trang hiện tại giữ nguyên bộ lọc, chỉ cần nối thêm số trang vào cuối. */
     @ModelAttribute("urlPhanTrang")
     public String urlPhanTrang(HttpServletRequest request) {
         String url = UriComponentsBuilder.newInstance()

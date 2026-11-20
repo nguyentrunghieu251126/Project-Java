@@ -3,7 +3,6 @@ package project.dien_may.project_java.entity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/** Tình trạng hiển thị của khuyến mãi, suy ra từ cờ TrangThai, ngày hiệu lực và số lượt. */
 @Getter
 @RequiredArgsConstructor
 public enum TinhTrangKhuyenMai {

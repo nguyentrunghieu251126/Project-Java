@@ -18,10 +18,8 @@ import project.dien_may.project_java.repository.TaiKhoanRepository;
 import project.dien_may.project_java.repository.VaiTroRepository;
 import project.dien_may.project_java.service.admin.NghiepVuException;
 import project.dien_may.project_java.service.admin.TaiKhoanAdminService;
-
 import java.security.Principal;
 
-/** Quản lý tài khoản người dùng (QT12 – QT15). */
 @Controller
 @RequestMapping("/admin/tai-khoan")
 public class AdminTaiKhoanController {
@@ -34,7 +32,7 @@ public class AdminTaiKhoanController {
     private final VaiTroRepository vaiTroRepository;
 
     public AdminTaiKhoanController(TaiKhoanAdminService taiKhoanService, TaiKhoanRepository taiKhoanRepository,
-                                   VaiTroRepository vaiTroRepository) {
+            VaiTroRepository vaiTroRepository) {
         this.taiKhoanService = taiKhoanService;
         this.taiKhoanRepository = taiKhoanRepository;
         this.vaiTroRepository = vaiTroRepository;
@@ -42,10 +40,10 @@ public class AdminTaiKhoanController {
 
     @GetMapping
     public String danhSach(@RequestParam(required = false) String tuKhoa,
-                           @RequestParam(required = false) Integer maVaiTro,
-                           @RequestParam(required = false) Boolean trangThai,
-                           @RequestParam(defaultValue = "1") int trang,
-                           Principal nguoiDung, Model model) {
+            @RequestParam(required = false) Integer maVaiTro,
+            @RequestParam(required = false) Boolean trangThai,
+            @RequestParam(defaultValue = "1") int trang,
+            Principal nguoiDung, Model model) {
         model.addAttribute("trang", taiKhoanRepository.timKiem(tuKhoa, maVaiTro, trangThai,
                 PhanTrang.tao(trang, Sort.by("maTaiKhoan"))));
         model.addAttribute("tuKhoa", tuKhoa);
@@ -63,7 +61,7 @@ public class AdminTaiKhoanController {
 
     @PostMapping("/them")
     public String them(@Valid @ModelAttribute("form") TaiKhoanForm form, BindingResult ketQua, Principal nguoiDung,
-                       Model model, RedirectAttributes redirect) {
+            Model model, RedirectAttributes redirect) {
         form.setMaTaiKhoan(null);
         taiKhoanService.kiemTra(form, ketQua);
         if (ketQua.hasErrors()) {
@@ -85,7 +83,7 @@ public class AdminTaiKhoanController {
 
     @PostMapping("/{ma}/sua")
     public String sua(@PathVariable Integer ma, @Valid @ModelAttribute("form") TaiKhoanForm form, BindingResult ketQua,
-                      Principal nguoiDung, Model model, RedirectAttributes redirect) {
+            Principal nguoiDung, Model model, RedirectAttributes redirect) {
         form.setMaTaiKhoan(ma);
         taiKhoanService.kiemTra(form, ketQua);
         if (ketQua.hasErrors()) {
@@ -119,7 +117,8 @@ public class AdminTaiKhoanController {
         } catch (NghiepVuException e) {
             redirect.addFlashAttribute("loi", e.getMessage());
         } catch (DataIntegrityViolationException e) {
-            redirect.addFlashAttribute("loi", "Không thể xóa tài khoản vì đang có dữ liệu liên quan. Hãy khóa tài khoản này.");
+            redirect.addFlashAttribute("loi",
+                    "Không thể xóa tài khoản vì đang có dữ liệu liên quan. Hãy khóa tài khoản này.");
         }
         return VE_DANH_SACH;
     }

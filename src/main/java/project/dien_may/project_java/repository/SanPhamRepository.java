@@ -18,129 +18,117 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SanPhamRepository
-        extends JpaRepository<SanPham, Integer>, JpaSpecificationExecutor<SanPham> {
+                extends JpaRepository<SanPham, Integer>, JpaSpecificationExecutor<SanPham> {
+        List<SanPham> findByDangKinhDoanhTrue();
 
-    // Lay danh sach san pham dang kinh doanh
-    List<SanPham> findByDangKinhDoanhTrue();
-    // Lay san pham co phan trang va sap xep
-    Page<SanPham> findByDangKinhDoanhTrue(Pageable pageable);
-    // Lay san pham theo danh muc
-    List<SanPham> findByDanhMuc_MaDanhMucAndDangKinhDoanhTrue(
-            Integer maDanhMuc
-    );
-    // Tim kiem san pham theo ten
-    List<SanPham> findByTenSanPhamContainingIgnoreCaseAndDangKinhDoanhTrue(
-            String tenSanPham
-    );
-    // Lay san pham theo danh muc, co phan trang va sap xep
-    Page<SanPham> findByDanhMuc_MaDanhMucAndDangKinhDoanhTrue(
-            Integer maDanhMuc,
-            Pageable pageable
-    );
-    // KH07: Goi y san pham cung danh muc, khong bao gom san pham dang xem.
-    List<SanPham> findTop6ByDanhMuc_MaDanhMucAndDangKinhDoanhTrueAndMaSanPhamNotOrderByMaSanPhamAsc(Integer maDanhMuc, Integer maSanPham);
-    // TV2: san pham moi dua vao danh sach (khong suy dien ngay ra mat tu ma san pham).
-    List<SanPham> findTop5ByDangKinhDoanhTrueOrderByMaSanPhamDesc();
-    // TV2: bo sung san pham de xuat neu doanh so thuc te chua du 4.
-    List<SanPham> findTop4ByDangKinhDoanhTrueOrderByMaSanPhamDesc();
-    // Trang chủ: tối đa 10 sản phẩm đang kinh doanh cho mỗi carousel.
-    List<SanPham> findTop10ByDangKinhDoanhTrueOrderByMaSanPhamDesc();
-    @Query(value = "SELECT TOP (10) ct.MaSanPham "
-            + "FROM dbo.ChiTietDonHang ct "
-            + "JOIN dbo.DonHang dh ON dh.MaDonHang = ct.MaDonHang "
-            + "JOIN dbo.SanPham sp ON sp.MaSanPham = ct.MaSanPham "
-            + "WHERE dh.TrangThaiDonHang = 'DA_GIAO' AND sp.DangKinhDoanh = 1 "
-            + "GROUP BY ct.MaSanPham "
-            + "ORDER BY SUM(ct.SoLuong) DESC, ct.MaSanPham ASC", nativeQuery = true)
-    List<Integer> layMaSanPhamBanChay();
+        Page<SanPham> findByDangKinhDoanhTrue(Pageable pageable);
 
-    // KH09 - Danh sach thuong hieu (khong trung) cua san pham dang kinh doanh
-    @Query("SELECT DISTINCT sp.thuongHieu FROM SanPham sp " + "WHERE sp.dangKinhDoanh = true ORDER BY sp.thuongHieu")
-    List<String> layDanhSachThuongHieu();
+        List<SanPham> findByDanhMuc_MaDanhMucAndDangKinhDoanhTrue(
+                        Integer maDanhMuc);
 
-    // KH09 - Thuong hieu (khong trung) trong mot danh muc, dung khi dang chon danh muc
-    @Query("SELECT DISTINCT sp.thuongHieu FROM SanPham sp "
-            + "WHERE sp.dangKinhDoanh = true AND sp.danhMuc.maDanhMuc = :maDanhMuc "
-            + "ORDER BY sp.thuongHieu")
-    List<String> layDanhSachThuongHieuTheoDanhMuc(@Param("maDanhMuc") Integer maDanhMuc);
+        List<SanPham> findByTenSanPhamContainingIgnoreCaseAndDangKinhDoanhTrue(
+                        String tenSanPham);
 
-    // KH09 - Gia thap nhat va cao nhat thuc te, dung lam gioi han thanh keo gia
-    @Query("SELECT MIN(sp.donGia) FROM SanPham sp WHERE sp.dangKinhDoanh = true")
-    BigDecimal layGiaThapNhat();
+        Page<SanPham> findByDanhMuc_MaDanhMucAndDangKinhDoanhTrue(
+                        Integer maDanhMuc,
+                        Pageable pageable);
 
-    @Query("SELECT MAX(sp.donGia) FROM SanPham sp WHERE sp.dangKinhDoanh = true")
-    BigDecimal layGiaCaoNhat();
+        List<SanPham> findTop6ByDanhMuc_MaDanhMucAndDangKinhDoanhTrueAndMaSanPhamNotOrderByMaSanPhamAsc(
+                        Integer maDanhMuc, Integer maSanPham);
 
-    // ===== Khu quản trị =====
+        List<SanPham> findTop5ByDangKinhDoanhTrueOrderByMaSanPhamDesc();
 
-    /** Bộ lọc nào truyền null thì bỏ qua. tinhTrang nhận tên của TinhTrangTonKho. */
-    @EntityGraph(attributePaths = "danhMuc")
-    @Query("""
-            SELECT s FROM SanPham s
-            WHERE (:tuKhoa IS NULL OR s.tenSanPham LIKE CONCAT('%', :tuKhoa, '%')
-                                   OR s.maModel LIKE CONCAT('%', :tuKhoa, '%'))
-              AND (:maDanhMuc IS NULL OR s.danhMuc.maDanhMuc = :maDanhMuc)
-              AND (:thuongHieu IS NULL OR s.thuongHieu = :thuongHieu)
-              AND (:dangKinhDoanh IS NULL OR s.dangKinhDoanh = :dangKinhDoanh)
-              AND (:tinhTrang IS NULL
-                   OR (:tinhTrang = 'HET' AND s.soLuong = 0)
-                   OR (:tinhTrang = 'SAP_HET' AND s.soLuong > 0 AND s.soLuong < s.mucTonToiThieu)
-                   OR (:tinhTrang = 'DU' AND s.soLuong > 0 AND s.soLuong >= s.mucTonToiThieu))
-            """)
-    Page<SanPham> timKiem(@Param("tuKhoa") String tuKhoa,
-                          @Param("maDanhMuc") Integer maDanhMuc,
-                          @Param("thuongHieu") String thuongHieu,
-                          @Param("dangKinhDoanh") Boolean dangKinhDoanh,
-                          @Param("tinhTrang") String tinhTrang,
-                          Pageable pageable);
+        List<SanPham> findTop4ByDangKinhDoanhTrueOrderByMaSanPhamDesc();
 
-    @Query("SELECT DISTINCT s.thuongHieu FROM SanPham s ORDER BY s.thuongHieu")
-    List<String> danhSachThuongHieu();
+        List<SanPham> findTop10ByDangKinhDoanhTrueOrderByMaSanPhamDesc();
 
-    boolean existsByMaModelIgnoreCase(String maModel);
+        @Query(value = "SELECT TOP (10) ct.MaSanPham "
+                        + "FROM dbo.ChiTietDonHang ct "
+                        + "JOIN dbo.DonHang dh ON dh.MaDonHang = ct.MaDonHang "
+                        + "JOIN dbo.SanPham sp ON sp.MaSanPham = ct.MaSanPham "
+                        + "WHERE dh.TrangThaiDonHang = 'DA_GIAO' AND sp.DangKinhDoanh = 1 "
+                        + "GROUP BY ct.MaSanPham "
+                        + "ORDER BY SUM(ct.SoLuong) DESC, ct.MaSanPham ASC", nativeQuery = true)
+        List<Integer> layMaSanPhamBanChay();
 
-    boolean existsByMaModelIgnoreCaseAndMaSanPhamNot(String maModel, Integer maSanPham);
+        @Query("SELECT DISTINCT sp.thuongHieu FROM SanPham sp "
+                        + "WHERE sp.dangKinhDoanh = true ORDER BY sp.thuongHieu")
+        List<String> layDanhSachThuongHieu();
 
-    /** Sản phẩm đã có trong chứng từ thì không xóa cứng được (khóa ngoại không cascade). */
-    @Query(value = """
-            SELECT CASE WHEN EXISTS (SELECT 1 FROM dbo.ChiTietDonHang WHERE MaSanPham = :ma)
-                          OR EXISTS (SELECT 1 FROM dbo.ChiTietYeuCauNhapHang WHERE MaSanPham = :ma)
-                          OR EXISTS (SELECT 1 FROM dbo.ChiTietPhieuNhap WHERE MaSanPham = :ma)
-                          OR EXISTS (SELECT 1 FROM dbo.ChiTietPhieuXuat WHERE MaSanPham = :ma)
-                          OR EXISTS (SELECT 1 FROM dbo.DanhGia WHERE MaSanPham = :ma)
-                        THEN 1 ELSE 0 END
-            """, nativeQuery = true)
-    int daPhatSinhChungTu(@Param("ma") Integer maSanPham);
+        @Query("SELECT DISTINCT sp.thuongHieu FROM SanPham sp "
+                        + "WHERE sp.dangKinhDoanh = true AND sp.danhMuc.maDanhMuc = :maDanhMuc "
+                        + "ORDER BY sp.thuongHieu")
+        List<String> layDanhSachThuongHieuTheoDanhMuc(@Param("maDanhMuc") Integer maDanhMuc);
 
-    @Query("""
-            SELECT new project.dien_may.project_java.dto.baocao.TonKhoDanhMuc(
-                       d.tenDanhMuc, COUNT(s), SUM(s.soLuong), SUM(s.soLuong * s.donGia),
-                       SUM(CASE WHEN s.soLuong < s.mucTonToiThieu THEN 1L ELSE 0L END))
-            FROM SanPham s JOIN s.danhMuc d
-            WHERE s.dangKinhDoanh = true
-            GROUP BY d.tenDanhMuc
-            ORDER BY SUM(s.soLuong * s.donGia) DESC
-            """)
-    List<TonKhoDanhMuc> tonKhoTheoDanhMuc();
+        @Query("SELECT MIN(sp.donGia) FROM SanPham sp WHERE sp.dangKinhDoanh = true")
+        BigDecimal layGiaThapNhat();
 
-    @EntityGraph(attributePaths = "danhMuc")
-    @Query("""
-            SELECT s FROM SanPham s
-            WHERE s.dangKinhDoanh = true AND s.soLuong < s.mucTonToiThieu
-            ORDER BY s.soLuong ASC, s.tenSanPham ASC
-            """)
-    List<SanPham> danhSachCanNhap();
+        @Query("SELECT MAX(sp.donGia) FROM SanPham sp WHERE sp.dangKinhDoanh = true")
+        BigDecimal layGiaCaoNhat();
 
-    /** Cộng thẳng trên CSDL để hai lần nhập cùng lúc không ghi đè số lượng của nhau. */
-    @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("UPDATE SanPham s SET s.soLuong = s.soLuong + :soLuong WHERE s.maSanPham = :maSanPham")
-    int congTonKho(@Param("maSanPham") Integer maSanPham, @Param("soLuong") int soLuong);
+        @EntityGraph(attributePaths = "danhMuc")
+        @Query("""
+                        SELECT s FROM SanPham s
+                        WHERE (:tuKhoa IS NULL OR s.tenSanPham LIKE CONCAT('%', :tuKhoa, '%')
+                                               OR s.maModel LIKE CONCAT('%', :tuKhoa, '%'))
+                          AND (:maDanhMuc IS NULL OR s.danhMuc.maDanhMuc = :maDanhMuc)
+                          AND (:thuongHieu IS NULL OR s.thuongHieu = :thuongHieu)
+                          AND (:dangKinhDoanh IS NULL OR s.dangKinhDoanh = :dangKinhDoanh)
+                          AND (:tinhTrang IS NULL
+                               OR (:tinhTrang = 'HET' AND s.soLuong = 0)
+                               OR (:tinhTrang = 'SAP_HET' AND s.soLuong > 0 AND s.soLuong < s.mucTonToiThieu)
+                               OR (:tinhTrang = 'DU' AND s.soLuong > 0 AND s.soLuong >= s.mucTonToiThieu))
+                        """)
+        Page<SanPham> timKiem(@Param("tuKhoa") String tuKhoa,
+                        @Param("maDanhMuc") Integer maDanhMuc,
+                        @Param("thuongHieu") String thuongHieu,
+                        @Param("dangKinhDoanh") Boolean dangKinhDoanh,
+                        @Param("tinhTrang") String tinhTrang,
+                        Pageable pageable);
 
-                // ===== TV5: xử lý đồng thời (NFR02) =====
+        @Query("SELECT DISTINCT s.thuongHieu FROM SanPham s ORDER BY s.thuongHieu")
+        List<String> danhSachThuongHieu();
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT s FROM SanPham s WHERE s.maSanPham = :maSanPham")
-    Optional<SanPham> khoaTheoMa(@Param("maSanPham") Integer maSanPham);
+        boolean existsByMaModelIgnoreCase(String maModel);
 
-    Optional<SanPham> findByMaModelIgnoreCase(String maModel);
+        boolean existsByMaModelIgnoreCaseAndMaSanPhamNot(String maModel, Integer maSanPham);
+
+        @Query(value = """
+                        SELECT CASE WHEN EXISTS (SELECT 1 FROM dbo.ChiTietDonHang WHERE MaSanPham = :ma)
+                                      OR EXISTS (SELECT 1 FROM dbo.ChiTietYeuCauNhapHang WHERE MaSanPham = :ma)
+                                      OR EXISTS (SELECT 1 FROM dbo.ChiTietPhieuNhap WHERE MaSanPham = :ma)
+                                      OR EXISTS (SELECT 1 FROM dbo.ChiTietPhieuXuat WHERE MaSanPham = :ma)
+                                      OR EXISTS (SELECT 1 FROM dbo.DanhGia WHERE MaSanPham = :ma)
+                                    THEN 1 ELSE 0 END
+                        """, nativeQuery = true)
+        int daPhatSinhChungTu(@Param("ma") Integer maSanPham);
+
+        @Query("""
+                        SELECT new project.dien_may.project_java.dto.baocao.TonKhoDanhMuc(
+                                   d.tenDanhMuc, COUNT(s), SUM(s.soLuong), SUM(s.soLuong * s.donGia),
+                                   SUM(CASE WHEN s.soLuong < s.mucTonToiThieu THEN 1L ELSE 0L END))
+                        FROM SanPham s JOIN s.danhMuc d
+                        WHERE s.dangKinhDoanh = true
+                        GROUP BY d.tenDanhMuc
+                        ORDER BY SUM(s.soLuong * s.donGia) DESC
+                        """)
+        List<TonKhoDanhMuc> tonKhoTheoDanhMuc();
+
+        @EntityGraph(attributePaths = "danhMuc")
+        @Query("""
+                        SELECT s FROM SanPham s
+                        WHERE s.dangKinhDoanh = true AND s.soLuong < s.mucTonToiThieu
+                        ORDER BY s.soLuong ASC, s.tenSanPham ASC
+                        """)
+        List<SanPham> danhSachCanNhap();
+
+        @Modifying(flushAutomatically = true, clearAutomatically = true)
+        @Query("UPDATE SanPham s SET s.soLuong = s.soLuong + :soLuong WHERE s.maSanPham = :maSanPham")
+        int congTonKho(@Param("maSanPham") Integer maSanPham, @Param("soLuong") int soLuong);
+
+        @Lock(LockModeType.PESSIMISTIC_WRITE)
+        @Query("SELECT s FROM SanPham s WHERE s.maSanPham = :maSanPham")
+        Optional<SanPham> khoaTheoMa(@Param("maSanPham") Integer maSanPham);
+
+        Optional<SanPham> findByMaModelIgnoreCase(String maModel);
 }

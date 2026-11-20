@@ -11,12 +11,27 @@ public class DongTonKho {
         this.soLuongTon = soLuongTon;
     }
 
-    public Long getMaSanPham() { return maSanPham; }
-    public void setMaSanPham(Long maSanPham) { this.maSanPham = maSanPham; }
+    public Long getMaSanPham() {
+        return maSanPham;
+    }
 
-    public String getTenSanPham() { return tenSanPham; }
-    public void setTenSanPham(String tenSanPham) { this.tenSanPham = tenSanPham; }
+    public void setMaSanPham(Long maSanPham) {
+        this.maSanPham = maSanPham;
+    }
 
-    public int getSoLuongTon() { return soLuongTon; }
-    public void setSoLuongTon(int soLuongTon) { this.soLuongTon = soLuongTon; }
+    public String getTenSanPham() {
+        return tenSanPham;
+    }
+
+    public void setTenSanPham(String tenSanPham) {
+        this.tenSanPham = tenSanPham;
+    }
+
+    public int getSoLuongTon() {
+        return soLuongTon;
+    }
+
+    public void setSoLuongTon(int soLuongTon) {
+        this.soLuongTon = soLuongTon;
+    }
 }

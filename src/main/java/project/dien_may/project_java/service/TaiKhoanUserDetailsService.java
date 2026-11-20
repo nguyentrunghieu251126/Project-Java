@@ -32,16 +32,17 @@ public class TaiKhoanUserDetailsService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        // Kiểm tra thông tin tài khoản
+        TaiKhoan taiKhoan = taiKhoanRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Email hoặc mật khẩu không đúng"));
 
-        TaiKhoan taiKhoan = taiKhoanRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new UsernameNotFoundException("Email hoặc mật khẩu không đúng"));
-
+        // Lấy thông tin người dùng và quyền
         VaiTro vaiTro = taiKhoan.getVaiTro();
-
-        // Vai trò dùng cho hasRole, mã chức năng trong bảng Quyen dùng cho hasAuthority
         List<SimpleGrantedAuthority> quyen = new ArrayList<>();
         quyen.add(new SimpleGrantedAuthority("ROLE_" + vaiTro.getTenVaiTro()));
         phanQuyenService.quyenHieuLuc(taiKhoan).forEach(ma -> quyen.add(new SimpleGrantedAuthority(ma)));
 
-        return User.builder().username(taiKhoan.getEmail()).password(taiKhoan.getMatKhau()).authorities(quyen).disabled(!taiKhoan.isTrangThai()).build();
+        return User.builder().username(taiKhoan.getEmail()).password(taiKhoan.getMatKhau()).authorities(quyen)
+                .disabled(!taiKhoan.isTrangThai()).build();
     }
 }

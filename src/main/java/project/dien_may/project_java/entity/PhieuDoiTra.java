@@ -3,10 +3,8 @@ package project.dien_may.project_java.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
-/** TV4 – Phiếu đổi trả của khách cho một sản phẩm trong đơn đã giao (KH21, NVK12, NVK14). */
 @Entity
 @Table(name = "PhieuDoiTra", schema = "dbo")
 @Getter
@@ -18,12 +16,10 @@ public class PhieuDoiTra {
     @Column(name = "MaPhieuDoiTra")
     private Integer maPhieuDoiTra;
 
-    /** Sản phẩm cụ thể trong đơn hàng mà khách gửi yêu cầu. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaChiTietDonHang", nullable = false)
     private ChiTietDonHang chiTietDonHang;
 
-    /** Nhân viên kho tiếp nhận; null khi chưa tiếp nhận. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaTaiKhoan")
     private TaiKhoan nhanVien;

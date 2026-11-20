@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-
 public class QuenMatKhauForm {
 
     @NotBlank(message = "Vui lòng nhập email.")
@@ -17,8 +16,7 @@ public class QuenMatKhauForm {
     private String soDienThoai;
 
     @NotBlank(message = "Vui lòng nhập mật khẩu mới.")
-    @Pattern(regexp = "^$|^[\\x21-\\x7E]{8,72}$",
-            message = "Mật khẩu mới phải có từ 8 đến 72 ký tự, không dấu và không có khoảng trắng.")
+    @Pattern(regexp = "^$|^[\\x21-\\x7E]{8,72}$", message = "Mật khẩu mới phải có từ 8 đến 72 ký tự, không dấu và không có khoảng trắng.")
     private String matKhauMoi;
 
     @NotBlank(message = "Vui lòng xác nhận mật khẩu mới.")

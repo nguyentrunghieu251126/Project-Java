@@ -10,11 +10,9 @@ import project.dien_may.project_java.entity.LichSuDiemThuong;
 import project.dien_may.project_java.entity.LoaiGiaoDichDiem;
 import project.dien_may.project_java.entity.TaiKhoan;
 import project.dien_may.project_java.repository.LichSuDiemThuongRepository;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
-/** TV3 – điểm thưởng: xem số điểm, lịch sử; ghi cộng / trừ khi đặt và hủy đơn. */
 @Service
 public class DiemThuongService {
 
@@ -31,10 +29,10 @@ public class DiemThuongService {
         return lichSuRepository.tongDiem(email);
     }
 
-    /** loai: "cong", "tru" hoặc null/khác = tất cả. */
     @Transactional(readOnly = true)
     public Page<LichSuDiemThuong> lichSu(String email, String loai, int trang) {
-        return lichSuRepository.cuaKhach(email, chuanHoaLoai(loai), PageRequest.of(Math.max(trang, 1) - 1, SO_DONG_MOI_TRANG));
+        return lichSuRepository.cuaKhach(email, chuanHoaLoai(loai),
+                PageRequest.of(Math.max(trang, 1) - 1, SO_DONG_MOI_TRANG));
     }
 
     @Transactional(readOnly = true)
@@ -60,8 +58,10 @@ public class DiemThuongService {
     }
 
     public static LoaiGiaoDichDiem chuanHoaLoai(String loai) {
-        if ("cong".equalsIgnoreCase(loai)) return LoaiGiaoDichDiem.CONG;
-        if ("tru".equalsIgnoreCase(loai)) return LoaiGiaoDichDiem.TRU;
+        if ("cong".equalsIgnoreCase(loai))
+            return LoaiGiaoDichDiem.CONG;
+        if ("tru".equalsIgnoreCase(loai))
+            return LoaiGiaoDichDiem.TRU;
         return null;
     }
 
@@ -70,7 +70,6 @@ public class DiemThuongService {
         return lichSuRepository.theoDon(maDon);
     }
 
-    /** Gọi trong giao dịch đặt hàng, trước khi đọc số điểm để kiểm tra. */
     public void khoaTaiKhoan(TaiKhoan taiKhoan) {
         lichSuRepository.khoaTaiKhoan(taiKhoan.getMaTaiKhoan());
     }
@@ -89,10 +88,6 @@ public class DiemThuongService {
         lichSuRepository.save(ls);
     }
 
-    /**
-     * Hủy đơn: hoàn lại điểm đã dùng cho đơn và thu hồi điểm đã cộng từ đơn
-     * (không thu hồi quá số điểm khách đang có để tổng điểm không âm).
-     */
     public void hoanKhiHuy(DonHang donHang) {
         TaiKhoan taiKhoan = donHang.getTaiKhoan();
         khoaTaiKhoan(taiKhoan);
@@ -106,7 +101,7 @@ public class DiemThuongService {
                 daCong += ls.getSoDiem();
             }
         }
-        // Hàm chỉ chạy một lần cho mỗi đơn (hủy đơn là câu UPDATE có điều kiện)
+
         ghi(taiKhoan, donHang, LoaiGiaoDichDiem.CONG, daDung, "Hoàn điểm đã dùng do hủy đơn " + ma);
         if (daCong > 0) {
             long hienCo = lichSuRepository.tongDiem(taiKhoan.getEmail());

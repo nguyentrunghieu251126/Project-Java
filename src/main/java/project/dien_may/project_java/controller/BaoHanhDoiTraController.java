@@ -12,7 +12,6 @@ import project.dien_may.project_java.service.admin.NghiepVuException;
 
 import java.security.Principal;
 
-/** TV4 – Khách hàng gửi yêu cầu bảo hành (KH20) và đổi trả (KH21). Chỉ ROLE_KHACH_HANG vào được. */
 @Controller
 @RequestMapping("/bao-hanh-doi-tra")
 public class BaoHanhDoiTraController {
@@ -38,8 +37,8 @@ public class BaoHanhDoiTraController {
 
     @PostMapping("/bao-hanh")
     public String guiBaoHanh(@RequestParam(required = false) Integer maChiTiet,
-                             @RequestParam(required = false) String moTaLoi,
-                             Principal principal, RedirectAttributes redirect) {
+            @RequestParam(required = false) String moTaLoi,
+            Principal principal, RedirectAttributes redirect) {
         try {
             var phieu = service.guiBaoHanh(principal.getName(), maChiTiet, moTaLoi);
             redirect.addFlashAttribute("thongBao", "Đã gửi yêu cầu bảo hành #" + phieu.getMaPhieuBaoHanh()
@@ -52,8 +51,8 @@ public class BaoHanhDoiTraController {
 
     @PostMapping("/doi-tra")
     public String guiDoiTra(@RequestParam(required = false) Integer maChiTiet,
-                            @RequestParam(required = false) String lyDoDoiTra,
-                            Principal principal, RedirectAttributes redirect) {
+            @RequestParam(required = false) String lyDoDoiTra,
+            Principal principal, RedirectAttributes redirect) {
         try {
             var phieu = service.guiDoiTra(principal.getName(), maChiTiet, lyDoDoiTra);
             redirect.addFlashAttribute("thongBao", "Đã gửi yêu cầu đổi trả #" + phieu.getMaPhieuDoiTra()

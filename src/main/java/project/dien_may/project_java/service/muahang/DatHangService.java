@@ -12,7 +12,6 @@ import project.dien_may.project_java.dto.muahang.UuDaiThanhToan;
 import project.dien_may.project_java.entity.*;
 import project.dien_may.project_java.repository.*;
 import project.dien_may.project_java.service.admin.NghiepVuException;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -22,17 +21,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-/**
- * TV3 – KH12 – KH15: trang thanh toán và đặt hàng.
- * Đặt hàng chạy trong một giao dịch (@Transactional): lỗi ở bất kỳ bước nào thì tồn kho,
- * lượt mã giảm giá và giỏ hàng đều quay về như cũ.
- */
 @Service
 public class DatHangService {
-
-    /** Mã sắp diễn ra trong khoảng này mới hiển thị cho khách xem trước. */
     private static final int SO_NGAY_XEM_TRUOC_MA = 14;
-    /** Mã hết hạn trong bao nhiêu ngày gần đây thì vẫn hiện (mờ) ở cuối danh sách. */
     private static final int SO_NGAY_XEM_MA_HET_HAN = 30;
 
     private final GioHangService gioHangService;
@@ -46,12 +37,12 @@ public class DatHangService {
     private final DiemThuongService diemThuongService;
 
     public DatHangService(GioHangService gioHangService, ChiTietGioHangRepository chiTietGioHangRepository,
-                          TaiKhoanRepository taiKhoanRepository, TonKhoMuaHangRepository tonKhoRepository,
-                          KhuyenMaiKhachHangRepository khuyenMaiRepository,
-                          DonHangKhachHangRepository donHangRepository,
-                          ChiTietDonHangRepository chiTietDonHangRepository,
-                          ThanhToanRepository thanhToanRepository,
-                          DiemThuongService diemThuongService) {
+            TaiKhoanRepository taiKhoanRepository, TonKhoMuaHangRepository tonKhoRepository,
+            KhuyenMaiKhachHangRepository khuyenMaiRepository,
+            DonHangKhachHangRepository donHangRepository,
+            ChiTietDonHangRepository chiTietDonHangRepository,
+            ThanhToanRepository thanhToanRepository,
+            DiemThuongService diemThuongService) {
         this.gioHangService = gioHangService;
         this.chiTietGioHangRepository = chiTietGioHangRepository;
         this.taiKhoanRepository = taiKhoanRepository;
@@ -63,7 +54,6 @@ public class DatHangService {
         this.diemThuongService = diemThuongService;
     }
 
-    /** @param dsChon mã sản phẩm được tick ở giỏ; rỗng thì lấy cả giỏ */
     @Transactional(readOnly = true)
     public TrangThanhToan layTrangThanhToan(String email, List<Integer> dsChon) {
         List<DongGioHang> dong = gioHangService.layGioHang(email).stream()
@@ -71,9 +61,6 @@ public class DatHangService {
                 .toList();
         BigDecimal tamTinh = dong.stream().map(DongGioHang::thanhTien).reduce(BigDecimal.ZERO, BigDecimal::add);
         LocalDate homNay = LocalDate.now();
-
-        // Thứ tự hiển thị: 1) mã dùng được, giảm nhiều tiền trước  2) chưa đủ điều kiện (chưa tới ngày)
-        //                  3) đã hết hạn hoặc hết lượt
         List<MaUuDai> dungDuoc = khuyenMaiRepository.dangChay(homNay).stream()
                 .map(km -> chuyenMa(km, true, tinhTienGiam(km, tamTinh), false))
                 .sorted(Comparator.comparing(MaUuDai::tienGiam).reversed()
@@ -82,7 +69,6 @@ public class DatHangService {
         List<MaUuDai> sapXep = new ArrayList<>();
         for (int i = 0; i < dungDuoc.size(); i++) {
             MaUuDai m = dungDuoc.get(i);
-            // Mã đầu tiên (giảm nhiều nhất) gắn nhãn "Tiết kiệm nhất"
             boolean laTotNhat = i == 0 && m.tienGiam().signum() > 0;
             sapXep.add(new MaUuDai(m.maGiamGia(), m.tenKhuyenMai(), m.loai(), m.giaTriGiam(), m.ngayBatDau(),
                     m.ngayKetThuc(), m.soLuotConLai(), true, m.tienGiam(), laTotNhat));
@@ -98,7 +84,6 @@ public class DatHangService {
                 .map(km -> chuyenMa(km, false, tinhTienGiam(km, tamTinh), false))
                 .sorted(Comparator.comparing(MaUuDai::tienGiam).reversed())
                 .toList();
-        // Phương thức thanh toán + ưu đãi lần đầu (đã dùng ở đơn chưa hủy thì không hiện nữa)
         BigDecimal tienLaptop = dong.stream().filter(DongGioHang::laLaptop)
                 .map(DongGioHang::thanhTien).reduce(BigDecimal.ZERO, BigDecimal::add);
         Set<PhuongThucThanhToan> daDung = Set.copyOf(thanhToanRepository.daDungUuDai(email));
@@ -112,7 +97,6 @@ public class DatHangService {
         return new TrangThanhToan(dong, tamTinh, sapXep, sapCo, hetHan, phuongThuc, diemThuongService.tongDiem(email));
     }
 
-    /** @return mã đơn hàng vừa tạo */
     @Transactional
     public Integer datHang(String email, DatHangForm form) {
         Set<Integer> dsChon = Set.copyOf(form.getSanPham() == null ? List.of() : form.getSanPham());
@@ -128,7 +112,6 @@ public class DatHangService {
             throw new NghiepVuException("Các sản phẩm đã chọn không còn trong giỏ hàng.");
         }
 
-        // 1. Trừ tồn kho có điều kiện cho từng sản phẩm (không bán vượt tồn – NFR06)
         BigDecimal tamTinh = BigDecimal.ZERO;
         for (ChiTietGioHang ct : dongMua) {
             SanPham sp = ct.getSanPham();
@@ -140,7 +123,6 @@ public class DatHangService {
             tamTinh = tamTinh.add(sp.getDonGia().multiply(BigDecimal.valueOf(ct.getSoLuong())));
         }
 
-        // 2. Mã giảm giá: chỉ nhận mã đang bật, còn hạn, còn lượt (KH15)
         KhuyenMai khuyenMai = null;
         BigDecimal tienGiam = BigDecimal.ZERO;
         String ma = form.getMaGiamGia() == null ? "" : form.getMaGiamGia().trim();
@@ -154,13 +136,13 @@ public class DatHangService {
             tienGiam = tinhTienGiam(khuyenMai, tamTinh);
         }
 
-        // 2a. Điểm thưởng: khóa dòng tài khoản để hai đơn đặt cùng lúc không dùng trùng điểm
         diemThuongService.khoaTaiKhoan(taiKhoan);
         int diemDung = form.getDiemSuDung() == null ? 0 : form.getDiemSuDung();
         if (diemDung > 0) {
             int diemToiDa = QuyTacDiemThuong.diemToiDa(diemThuongService.tongDiem(email), tamTinh.subtract(tienGiam));
             if (diemDung < QuyTacDiemThuong.DIEM_TOI_THIEU) {
-                throw new NghiepVuException("Mỗi lần dùng ít nhất " + QuyTacDiemThuong.DIEM_TOI_THIEU + " điểm thưởng.");
+                throw new NghiepVuException(
+                        "Mỗi lần dùng ít nhất " + QuyTacDiemThuong.DIEM_TOI_THIEU + " điểm thưởng.");
             }
             if (diemDung > diemToiDa) {
                 throw new NghiepVuException(diemToiDa == 0
@@ -170,7 +152,6 @@ public class DatHangService {
         }
         BigDecimal tienGiamDiem = QuyTacDiemThuong.tienGiam(diemDung);
 
-        // 2b. Ưu đãi lần đầu của phương thức thanh toán (mỗi phương thức một lần; đơn bị hủy thì được dùng lại)
         PhuongThucThanhToan phuongThuc = form.getPhuongThucThanhToan();
         UuDaiThanhToan.KetQua uuDai = UuDaiThanhToan.KetQua.KHONG;
         if (!thanhToanRepository.daDungUuDai(email).contains(phuongThuc)) {
@@ -180,10 +161,8 @@ public class DatHangService {
                     .map(ChiTietGioHang::getThanhTien).reduce(BigDecimal.ZERO, BigDecimal::add);
             uuDai = UuDaiThanhToan.tinh(phuongThuc, tamTinh, tienLaptop);
         }
-        // Không giảm quá số tiền còn lại sau mã giảm giá và điểm thưởng
         BigDecimal tienGiamThanhToan = uuDai.tienGiam().min(tamTinh.subtract(tienGiam).subtract(tienGiamDiem));
 
-        // 3. Lưu đơn hàng, chi tiết (giá chốt tại thời điểm đặt) và thanh toán
         DonHang donHang = new DonHang();
         donHang.setTaiKhoan(taiKhoan);
         donHang.setKhuyenMai(khuyenMai);
@@ -217,18 +196,15 @@ public class DatHangService {
         thanhToan.setTrangThai(TrangThaiThanhToan.CHUA_THANH_TOAN);
         thanhToanRepository.save(thanhToan);
 
-        // 3b. Lịch sử điểm: trừ điểm đã dùng, cộng điểm tích từ số tiền thực trả
         String maHien = String.format("#DH%06d", donHang.getMaDonHang());
         diemThuongService.ghi(taiKhoan, donHang, LoaiGiaoDichDiem.TRU, diemDung, QuyTacDiemThuong.MO_TA_DUNG + maHien);
         diemThuongService.ghi(taiKhoan, donHang, LoaiGiaoDichDiem.CONG,
                 QuyTacDiemThuong.diemNhanDuoc(donHang.getTongTien()), QuyTacDiemThuong.MO_TA_TICH + maHien);
 
-        // 4. Bỏ các sản phẩm đã mua khỏi giỏ
         chiTietGioHangRepository.xoaCacDong(dongMua.get(0).getGioHang().getMaGioHang(), dsChon);
         return donHang.getMaDonHang();
     }
 
-    /** PHAN_TRAM: làm tròn đến đồng; SO_TIEN: không giảm quá giá trị đơn. */
     public static BigDecimal tinhTienGiam(KhuyenMai km, BigDecimal tamTinh) {
         if (km == null || tamTinh == null || tamTinh.signum() <= 0) {
             return BigDecimal.ZERO;

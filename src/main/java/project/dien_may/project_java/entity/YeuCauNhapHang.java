@@ -19,7 +19,6 @@ public class YeuCauNhapHang {
     @Column(name = "MaYeuCauNhap")
     private Integer maYeuCauNhap;
 
-    /** Nhân viên kho gửi yêu cầu. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaTaiKhoan", nullable = false)
     private TaiKhoan taiKhoan;

@@ -14,7 +14,6 @@ public interface TaiKhoanQuyenRepository extends JpaRepository<TaiKhoanQuyen, In
     @EntityGraph(attributePaths = "quyen")
     List<TaiKhoanQuyen> findByTaiKhoanMaTaiKhoan(Integer maTaiKhoan);
 
-    /** Xóa ngay bằng câu lệnh riêng, vì Hibernate ghi INSERT trước DELETE sẽ vi phạm UQ_TaiKhoan_Quyen. */
     @Modifying
     @Query("DELETE FROM TaiKhoanQuyen t WHERE t.taiKhoan.maTaiKhoan = :ma")
     void xoaTheoTaiKhoan(@Param("ma") Integer maTaiKhoan);

@@ -11,7 +11,6 @@ final class PhanTrang {
     private PhanTrang() {
     }
 
-    /** @param trang số trang trên URL, tính từ 1 */
     static Pageable tao(int trang, Sort sapXep) {
         return PageRequest.of(Math.max(trang, 1) - 1, KICH_THUOC_TRANG, sapXep);
     }

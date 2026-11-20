@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import project.dien_may.project_java.service.muahang.GioHangService;
 
-/**
- * TV3: số sản phẩm trong giỏ cho huy hiệu "Giỏ hàng" trên header, áp dụng cho mọi trang.
- */
 @ControllerAdvice
 public class MuaHangControllerAdvice {
 
@@ -26,10 +23,6 @@ public class MuaHangControllerAdvice {
         this.gioHangService = gioHangService;
     }
 
-    /**
-     * Tạo sẵn mã CSRF (và session) trước khi render. Trang dài như trang chủ có thể đã gửi một phần HTML
-     * về trình duyệt trước khi tới form "Thêm vào giỏ"; lúc đó không tạo session để lưu mã CSRF được nữa.
-     */
     @ModelAttribute
     public void napSanMaCsrf(HttpServletRequest request) {
         Object token = request.getAttribute(CsrfToken.class.getName());

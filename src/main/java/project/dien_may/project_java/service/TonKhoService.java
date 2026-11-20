@@ -37,14 +37,16 @@ public class TonKhoService {
     @Transactional
     public void truTonKho(Integer maSanPham, int soLuong) throws TonKhoKhongDuException {
         String threadName = Thread.currentThread().getName();
-        System.out.println("[LUONG: " + threadName + "] Bat dau tru kho SP: " + maSanPham + ", so luong mua: " + soLuong);
+        System.out
+                .println("[LUONG: " + threadName + "] Bat dau tru kho SP: " + maSanPham + ", so luong mua: " + soLuong);
 
         ReentrantLock lock = locks.computeIfAbsent(maSanPham, k -> new ReentrantLock());
         lock.lock();
         try {
             if (sanPhamRepository == null) {
                 int hienTai = tonKhoTam.getOrDefault(maSanPham, 0);
-                System.out.println("[LUONG: " + threadName + "] Ton kho hien tai trong bo nho cua SP " + maSanPham + " la: " + hienTai);
+                System.out.println("[LUONG: " + threadName + "] Ton kho hien tai trong bo nho cua SP " + maSanPham
+                        + " la: " + hienTai);
 
                 if (hienTai < soLuong) {
                     System.out.println("[LUONG: " + threadName + "] LOI: Khong du ton kho!");
@@ -52,7 +54,8 @@ public class TonKhoService {
                 }
 
                 tonKhoTam.put(maSanPham, hienTai - soLuong);
-                System.out.println("[LUONG: " + threadName + "] THANH CONG. Ton kho moi trong bo nho: " + tonKhoTam.get(maSanPham));
+                System.out.println("[LUONG: " + threadName + "] THANH CONG. Ton kho moi trong bo nho: "
+                        + tonKhoTam.get(maSanPham));
                 return;
             }
 
@@ -60,7 +63,8 @@ public class TonKhoService {
                     .orElseThrow(() -> new RuntimeException("Khong tim thay san pham co ID: " + maSanPham));
 
             int hienTai = sp.getSoLuong();
-            System.out.println("[LUONG: " + threadName + "] Ton kho hien tai tren SQL cua SP " + maSanPham + " la: " + hienTai);
+            System.out.println(
+                    "[LUONG: " + threadName + "] Ton kho hien tai tren SQL cua SP " + maSanPham + " la: " + hienTai);
 
             if (hienTai < soLuong) {
                 System.out.println("[LUONG: " + threadName + "] LOI: Khong du ton kho!");

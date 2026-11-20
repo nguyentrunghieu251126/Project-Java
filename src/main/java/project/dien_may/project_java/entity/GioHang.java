@@ -6,7 +6,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/** TV3 – KH11: mỗi khách hàng có đúng một giỏ (UQ_GioHang_MaTaiKhoan). */
 @Entity
 @Table(name = "GioHang", schema = "dbo")
 @Getter

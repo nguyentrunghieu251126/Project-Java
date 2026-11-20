@@ -3,7 +3,6 @@ package project.dien_may.project_java.dto.muahang;
 import java.math.BigDecimal;
 import java.util.List;
 
-/** TV3 – dữ liệu dựng trang thanh toán. */
 public record TrangThanhToan(
         List<DongGioHang> dong,
         BigDecimal tamTinh,
@@ -11,8 +10,7 @@ public record TrangThanhToan(
         List<MaUuDai> maSapCo,
         List<MaUuDai> maHetHan,
         List<LuaChonThanhToan> phuongThuc,
-        long diemHienCo
-) {
+        long diemHienCo) {
     public int soSanPham() {
         return dong.size();
     }

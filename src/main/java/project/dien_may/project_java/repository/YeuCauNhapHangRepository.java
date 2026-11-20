@@ -15,40 +15,32 @@ import java.time.LocalDateTime;
 
 public interface YeuCauNhapHangRepository extends JpaRepository<YeuCauNhapHang, Integer> {
 
-    @EntityGraph(attributePaths = {"taiKhoan", "nguoiDuyet"})
-    @Query("SELECT y FROM YeuCauNhapHang y WHERE :trangThai IS NULL OR y.trangThai = :trangThai")
-    Page<YeuCauNhapHang> timKiem(@Param("trangThai") TrangThaiYeuCauNhap trangThai, Pageable pageable);
+        @EntityGraph(attributePaths = { "taiKhoan", "nguoiDuyet" })
+        @Query("SELECT y FROM YeuCauNhapHang y WHERE :trangThai IS NULL OR y.trangThai = :trangThai")
+        Page<YeuCauNhapHang> timKiem(@Param("trangThai") TrangThaiYeuCauNhap trangThai, Pageable pageable);
 
-    long countByTrangThai(TrangThaiYeuCauNhap trangThai);
+        long countByTrangThai(TrangThaiYeuCauNhap trangThai);
 
-    /**
-     * Chỉ cập nhật khi yêu cầu còn chờ duyệt; trả về 0 nghĩa là đã có người xử lý trước,
-     * nhờ vậy hai quản trị viên thao tác cùng lúc không ghi đè kết quả của nhau.
-     */
-    @Modifying(clearAutomatically = true)
-    @Query("""
-            UPDATE YeuCauNhapHang y
-            SET y.trangThai = :trangThai, y.nguoiDuyet = :nguoiDuyet,
-                y.ngayDuyet = :ngayDuyet, y.lyDoTuChoi = :lyDoTuChoi
-            WHERE y.maYeuCauNhap = :ma
-              AND y.trangThai = project.dien_may.project_java.entity.TrangThaiYeuCauNhap.CHO_DUYET
-            """)
-    int xuLy(@Param("ma") Integer maYeuCauNhap,
-             @Param("trangThai") TrangThaiYeuCauNhap trangThai,
-             @Param("nguoiDuyet") TaiKhoan nguoiDuyet,
-             @Param("ngayDuyet") LocalDateTime ngayDuyet,
-             @Param("lyDoTuChoi") String lyDoTuChoi);
+        @Modifying(clearAutomatically = true)
+        @Query("""
+                        UPDATE YeuCauNhapHang y
+                        SET y.trangThai = :trangThai, y.nguoiDuyet = :nguoiDuyet,
+                            y.ngayDuyet = :ngayDuyet, y.lyDoTuChoi = :lyDoTuChoi
+                        WHERE y.maYeuCauNhap = :ma
+                          AND y.trangThai = project.dien_may.project_java.entity.TrangThaiYeuCauNhap.CHO_DUYET
+                        """)
+        int xuLy(@Param("ma") Integer maYeuCauNhap,
+                        @Param("trangThai") TrangThaiYeuCauNhap trangThai,
+                        @Param("nguoiDuyet") TaiKhoan nguoiDuyet,
+                        @Param("ngayDuyet") LocalDateTime ngayDuyet,
+                        @Param("lyDoTuChoi") String lyDoTuChoi);
 
-    /**
-     * TV4 (NVK10): Đổi trạng thái khi yêu cầu còn đúng trạng thái cũ (ví dụ DA_DUYET sang DA_NHAP).
-     * Trả về 0 nghĩa là đã có người lập phiếu nhập trước, nên không cộng kho hai lần.
-     */
-    @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("""
-            UPDATE YeuCauNhapHang y SET y.trangThai = :trangThaiMoi
-            WHERE y.maYeuCauNhap = :ma AND y.trangThai = :trangThaiCu
-            """)
-    int chuyenTrangThai(@Param("ma") Integer maYeuCauNhap,
+        @Modifying(flushAutomatically = true, clearAutomatically = true)
+        @Query("""
+                        UPDATE YeuCauNhapHang y SET y.trangThai = :trangThaiMoi
+                        WHERE y.maYeuCauNhap = :ma AND y.trangThai = :trangThaiCu
+                        """)
+        int chuyenTrangThai(@Param("ma") Integer maYeuCauNhap,
                         @Param("trangThaiCu") TrangThaiYeuCauNhap trangThaiCu,
                         @Param("trangThaiMoi") TrangThaiYeuCauNhap trangThaiMoi);
 }

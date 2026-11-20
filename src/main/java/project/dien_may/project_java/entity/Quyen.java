@@ -15,7 +15,6 @@ public class Quyen {
     @Column(name = "MaQuyen")
     private Integer maQuyen;
 
-    /** Mã dùng làm authority trong Spring Security, ví dụ SANPHAM_THEM. */
     @Column(name = "MaChucNang", nullable = false, length = 50)
     private String maChucNang;
 
