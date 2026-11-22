@@ -17,19 +17,23 @@
   });
 
   document.getElementById("hopXacNhanDongY").addEventListener("click", function () {
-    if (formCho) formCho.submit(); // submit() không kích hoạt lại sự kiện nên không bị hỏi lần hai
+    if (formCho) formCho.submit();
   });
 })();
 
-// In báo cáo: trình duyệt lấy tiêu đề trang làm tên file khi chọn "Lưu dưới dạng PDF"
+// In báo cáo dưới dạng pdf
 document.addEventListener("click", function (e) {
   const nut = e.target.closest("[data-in-bao-cao]");
   if (!nut) return;
 
   const tieuDeCu = document.title;
-  window.addEventListener("afterprint", function () {
-    document.title = tieuDeCu;
-  }, { once: true });
+  window.addEventListener(
+    "afterprint",
+    function () {
+      document.title = tieuDeCu;
+    },
+    { once: true },
+  );
   document.title = nut.dataset.inBaoCao;
   window.print();
 });

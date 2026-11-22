@@ -49,6 +49,7 @@ public class PhanQuyenService {
                 .collect(Collectors.groupingBy(Quyen::getNhomChucNang, LinkedHashMap::new, Collectors.toList()));
     }
 
+    // Lấy danh sách tất cả các quyển có hiệu lực
     @Transactional(readOnly = true)
     public Set<String> quyenHieuLuc(TaiKhoan taiKhoan) {
         String tenVaiTro = taiKhoan.getVaiTro().getTenVaiTro();
@@ -73,10 +74,7 @@ public class PhanQuyenService {
         return maChucNang(vaiTroNhanVien().getDsQuyen());
     }
 
-    /**
-     * @param dsMaQuyen các quyền được tick; thay đổi có hiệu lực với mọi nhân viên,
-     *                  trừ phần đã chỉnh riêng
-     */
+    // Cập nhật lại quyền cho toàn thể nhân viên
     @Transactional
     public void capNhatToanTheNhanVien(Collection<Integer> dsMaQuyen) {
         Set<Quyen> moi = layQuyen(dsMaQuyen);
@@ -90,10 +88,6 @@ public class PhanQuyenService {
         return taiKhoanRepository.findByVaiTroTenVaiTroOrderByHoTenAsc(VAI_TRO_NHAN_VIEN);
     }
 
-    /**
-     * Chỉ nhân viên kho mới có phân quyền riêng; tài khoản khác coi như không tồn
-     * tại ở màn hình này.
-     */
     @Transactional(readOnly = true)
     public TaiKhoan nhanVien(Integer maTaiKhoan) {
         return taiKhoanRepository.findById(maTaiKhoan)
@@ -109,12 +103,6 @@ public class PhanQuyenService {
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * Chỉ lưu phần khác với quyền của vai trò, nên ô nào tick giống toàn thể thì
-     * người đó tiếp tục theo toàn thể.
-     *
-     * @param dsMaQuyen các quyền được tick cho nhân viên này
-     */
     @Transactional
     public void capNhatNhanVien(Integer maTaiKhoan, Collection<Integer> dsMaQuyen) {
         TaiKhoan nhanVien = nhanVien(maTaiKhoan);

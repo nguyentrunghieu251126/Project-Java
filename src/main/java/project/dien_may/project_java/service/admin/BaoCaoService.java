@@ -25,10 +25,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Doanh thu và sản phẩm bán chạy chỉ tính đơn đã giao, theo ngày đặt hàng,
- * để các báo cáo khớp nhau trên cùng một khoảng thời gian.
- */
 @Service
 public class BaoCaoService {
 
@@ -39,34 +35,30 @@ public class BaoCaoService {
     private final SanPhamRepository sanPhamRepository;
 
     public BaoCaoService(DonHangRepository donHangRepository, ChiTietDonHangRepository chiTietDonHangRepository,
-                         SanPhamRepository sanPhamRepository) {
+            SanPhamRepository sanPhamRepository) {
         this.donHangRepository = donHangRepository;
         this.chiTietDonHangRepository = chiTietDonHangRepository;
         this.sanPhamRepository = sanPhamRepository;
     }
 
-    /** chuaToi: tháng còn ở tương lai, chưa có số liệu chứ không phải doanh thu bằng 0. */
     public record DoanhThuThang(int thang, long soDon, BigDecimal tienGiam, BigDecimal doanhThu, boolean chuaToi) {
     }
 
     public record MocTruc(String nhan, double phanTram) {
     }
 
-    /** phanTram là chiều cao của điểm so với đỉnh trục, chỉ có nghĩa khi tháng đã tới. */
     public record DiemDuong(int thang, BigDecimal doanhThu, long soDon, double phanTram, boolean chuaToi) {
     }
 
-    /** duongCong và vungTo là dữ liệu path của SVG, hệ tọa độ 100 x 100. */
     public record BieuDoDuong(int nam, List<DiemDuong> diem, List<MocTruc> moc, String duongCong, String vungTo) {
     }
 
     public record BaoCaoNam(int nam, List<DoanhThuThang> dsThang, BieuDoDuong bieuDo, long soDon,
-                            BigDecimal tongTienGiam, BigDecimal tongDoanhThu, BigDecimal giaTriDonTrungBinh) {
+            BigDecimal tongTienGiam, BigDecimal tongDoanhThu, BigDecimal giaTriDonTrungBinh) {
     }
 
-    /** thangCaoNhat và thangThapNhat là null khi chưa có tháng nào đủ điều kiện so sánh. */
     public record TomTatDoanhThu(BigDecimal caNam, DoanhThuThang thangHienTai,
-                                 DoanhThuThang thangCaoNhat, DoanhThuThang thangThapNhat) {
+            DoanhThuThang thangCaoNhat, DoanhThuThang thangThapNhat) {
     }
 
     public record CotSanPham(SanPhamBanChay sanPham, double phanTram) {
@@ -76,17 +68,16 @@ public class BaoCaoService {
     }
 
     public record BaoCaoThang(int nam, int thang, long soDon, BigDecimal tienGiam, BigDecimal doanhThu,
-                              long tongSoLuongBan, BieuDoSanPham bieuDo) {
+            long tongSoLuongBan, BieuDoSanPham bieuDo) {
     }
 
     public record DongBanChay(SanPhamBanChay sanPham, double phanTram) {
     }
 
     public record BaoCaoTonKho(List<TonKhoDanhMuc> theoDanhMuc, List<SanPham> dsCanNhap, long tongSanPham,
-                               long tongSoLuong, BigDecimal tongGiaTri, long soHetHang, long soSapHet) {
+            long tongSoLuong, BigDecimal tongGiaTri, long soHetHang, long soSapHet) {
     }
 
-    /** Các năm có thể xem báo cáo, mới nhất trước: ít nhất 5 năm gần nhất, xa hơn nếu có đơn cũ hơn. */
     @Transactional(readOnly = true)
     public List<Integer> dsNam() {
         int namNay = Year.now().getValue();
@@ -124,7 +115,8 @@ public class BaoCaoService {
         BigDecimal tongGiam = BigDecimal.ZERO;
         BigDecimal tong = BigDecimal.ZERO;
         for (int t = 1; t <= 12; t++) {
-            dsThang.add(new DoanhThuThang(t, soDon[t], tienGiam[t], doanhThu[t], YearMonth.of(nam, t).isAfter(thangNay)));
+            dsThang.add(
+                    new DoanhThuThang(t, soDon[t], tienGiam[t], doanhThu[t], YearMonth.of(nam, t).isAfter(thangNay)));
             tongDon += soDon[t];
             tongGiam = tongGiam.add(tienGiam[t]);
             tong = tong.add(doanhThu[t]);
@@ -135,10 +127,6 @@ public class BaoCaoService {
         return new BaoCaoNam(nam, dsThang, veBieuDoDuong(nam, dsThang), tongDon, tongGiam, tong, trungBinh);
     }
 
-    /**
-     * Chỉ so sánh từ tháng đầu tiên có đơn, vì các tháng trước đó chưa có dữ liệu chứ không phải bán ế.
-     * Tháng thấp nhất bỏ qua tháng đang chạy, nếu không tháng mới bắt đầu luôn thành thấp nhất.
-     */
     public TomTatDoanhThu tomTatDoanhThu(BaoCaoNam baoCao, int thangNay) {
         List<DoanhThuThang> tuThangCoDon = baoCao.dsThang().stream()
                 .dropWhile(t -> t.soDon() == 0)
@@ -187,7 +175,8 @@ public class BaoCaoService {
         List<SanPham> dsCanNhap = sanPhamRepository.danhSachCanNhap();
         long tongSanPham = theoDanhMuc.stream().mapToLong(TonKhoDanhMuc::soSanPham).sum();
         long tongSoLuong = theoDanhMuc.stream().mapToLong(TonKhoDanhMuc::soLuong).sum();
-        BigDecimal tongGiaTri = theoDanhMuc.stream().map(TonKhoDanhMuc::giaTri).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal tongGiaTri = theoDanhMuc.stream().map(TonKhoDanhMuc::giaTri).reduce(BigDecimal.ZERO,
+                BigDecimal::add);
         long soHet = dsCanNhap.stream().filter(s -> s.getTinhTrangTonKho() == TinhTrangTonKho.HET).count();
         return new BaoCaoTonKho(theoDanhMuc, dsCanNhap, tongSanPham, tongSoLuong, tongGiaTri, soHet,
                 dsCanNhap.size() - soHet);
@@ -208,8 +197,7 @@ public class BaoCaoService {
             double phanTram = t.doanhThu().doubleValue() * 100 / dinhTruc;
             dsDiem.add(new DiemDuong(t.thang(), t.doanhThu(), t.soDon(), phanTram, t.chuaToi()));
             if (!t.chuaToi()) {
-                // Điểm nằm giữa dải của tháng, khớp với cột nhãn dàn đều bên dưới
-                toaDo.add(new double[]{(t.thang() - 0.5) * 100 / 12, 100 - phanTram});
+                toaDo.add(new double[] { (t.thang() - 0.5) * 100 / 12, 100 - phanTram });
             }
         }
 
@@ -219,15 +207,12 @@ public class BaoCaoService {
         }
 
         String duongCong = duongCongDonDieu(toaDo);
-        String vungTo = toaDo.size() < 2 ? "" : duongCong
-                + " L" + so(toaDo.get(toaDo.size() - 1)[0]) + " 100 L" + so(toaDo.get(0)[0]) + " 100 Z";
+        String vungTo = toaDo.size() < 2 ? ""
+                : duongCong
+                        + " L" + so(toaDo.get(toaDo.size() - 1)[0]) + " 100 L" + so(toaDo.get(0)[0]) + " 100 Z";
         return new BieuDoDuong(nam, dsDiem, dsMoc, duongCong, vungTo);
     }
 
-    /**
-     * Đường cong đơn điệu (Fritsch–Butland): mượt nhưng không lượn quá điểm dữ liệu,
-     * nên không vẽ ra doanh thu âm hay đỉnh giả giữa hai tháng.
-     */
     private String duongCongDonDieu(List<double[]> diem) {
         int n = diem.size();
         if (n < 2) {
@@ -272,10 +257,9 @@ public class BaoCaoService {
         return new BieuDoSanPham(dsCot, dsMoc);
     }
 
-    /** Bước nguyên 1, 2, 5, 10, 20... đủ để bốn khoảng trên trục chứa được giá trị lớn nhất. */
     private long buocTrucSoNguyen(long lonNhat) {
-        for (long coSo = 1; ; coSo *= 10) {
-            for (long heSo : new long[]{1, 2, 5}) {
+        for (long coSo = 1;; coSo *= 10) {
+            for (long heSo : new long[] { 1, 2, 5 }) {
                 if (coSo * heSo * 4 >= lonNhat) {
                     return coSo * heSo;
                 }
@@ -283,13 +267,12 @@ public class BaoCaoService {
         }
     }
 
-    /** Làm tròn lên số đẹp để bốn mốc trên trục đều là số dễ đọc. */
     private double lamTronDinhTruc(double giaTri) {
         if (giaTri <= 0) {
             return 1_000_000;
         }
         double coSo = Math.pow(10, Math.floor(Math.log10(giaTri)));
-        for (double heSo : new double[]{1, 2, 4, 6, 8, 10}) {
+        for (double heSo : new double[] { 1, 2, 4, 6, 8, 10 }) {
             if (coSo * heSo >= giaTri) {
                 return coSo * heSo;
             }

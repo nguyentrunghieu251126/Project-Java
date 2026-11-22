@@ -14,10 +14,6 @@ import project.dien_may.project_java.repository.VaiTroRepository;
 
 import java.util.Locale;
 
-/**
- * Quản trị viên không được khóa, xóa hay đổi vai trò của chính mình. Nhờ vậy người đang
- * thao tác luôn còn quyền, hệ thống không thể rơi vào tình trạng không còn quản trị viên.
- */
 @Service
 public class TaiKhoanAdminService {
 
@@ -26,7 +22,7 @@ public class TaiKhoanAdminService {
     private final PasswordEncoder passwordEncoder;
 
     public TaiKhoanAdminService(TaiKhoanRepository taiKhoanRepository, VaiTroRepository vaiTroRepository,
-                                PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder) {
         this.taiKhoanRepository = taiKhoanRepository;
         this.vaiTroRepository = vaiTroRepository;
         this.passwordEncoder = passwordEncoder;
