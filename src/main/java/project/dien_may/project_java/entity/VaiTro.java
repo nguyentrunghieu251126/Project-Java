@@ -47,6 +47,7 @@ public class VaiTro {
             case "QUAN_TRI" -> "Quản trị viên";
             case "NHAN_VIEN_KHO" -> "Nhân viên kho";
             case "KHACH_HANG" -> "Khách hàng";
+            case "NHAN_VIEN_GIAO_HANG" -> "Nhân viên giao hàng";
             default -> tenVaiTro;
         };
     }

@@ -104,6 +104,7 @@ public class AdminKhoController {
         model.addAttribute("tinhTrang", tinhTrang);
         model.addAttribute("dsTinhTrang", TinhTrangTonKho.values());
         model.addAttribute("dsDanhMuc", danhMucRepository.findAllByOrderByTenDanhMucAsc());
+        model.addAttribute("dangChoNhap", khoService.yeuCauDangChoTheoSanPham());
         return "admin/kho/ton-kho";
     }
 

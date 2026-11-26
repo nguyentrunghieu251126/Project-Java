@@ -22,6 +22,15 @@ import project.dien_may.project_java.repository.YeuCauNhapHangRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /** Việc ở khâu kho: xem đơn hàng, lập và duyệt yêu cầu nhập (QT17, QT19 – QT21, NVK09). */
 @Service
@@ -49,6 +58,16 @@ public class KhoAdminService {
     public record KetQuaNhap(Integer maYeuCau, boolean daDuyet) {
     }
 
+    /** Giới hạn số lượng cho mỗi dòng yêu cầu nhập. */
+    private static final int SO_LUONG_NHAP_TOI_DA = 10000;
+
+    /**
+     * Một dòng trên trang lập yêu cầu nhập nhiều sản phẩm.
+     * @param canhBao true khi sản phẩm hết hoặc sắp hết hàng; false là sản phẩm còn hàng, nhập thêm để dự trữ
+     */
+    public record DongCanNhap(SanPham sanPham, int soLuongGoiY, boolean canhBao) {
+    }
+
     /**
      * Lập phiếu yêu cầu nhập cho một sản phẩm đang ở mức cảnh báo (sắp hết hoặc hết hàng).
      * Nhân viên kho gửi thì phiếu chờ duyệt; quản trị viên lập thì phiếu được duyệt luôn.
@@ -56,20 +75,76 @@ public class KhoAdminService {
      */
     @Transactional
     public KetQuaNhap lapYeuCauNhap(Integer maSanPham, Integer soLuong, String emailNguoiGui) {
-        SanPham sanPham = sanPhamRepository.findById(maSanPham)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (sanPham.getTinhTrangTonKho() == TinhTrangTonKho.DU) {
-            throw new NghiepVuException("Sản phẩm " + sanPham.getTenSanPham() + " vẫn đủ hàng, chưa cần yêu cầu nhập.");
+        return lapYeuCau(Collections.singletonList(maSanPham), Collections.singletonList(soLuong),
+                emailNguoiGui, false);
+    }
+
+    /**
+     * TV4: sản phẩm đang có yêu cầu nhập chưa xong (chờ duyệt hoặc đã duyệt chờ lập phiếu nhập),
+     * khóa là mã sản phẩm, giá trị là mã yêu cầu. Dùng để hiện "Đang chờ nhập #..." thay cho nút nhập.
+     */
+    @Transactional(readOnly = true)
+    public Map<Integer, Integer> yeuCauDangChoTheoSanPham() {
+        Map<Integer, Integer> ketQua = new HashMap<>();
+        for (Object[] dong : chiTietYeuCauRepository.sanPhamVaYeuCauTheoTrangThai(
+                List.of(TrangThaiYeuCauNhap.CHO_DUYET, TrangThaiYeuCauNhap.DA_DUYET))) {
+            ketQua.putIfAbsent((Integer) dong[0], (Integer) dong[1]);
         }
-        if (soLuong == null || soLuong <= 0) {
-            throw new NghiepVuException("Số lượng yêu cầu nhập phải lớn hơn 0.");
+        return ketQua;
+    }
+
+    /**
+     * TV4 – NVK09: mọi sản phẩm đang kinh doanh chưa có yêu cầu nhập nào đang chờ.
+     * Sản phẩm hết hàng, sắp hết đứng trước (gợi ý phần còn thiếu); sản phẩm còn hàng đứng sau
+     * (gợi ý nhập thêm bằng mức tồn tối thiểu).
+     */
+    @Transactional(readOnly = true)
+    public List<DongCanNhap> sanPhamCoTheYeuCauNhap() {
+        Set<Integer> daCoYeuCau = new HashSet<>(
+                chiTietYeuCauRepository.maSanPhamTheoTrangThai(TrangThaiYeuCauNhap.CHO_DUYET));
+        daCoYeuCau.addAll(chiTietYeuCauRepository.maSanPhamTheoTrangThai(TrangThaiYeuCauNhap.DA_DUYET));
+        return sanPhamRepository.danhSachDangKinhDoanh().stream()
+                .filter(sp -> !daCoYeuCau.contains(sp.getMaSanPham()))
+                .sorted(Comparator.comparing(SanPham::getTinhTrangTonKho))
+                .map(sp -> {
+                    boolean canhBao = sp.getTinhTrangTonKho() != TinhTrangTonKho.DU;
+                    int goiY = canhBao ? sp.getMucTonToiThieu() - sp.getSoLuong() : sp.getMucTonToiThieu();
+                    return new DongCanNhap(sp, Math.max(1, goiY), canhBao);
+                })
+                .toList();
+    }
+
+    /**
+     * TV4 – NVK09: lập MỘT yêu cầu nhập gồm nhiều sản phẩm. Khi được duyệt, kho lập một phiếu nhập
+     * chứa đủ các sản phẩm này (NVK10). Chạy trong một transaction: một dòng không hợp lệ thì không lưu gì.
+     *
+     * @param dsMaSanPham mã sản phẩm, cùng thứ tự với dsSoLuong
+     */
+    @Transactional
+    public KetQuaNhap lapYeuCauNhapNhieu(List<Integer> dsMaSanPham, List<Integer> dsSoLuong, String emailNguoiGui) {
+        return lapYeuCau(dsMaSanPham, dsSoLuong, emailNguoiGui, true);
+    }
+
+    /** @param choNhapThem true thì cho phép cả sản phẩm còn đủ hàng (nhập thêm để dự trữ) */
+    private KetQuaNhap lapYeuCau(List<Integer> dsMaSanPham, List<Integer> dsSoLuong, String emailNguoiGui,
+            boolean choNhapThem) {
+        if (dsMaSanPham == null || dsMaSanPham.isEmpty()) {
+            throw new NghiepVuException("Vui lòng chọn ít nhất một sản phẩm cần nhập.");
         }
-        if (chiTietYeuCauRepository.existsBySanPhamMaSanPhamAndYeuCauTrangThai(maSanPham, TrangThaiYeuCauNhap.CHO_DUYET)) {
-            throw new NghiepVuException("Sản phẩm " + sanPham.getTenSanPham() + " đã có yêu cầu nhập đang chờ duyệt.");
+        if (dsSoLuong == null || dsSoLuong.size() != dsMaSanPham.size()) {
+            throw new NghiepVuException("Vui lòng nhập số lượng cho từng sản phẩm đã chọn.");
         }
-        if (chiTietYeuCauRepository.existsBySanPhamMaSanPhamAndYeuCauTrangThai(maSanPham, TrangThaiYeuCauNhap.DA_DUYET)) {
-            throw new NghiepVuException("Sản phẩm " + sanPham.getTenSanPham()
-                    + " đã có yêu cầu được duyệt, đang chờ kho lập phiếu nhập.");
+        if (new HashSet<>(dsMaSanPham).size() != dsMaSanPham.size()) {
+            throw new NghiepVuException("Mỗi sản phẩm chỉ được chọn một lần trong một yêu cầu.");
+        }
+
+        List<SanPham> dsSanPham = new ArrayList<>();
+        for (int i = 0; i < dsMaSanPham.size(); i++) {
+            Integer ma = dsMaSanPham.get(i);
+            SanPham sanPham = (ma == null ? Optional.<SanPham>empty() : sanPhamRepository.findById(ma))
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+            kiemTraCoTheYeuCauNhap(sanPham, dsSoLuong.get(i), choNhapThem);
+            dsSanPham.add(sanPham);
         }
 
         TaiKhoan nguoiGui = taiKhoanRepository.findByEmailIgnoreCase(emailNguoiGui).orElseThrow();
@@ -88,13 +163,38 @@ public class KhoAdminService {
         }
         yeuCauRepository.save(yeuCau);
 
-        ChiTietYeuCauNhapHang chiTiet = new ChiTietYeuCauNhapHang();
-        chiTiet.setYeuCau(yeuCau);
-        chiTiet.setSanPham(sanPham);
-        chiTiet.setSoLuongYeuCau(soLuong);
-        chiTietYeuCauRepository.save(chiTiet);
-
+        for (int i = 0; i < dsSanPham.size(); i++) {
+            ChiTietYeuCauNhapHang chiTiet = new ChiTietYeuCauNhapHang();
+            chiTiet.setYeuCau(yeuCau);
+            chiTiet.setSanPham(dsSanPham.get(i));
+            chiTiet.setSoLuongYeuCau(dsSoLuong.get(i));
+            chiTietYeuCauRepository.save(chiTiet);
+        }
         return new KetQuaNhap(yeuCau.getMaYeuCauNhap(), nhapNgay);
+    }
+
+    private void kiemTraCoTheYeuCauNhap(SanPham sanPham, Integer soLuong, boolean choNhapThem) {
+        Integer maSanPham = sanPham.getMaSanPham();
+        if (choNhapThem && !sanPham.isDangKinhDoanh()) {
+            throw new NghiepVuException("Sản phẩm " + sanPham.getTenSanPham() + " đã ngừng kinh doanh.");
+        }
+        if (!choNhapThem && sanPham.getTinhTrangTonKho() == TinhTrangTonKho.DU) {
+            throw new NghiepVuException("Sản phẩm " + sanPham.getTenSanPham() + " vẫn đủ hàng, chưa cần yêu cầu nhập.");
+        }
+        if (soLuong == null || soLuong <= 0) {
+            throw new NghiepVuException("Số lượng yêu cầu nhập của " + sanPham.getTenSanPham() + " phải lớn hơn 0.");
+        }
+        if (soLuong > SO_LUONG_NHAP_TOI_DA) {
+            throw new NghiepVuException("Số lượng yêu cầu nhập của " + sanPham.getTenSanPham()
+                    + " không được vượt quá " + SO_LUONG_NHAP_TOI_DA + ".");
+        }
+        if (chiTietYeuCauRepository.existsBySanPhamMaSanPhamAndYeuCauTrangThai(maSanPham, TrangThaiYeuCauNhap.CHO_DUYET)) {
+            throw new NghiepVuException("Sản phẩm " + sanPham.getTenSanPham() + " đã có yêu cầu nhập đang chờ duyệt.");
+        }
+        if (chiTietYeuCauRepository.existsBySanPhamMaSanPhamAndYeuCauTrangThai(maSanPham, TrangThaiYeuCauNhap.DA_DUYET)) {
+            throw new NghiepVuException("Sản phẩm " + sanPham.getTenSanPham()
+                    + " đã có yêu cầu được duyệt, đang chờ kho lập phiếu nhập.");
+        }
     }
 
     @Transactional(readOnly = true)

@@ -26,13 +26,14 @@ public final class TabKhuQuanLy {
             new Tab("/admin/kho/yeu-cau-nhap", Set.of("KHO_DUYET_NHAP", "KHO_YEUCAU_NHAP")),
             new Tab("/admin/kho/bao-hanh", Set.of("BAOHANH_XULY")),
             new Tab("/admin/kho/doi-tra", Set.of("DOITRA_XULY")),
+            new Tab("/admin/giao-hang", Set.of("GIAOHANG_XULY")),
             new Tab("/admin/tai-khoan", Set.of("TAIKHOAN_XEM")),
             new Tab("/admin/phan-quyen", Set.of("PHANQUYEN_QUANLY")));
 
     private TabKhuQuanLy() {
     }
 
-    // Trỏ vào tab đầu tiên khi tài khoản người dùng là nhân viên kho hay admin
+    // Trỏ vào tab đầu tiên khi tài khoản người dùng là nhân viên kho, nhân viên giao hàng hay admin
     public static Optional<String> tabDauTien(Collection<? extends GrantedAuthority> dsQuyen) {
         Set<String> coQuyen = dsQuyen.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
         return DS_TAB.stream()

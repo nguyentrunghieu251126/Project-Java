@@ -51,4 +51,13 @@ public class DonHang {
 
     @Column(name = "NgayGiao")
     private LocalDateTime ngayGiao;
+
+    /** TV4: nhân viên giao hàng đã nhận đơn (null khi chưa có ai nhận). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MaNhanVienGiao")
+    private TaiKhoan nhanVienGiao;
+
+    /** TV4: lý do giao không thành công, có khi nhân viên giao hàng báo giao thất bại. */
+    @Column(name = "LyDoGiaoThatBai", length = 500)
+    private String lyDoGiaoThatBai;
 }

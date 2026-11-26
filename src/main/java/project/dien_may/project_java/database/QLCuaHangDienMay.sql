@@ -177,8 +177,11 @@ CREATE TABLE dbo.DonHang (
     TongTien DECIMAL (18, 0) NOT NULL,
     TrangThaiDonHang VARCHAR (20) CONSTRAINT DF_DonHang_TrangThai DEFAULT 'CHO_XAC_NHAN' NOT NULL,
     NgayGiao DATETIME2 (0) NULL, 
+    MaNhanVienGiao INT NULL, -- TV4: nhân viên giao hàng đã nhận đơn
+    LyDoGiaoThatBai NVARCHAR (500) NULL, -- TV4: lý do khi giao không thành công
     CONSTRAINT PK_DonHang PRIMARY KEY (MaDonHang),
     CONSTRAINT FK_DonHang_TaiKhoan FOREIGN KEY (MaTaiKhoan) REFERENCES dbo.TaiKhoan (MaTaiKhoan),
+    CONSTRAINT FK_DonHang_NhanVienGiao FOREIGN KEY (MaNhanVienGiao) REFERENCES dbo.TaiKhoan (MaTaiKhoan),
     CONSTRAINT FK_DonHang_KhuyenMai FOREIGN KEY (MaKhuyenMai) REFERENCES dbo.KhuyenMai (MaKhuyenMai),
     CONSTRAINT CK_DonHang_Tien CHECK (TongTien >= 0 AND TienGiam >= 0),
     CONSTRAINT CK_DonHang_TrangThai CHECK (TrangThaiDonHang IN ('CHO_XAC_NHAN', 'DA_XAC_NHAN', 'DA_XUAT_KHO', 'DANG_GIAO', 'DA_GIAO', 'DA_HUY')),
@@ -189,6 +192,7 @@ CREATE TABLE dbo.DonHang (
 CREATE INDEX IX_DonHang_NgayDat ON dbo.DonHang (NgayDat); 
 CREATE INDEX IX_DonHang_MaTaiKhoan ON dbo.DonHang (MaTaiKhoan);
 CREATE INDEX IX_DonHang_TrangThai ON dbo.DonHang (TrangThaiDonHang);
+CREATE INDEX IX_DonHang_NhanVienGiao ON dbo.DonHang (MaNhanVienGiao);
 
 -- Bảng chi tiết đơn hàng
 CREATE TABLE dbo.ChiTietDonHang (
@@ -375,7 +379,8 @@ SET IDENTITY_INSERT dbo.VaiTro ON;
 INSERT INTO dbo.VaiTro (MaVaiTro, TenVaiTro) VALUES
 (1, N'QUAN_TRI'),
 (2, N'NHAN_VIEN_KHO'),
-(3, N'KHACH_HANG');
+(3, N'KHACH_HANG'),
+(4, N'NHAN_VIEN_GIAO_HANG');
 
 -- Bật lại cơ chế đánh số tự động
 SET IDENTITY_INSERT dbo.VaiTro OFF;
@@ -423,7 +428,8 @@ INSERT INTO dbo.Quyen (MaQuyen, MaChucNang, TenQuyen, NhomChucNang, MoTa) VALUES
 (35, 'DANHGIA_VIET', N'Đánh giá sản phẩm', N'Mua hàng', N'KH22'),
 (36, 'HOTRO_GUI', N'Gửi yêu cầu hỗ trợ', N'Hỗ trợ', N'KH23'),
 (37, 'TAIKHOAN_CANHAN', N'Cập nhật thông tin cá nhân', N'Tài khoản', N'KH04 và mọi vai trò'),
-(38, 'TONGQUAN_XEM', N'Xem trang tổng quan', N'Tổng quan', N'QT08');
+(38, 'TONGQUAN_XEM', N'Xem trang tổng quan', N'Tổng quan', N'QT08'),
+(39, 'GIAOHANG_XULY', N'Nhận và giao đơn hàng', N'Giao hàng', N'NVGH01 – NVGH04');
 
 -- Bật lại cơ chế đánh số tự động
 SET IDENTITY_INSERT dbo.Quyen OFF;
@@ -437,6 +443,8 @@ INSERT INTO dbo.VaiTro_Quyen (MaVaiTro, MaQuyen) VALUES
 (1, 21), (1, 28), (1, 37),
 -- Nhân viên kho
 (2, 1), (2, 20), (2, 22), (2, 23), (2, 24), (2, 25), (2, 26), (2, 27), (2, 37),
+-- Nhân viên giao hàng (TV4)
+(4, 37), (4, 39),
 -- Khách hàng
 (3, 29), (3, 30), (3, 31), (3, 32), (3, 33), (3, 34), (3, 35), (3, 36), (3, 37);
 GO
@@ -475,7 +483,10 @@ INSERT INTO dbo.TaiKhoan (MaTaiKhoan, HoTen, Email, MatKhau, SoDienThoai, DiaChi
 (27, N'Phạm Hoàng Giang', 'giang.pham27@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0961675136', N'38 Điện Biên Phủ, Quận 10, TP. Hồ Chí Minh', 3, 1, '2026-06-09T09:00:00'),
 (28, N'Lê Anh Yến', 'yen.le28@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0952427316', N'250 Cách Mạng Tháng 8, Quận 7, TP. Hồ Chí Minh', 3, 1, '2026-03-21T19:00:00'),
 (29, N'Võ Bảo Phúc', 'phuc.vo29@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0956355150', N'174 Hoàng Văn Thụ, Quận Tân Bình, TP. Hồ Chí Minh', 3, 0, '2026-04-26T19:00:00'),
-(30, N'Nguyễn Gia Mai', 'mai.nguyen30@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0989481131', N'44 Võ Văn Tần, Quận 10, TP. Hồ Chí Minh', 3, 1, '2026-03-06T20:00:00');
+(30, N'Nguyễn Gia Mai', 'mai.nguyen30@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0989481131', N'44 Võ Văn Tần, Quận 10, TP. Hồ Chí Minh', 3, 1, '2026-03-06T20:00:00'),
+-- Nhân viên giao hàng (TV4)
+(31, N'Trần Văn Lực', 'giaohang1@dienmay.vn', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0938112233', N'18 Nguyễn Thị Thập, Quận 7, TP. Hồ Chí Minh', 4, 1, '2026-05-02T08:00:00'),
+(32, N'Phạm Minh Khoa', 'giaohang2@dienmay.vn', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0907445566', N'72 Lê Văn Việt, TP. Thủ Đức, TP. Hồ Chí Minh', 4, 1, '2026-05-10T08:00:00');
 
 -- Bật lại cơ chế đánh số tự động
 SET IDENTITY_INSERT dbo.TaiKhoan OFF;
@@ -1657,4 +1668,12 @@ FROM dbo.ChiTietDonHang ct
 JOIN dbo.SanPham sp ON sp.MaSanPham = ct.MaSanPham
 JOIN dbo.DonHang d ON d.MaDonHang = ct.MaDonHang
 WHERE d.TrangThaiDonHang IN ('DA_XUAT_KHO', 'DANG_GIAO', 'DA_GIAO');
+GO
+
+/* ===================== TV4 – NHÂN VIÊN GIAO HÀNG ===================== */
+-- Dữ liệu mẫu: các đơn đang giao và đã giao được gán cho 2 nhân viên giao hàng (tài khoản 31, 32).
+UPDATE dbo.DonHang
+SET    MaNhanVienGiao = CASE WHEN MaDonHang % 2 = 0 THEN 31 ELSE 32 END
+WHERE  TrangThaiDonHang IN ('DANG_GIAO', 'DA_GIAO')
+  AND  MaNhanVienGiao IS NULL;
 GO

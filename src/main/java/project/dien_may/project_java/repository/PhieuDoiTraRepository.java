@@ -25,4 +25,7 @@ public interface PhieuDoiTraRepository extends JpaRepository<PhieuDoiTra, Intege
 
     @EntityGraph(attributePaths = { "chiTietDonHang", "chiTietDonHang.sanPham" })
     List<PhieuDoiTra> findByChiTietDonHangDonHangTaiKhoanEmailIgnoreCaseOrderByNgayYeuCauDesc(String email);
+
+    @EntityGraph(attributePaths = { "chiTietDonHang", "chiTietDonHang.sanPham" })
+    List<PhieuDoiTra> findByChiTietDonHangDonHangMaDonHangOrderByNgayYeuCauDesc(Integer maDonHang);
 }
