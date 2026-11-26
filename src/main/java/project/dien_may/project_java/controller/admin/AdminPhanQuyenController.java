@@ -24,24 +24,30 @@ public class AdminPhanQuyenController {
         this.phanQuyenService = phanQuyenService;
     }
 
+    /** vaiTro: NHAN_VIEN_KHO (mặc định) hoặc NHAN_VIEN_BAO_HANH. */
     @GetMapping
-    public String toanThe(Model model) {
+    public String toanThe(@RequestParam(required = false) String vaiTro, Model model) {
+        String ten = PhanQuyenService.chuanHoaVaiTro(vaiTro);
         model.addAttribute("quyenTheoNhom", phanQuyenService.quyenTheoNhom());
-        model.addAttribute("daChon", phanQuyenService.quyenToanTheNhanVien());
+        model.addAttribute("daChon", phanQuyenService.quyenToanTheNhanVien(ten));
         model.addAttribute("chinhRieng", Set.of());
+        model.addAttribute("vaiTroHienTai", ten);
+        model.addAttribute("dsVaiTroNhanVien", phanQuyenService.dsVaiTroNhanVien());
         return "admin/phan-quyen";
     }
 
     @PostMapping
-    public String luuToanThe(@RequestParam(name = "quyen", required = false) List<Integer> dsMaQuyen,
+    public String luuToanThe(@RequestParam(required = false) String vaiTro,
+            @RequestParam(name = "quyen", required = false) List<Integer> dsMaQuyen,
             RedirectAttributes redirect) {
+        String ten = PhanQuyenService.chuanHoaVaiTro(vaiTro);
         try {
-            phanQuyenService.capNhatToanTheNhanVien(dsMaQuyen == null ? List.of() : dsMaQuyen);
+            phanQuyenService.capNhatToanTheNhanVien(ten, dsMaQuyen == null ? List.of() : dsMaQuyen);
             redirect.addFlashAttribute("thongBao", "Đã lưu phân quyền. Thay đổi có hiệu lực ngay lập tức.");
         } catch (NghiepVuException e) {
             redirect.addFlashAttribute("loi", e.getMessage());
         }
-        return "redirect:/admin/phan-quyen";
+        return "redirect:/admin/phan-quyen?vaiTro=" + ten;
     }
 
     @GetMapping("/nhan-vien")

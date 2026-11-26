@@ -9,9 +9,12 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import project.dien_may.project_java.dto.muahang.ChiTietDonHangKhach;
 import project.dien_may.project_java.dto.muahang.DatHangForm;
 import project.dien_may.project_java.dto.muahang.TrangThanhToan;
 import project.dien_may.project_java.entity.SoDiaChi;
+import project.dien_may.project_java.entity.ThanhToan;
+import project.dien_may.project_java.entity.TrangThaiThanhToan;
 import project.dien_may.project_java.service.admin.NghiepVuException;
 import project.dien_may.project_java.service.muahang.DatHangService;
 import project.dien_may.project_java.service.muahang.DonHangKhachHangService;
@@ -66,7 +69,9 @@ public class DatHangController {
                 form.setSoDienThoaiNguoiNhan(dc.getSoDienThoai());
                 form.setDiaChiGiaoHang(dc.getDiaChiDayDu());
                 Integer maDon = datHangService.datHang(principal.getName(), form);
-                return "redirect:/dat-hang/thanh-cong/" + maDon;
+                return form.getPhuongThucThanhToan().isQuetQr()
+                        ? "redirect:/dat-hang/thanh-toan/" + maDon
+                        : "redirect:/dat-hang/thanh-cong/" + maDon;
             } catch (NghiepVuException e) {
                 model.addAttribute("loi", e.getMessage());
             } catch (DataAccessException e) {
@@ -76,6 +81,30 @@ public class DatHangController {
         }
         return hienTrang(model, principal,
                 datHangService.layTrangThanhToan(principal.getName(), form.getSanPham()), form);
+    }
+
+    /** Trang quét mã QR (mô phỏng) cho các phương thức trả trước. */
+    @GetMapping("/thanh-toan/{maDon}")
+    public String trangQuetQr(@PathVariable Integer maDon, Principal principal, Model model) {
+        ChiTietDonHangKhach ct = donHangService.layChiTiet(principal.getName(), maDon);
+        ThanhToan tt = ct.thanhToan();
+        if (tt == null || !tt.getPhuongThuc().isQuetQr() || ct.daHuy()
+                || tt.getTrangThai() != TrangThaiThanhToan.CHUA_THANH_TOAN) {
+            return "redirect:/dat-hang/thanh-cong/" + maDon;
+        }
+        model.addAttribute("ct", ct);
+        return "dat-hang/ThanhToanQR";
+    }
+
+    @PostMapping("/thanh-toan/{maDon}")
+    public String daThanhToan(@PathVariable Integer maDon, Principal principal, RedirectAttributes redirect) {
+        try {
+            donHangService.xacNhanDaThanhToan(principal.getName(), maDon);
+        } catch (NghiepVuException e) {
+            redirect.addFlashAttribute("loi", e.getMessage());
+            return "redirect:/don-hang/" + maDon;
+        }
+        return "redirect:/dat-hang/thanh-cong/" + maDon;
     }
 
     @GetMapping("/thanh-cong/{maDon}")

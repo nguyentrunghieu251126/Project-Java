@@ -46,7 +46,7 @@
         </form>
         <ul class="navbar-nav align-items-lg-center gap-lg-2">
           <!-- Quản trị viên đang xem cửa hàng: nút quay lại khu quản trị -->
-          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO')">
+          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_BAO_HANH')">
             <a class="nav-link admin-link" th:href="@{/admin}">
               <i class="bi bi-speedometer2" aria-hidden="true"></i> Trang quản trị
             </a>
@@ -305,15 +305,6 @@
                       th:text="|Đơn này được giảm ${#numbers.formatDecimal(lc.tienGiam(), 1, 'POINT', 0, 'COMMA')}₫|">Đơn này được giảm</span>
               </span>
             </label>
-            <div class="mh-bank" id="thongTinChuyenKhoan" hidden th:if="${pt.name() == 'CHUYEN_KHOAN'}">
-              <div class="mh-bank-qr" aria-hidden="true"><i class="bi bi-qr-code"></i></div>
-              <dl>
-                <div><dt>Ngân hàng</dt><dd>Vietcombank – CN TP.HCM</dd></div>
-                <div><dt>Số tài khoản</dt><dd>0123 4567 8910</dd></div>
-                <div><dt>Chủ tài khoản</dt><dd>CONG TY PDMJV</dd></div>
-                <div><dt>Nội dung</dt><dd>Mã đơn + số điện thoại</dd></div>
-              </dl>
-            </div>
           </th:block>
         </section>
       </div>

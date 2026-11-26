@@ -19,8 +19,9 @@ import java.util.Set;
 
 @Configuration
 public class SecurityConfig {
-        private static final String[] VAI_TRO_KHU_QUAN_LY = { "QUAN_TRI", "NHAN_VIEN_KHO" };
-        private static final Set<String> ROLE_KHU_QUAN_LY = Set.of("ROLE_QUAN_TRI", "ROLE_NHAN_VIEN_KHO");
+        private static final String[] VAI_TRO_KHU_QUAN_LY = { "QUAN_TRI", "NHAN_VIEN_KHO", "NHAN_VIEN_BAO_HANH" };
+        private static final Set<String> ROLE_KHU_QUAN_LY = Set.of("ROLE_QUAN_TRI", "ROLE_NHAN_VIEN_KHO",
+                        "ROLE_NHAN_VIEN_BAO_HANH");
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService)

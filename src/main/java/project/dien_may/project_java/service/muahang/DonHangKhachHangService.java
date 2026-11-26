@@ -20,6 +20,7 @@ import project.dien_may.project_java.repository.TaiKhoanRepository;
 import project.dien_may.project_java.repository.ThanhToanRepository;
 import project.dien_may.project_java.repository.TonKhoMuaHangRepository;
 import project.dien_may.project_java.service.admin.NghiepVuException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -128,6 +129,28 @@ public class DonHangKhachHangService {
         }
         return new ChiTietDonHangKhach(donHang, chiTiet, thanhToan, dungCacBuoc(donHang), soSao,
                 diemThuongService.theoDon(maDon));
+    }
+
+    /**
+     * Mô phỏng cổng thanh toán: khách bấm "Tôi đã thanh toán" sau khi quét mã QR.
+     * Bấm lại khi đã thanh toán thì bỏ qua, không báo lỗi.
+     */
+    @Transactional
+    public void xacNhanDaThanhToan(String email, Integer maDon) {
+        DonHang donHang = timDon(email, maDon);
+        ThanhToan tt = thanhToanRepository.findFirstByDonHangMaDonHangOrderByMaThanhToanDesc(maDon)
+                .orElseThrow(() -> new NghiepVuException("Đơn hàng chưa có thông tin thanh toán."));
+        if (!tt.getPhuongThuc().isQuetQr()) {
+            throw new NghiepVuException("Đơn thanh toán khi nhận hàng không cần thanh toán trước.");
+        }
+        if (tt.getTrangThai() == TrangThaiThanhToan.DA_THANH_TOAN) {
+            return;
+        }
+        if (donHang.getTrangThai() == TrangThaiDonHang.DA_HUY || tt.getTrangThai() != TrangThaiThanhToan.CHUA_THANH_TOAN) {
+            throw new NghiepVuException("Đơn hàng đã hủy nên không thể thanh toán.");
+        }
+        tt.setTrangThai(TrangThaiThanhToan.DA_THANH_TOAN);
+        tt.setNgayThanhToan(LocalDateTime.now());
     }
 
     @Transactional

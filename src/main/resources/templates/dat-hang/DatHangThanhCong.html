@@ -46,7 +46,7 @@
         </form>
         <ul class="navbar-nav align-items-lg-center gap-lg-2">
           <!-- Quản trị viên đang xem cửa hàng: nút quay lại khu quản trị -->
-          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO')">
+          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_BAO_HANH')">
             <a class="nav-link admin-link" th:href="@{/admin}">
               <i class="bi bi-speedometer2" aria-hidden="true"></i> Trang quản trị
             </a>
@@ -184,6 +184,11 @@
         <div><dt>Mã đơn hàng</dt><dd th:text="${'#' + ct.maHien()}">#DH000001</dd></div>
         <div><dt>Tổng thanh toán</dt><dd class="mh-success-money" th:text="${#numbers.formatDecimal(d.tongTien, 1, 'POINT', 0, 'COMMA')} + '₫'">0₫</dd></div>
         <div th:if="${ct.thanhToan() != null}"><dt>Thanh toán</dt><dd th:text="${ct.thanhToan().phuongThuc.nhan}">COD</dd></div>
+        <div th:if="${ct.thanhToan() != null and ct.thanhToan().phuongThuc.quetQr}"><dt>Trạng thái thanh toán</dt>
+          <dd th:if="${ct.thanhToan().trangThai.name() == 'DA_THANH_TOAN'}" class="mh-paid">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Đã thanh toán</dd>
+          <dd th:unless="${ct.thanhToan().trangThai.name() == 'DA_THANH_TOAN'}" class="mh-unpaid">Chưa thanh toán
+            <a th:unless="${ct.daHuy()}" th:href="@{/dat-hang/thanh-toan/{id}(id=${d.maDonHang})}">Thanh toán ngay</a></dd></div>
         <div th:if="${ct.thanhToan() != null and ct.thanhToan().tienGiamUuDai != null and ct.thanhToan().tienGiamUuDai.signum() > 0}"><dt>Ưu đãi thanh toán</dt>
           <dd th:text="|−${#numbers.formatDecimal(ct.thanhToan().tienGiamUuDai, 1, 'POINT', 0, 'COMMA')}₫ (${ct.thanhToan().uuDai})|">−0₫</dd></div>
         <div><dt>Người nhận</dt><dd th:text="|${d.hoTenNguoiNhan} · ${d.soDienThoaiNguoiNhan}|">Người nhận</dd></div>
@@ -195,15 +200,6 @@
         <div th:if="${ct.ngayNhanDuKien() != null}"><dt>Dự kiến nhận hàng</dt>
           <dd th:text="|${ct.ngayNhanDuKien()} (${ct.giaoHang().soNgay()})|">Thứ Năm 12/11 – Thứ Sáu 13/11</dd></div>
       </dl>
-      <div class="mh-bank mh-bank-inline" th:if="${ct.thanhToan() != null and ct.thanhToan().phuongThuc.name() == 'CHUYEN_KHOAN'}">
-        <div class="mh-bank-qr" aria-hidden="true"><i class="bi bi-qr-code"></i></div>
-        <dl>
-          <div><dt>Ngân hàng</dt><dd>Vietcombank – CN TP.HCM</dd></div>
-          <div><dt>Số tài khoản</dt><dd>0123 4567 8910</dd></div>
-          <div><dt>Chủ tài khoản</dt><dd>CONG TY PDMJV</dd></div>
-          <div><dt>Nội dung</dt><dd th:text="${ct.maHien() + ' ' + d.soDienThoaiNguoiNhan}">Nội dung</dd></div>
-        </dl>
-      </div>
       <div class="mh-success-actions">
         <a class="account-primary" href="#" th:href="@{/don-hang/{id}(id=${d.maDonHang})}"><i class="bi bi-receipt"></i> Xem đơn hàng</a>
         <a class="account-secondary" href="#" th:href="@{/}">Tiếp tục mua sắm</a>

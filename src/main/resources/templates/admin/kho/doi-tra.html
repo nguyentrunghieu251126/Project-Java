@@ -42,7 +42,9 @@
                                 <summary class="btn btn-sm btn-outline-danger">Từ chối</summary>
                                 <form class="d-flex gap-1 mt-1" method="post"
                                       th:action="@{/admin/kho/doi-tra/{ma}/tu-choi(ma=${p.maPhieuDoiTra})}"
-                                      onsubmit="return confirm('Từ chối yêu cầu này?');">
+                                      data-xac-nhan-tieu-de="Từ chối yêu cầu đổi trả"
+                                      data-xac-nhan="Khách hàng sẽ thấy yêu cầu bị từ chối cùng lý do bên dưới. Thao tác này không hoàn tác được."
+                                      data-xac-nhan-nut="Từ chối" data-xac-nhan-trich="ketQua">
                                     <input class="form-control form-control-sm" name="ketQua" maxlength="1000" required
                                            placeholder="Lý do từ chối">
                                     <button class="btn btn-sm btn-danger" type="submit">Gửi</button>

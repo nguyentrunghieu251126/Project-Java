@@ -46,7 +46,7 @@
         </form>
         <ul class="navbar-nav align-items-lg-center gap-lg-2">
           <!-- Quản trị viên đang xem cửa hàng: nút quay lại khu quản trị -->
-          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO')">
+          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_BAO_HANH')">
             <a class="nav-link admin-link" th:href="@{/admin}">
               <i class="bi bi-speedometer2" aria-hidden="true"></i> Trang quản trị
             </a>
@@ -288,7 +288,10 @@
                 <strong th:text="${ct.thanhToan() != null} ? ${ct.thanhToan().phuongThuc.nhan} : 'Chưa có thông tin'">COD</strong>
                 <span th:if="${ct.thanhToan() != null}" class="mh-pay-state" th:classappend="${'mh-pay-' + ct.thanhToan().trangThai.mau}">
                   <th:block th:text="${ct.thanhToan().trangThai.nhan}">Trạng thái</th:block><th:block th:if="${ct.thanhToan().ngayThanhToan != null}"
-                    th:text="${' · ' + #temporals.format(ct.thanhToan().ngayThanhToan, 'dd/MM/yyyy')}"></th:block></span></div></div>
+                    th:text="${' · ' + #temporals.format(ct.thanhToan().ngayThanhToan, 'dd/MM/yyyy')}"></th:block></span>
+                <a class="mh-pay-now" th:if="${ct.thanhToan() != null and ct.thanhToan().phuongThuc.quetQr
+                      and ct.thanhToan().trangThai.name() == 'CHUA_THANH_TOAN' and !ct.daHuy()}"
+                   th:href="@{/dat-hang/thanh-toan/{id}(id=${d.maDonHang})}"><i class="bi bi-qr-code-scan" aria-hidden="true"></i> Thanh toán ngay</a></div></div>
           </div>
 
           <div class="mh-table-wrap" id="san-pham">

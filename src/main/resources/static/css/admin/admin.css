@@ -1007,6 +1007,103 @@ a.o-so-lieu:hover {
   display: none;
 }
 
+/* Hộp xác nhận dùng chung (#hopXacNhan) */
+.hop-xac-nhan {
+  max-width: 420px;
+}
+
+.hop-xac-nhan .modal-content {
+  position: relative;
+  border: 0;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+}
+
+.hop-xac-nhan .hop-xac-nhan-dong {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 0.75rem;
+}
+
+.hop-xac-nhan .modal-body {
+  padding: 28px 28px 8px;
+  text-align: center;
+}
+
+.hop-xac-nhan-bieu-tuong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: #fdecec;
+  color: #dc3545;
+  font-size: 1.6rem;
+}
+
+.kieu-chinh .hop-xac-nhan-bieu-tuong {
+  background: #e7f6ec;
+  color: var(--chinh);
+}
+
+.hop-xac-nhan .modal-title {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--chu);
+}
+
+.hop-xac-nhan-noi-dung {
+  margin: 0;
+  color: var(--chu-phu);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.hop-xac-nhan-trich {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border-left: 3px solid #dc3545;
+  border-radius: 8px;
+  background: #f8fafc;
+  text-align: left;
+  font-size: 0.88rem;
+  color: var(--chu);
+  word-break: break-word;
+}
+
+.kieu-chinh .hop-xac-nhan-trich {
+  border-left-color: var(--chinh);
+}
+
+.hop-xac-nhan-trich-nhan {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--chu-phu);
+}
+
+.hop-xac-nhan .modal-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 20px 28px 24px;
+  border-top: 0;
+}
+
+.hop-xac-nhan .modal-footer > .btn {
+  margin: 0;
+  padding: 9px 0;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
 @media print {
   @page {
     size: A4;
@@ -1124,4 +1221,18 @@ a.o-so-lieu:hover {
   a {
     color: inherit;
   }
+}
+
+/* Chọn vai trò ở trang Phân quyền – tab Toàn thể nhân viên */
+.chon-vai-tro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.chon-vai-tro-nhan {
+  font-weight: 600;
+  margin-right: 4px;
 }

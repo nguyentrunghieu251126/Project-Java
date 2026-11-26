@@ -5,8 +5,16 @@
 <main>
     <ul th:replace="~{admin/fragments :: tab-phan-quyen('toan-the')}"></ul>
     <form class="the" method="post" th:action="@{/admin/phan-quyen}">
-        <p class="chu-thich">Quyền chung cho mọi nhân viên. Thay đổi áp dụng ngay cho cả người đang đăng nhập, trừ những
-            quyền đã chỉnh riêng ở tab Từng nhân viên. Quản trị viên mặc nhiên có tất cả các quyền.</p>
+        <input type="hidden" name="vaiTro" th:value="${vaiTroHienTai}" />
+        <div class="chon-vai-tro">
+            <span class="chon-vai-tro-nhan">Vai trò:</span>
+            <a th:each="v : ${dsVaiTroNhanVien}" class="btn btn-sm"
+               th:classappend="${v.tenVaiTro == vaiTroHienTai} ? 'btn-chinh' : 'btn-outline-secondary'"
+               th:href="@{/admin/phan-quyen(vaiTro=${v.tenVaiTro})}" th:text="${v.tenHienThi}">Vai trò</a>
+        </div>
+        <p class="chu-thich">Quyền chung cho mọi nhân viên của vai trò đang chọn. Thay đổi áp dụng ngay cho cả người
+            đang đăng nhập, trừ những quyền đã chỉnh riêng ở tab Từng nhân viên. Quản trị viên mặc nhiên có tất cả
+            các quyền.</p>
         <table th:replace="~{admin/fragments :: bang-chon-quyen(${quyenTheoNhom}, ${daChon}, ${chinhRieng})}"></table>
         <div class="thanh-luu">
             <span></span>

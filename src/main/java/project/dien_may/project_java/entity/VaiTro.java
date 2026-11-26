@@ -46,6 +46,7 @@ public class VaiTro {
         return switch (tenVaiTro) {
             case "QUAN_TRI" -> "Quản trị viên";
             case "NHAN_VIEN_KHO" -> "Nhân viên kho";
+            case "NHAN_VIEN_BAO_HANH" -> "Nhân viên bảo hành";
             case "KHACH_HANG" -> "Khách hàng";
             default -> tenVaiTro;
         };

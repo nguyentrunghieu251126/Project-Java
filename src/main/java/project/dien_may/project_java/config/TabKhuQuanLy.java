@@ -32,7 +32,7 @@ public final class TabKhuQuanLy {
     private TabKhuQuanLy() {
     }
 
-    // Trỏ vào tab đầu tiên khi tài khoản người dùng là nhân viên kho hay admin
+    // Trỏ vào tab đầu tiên khi tài khoản là admin, nhân viên kho hay nhân viên bảo hành
     public static Optional<String> tabDauTien(Collection<? extends GrantedAuthority> dsQuyen) {
         Set<String> coQuyen = dsQuyen.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
         return DS_TAB.stream()

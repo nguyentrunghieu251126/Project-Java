@@ -11,12 +11,15 @@
         <!-- TV4: Nhân viên kho xử lý đơn (NVK03 – NVK06); nút chỉ hiện đúng trạng thái và đúng quyền -->
         <form th:if="${donHang.trangThai.name() == 'CHO_XAC_NHAN'}" sec:authorize="hasAuthority('DONHANG_XULY')"
               th:action="@{/admin/kho/don-hang/{ma}/xac-nhan(ma=${donHang.maDonHang})}" method="post" class="d-inline"
-              onsubmit="return confirm('Xác nhận đơn hàng này?');">
+              data-xac-nhan-kieu="chinh" data-xac-nhan-tieu-de="Xác nhận đơn hàng"
+              data-xac-nhan="Đơn hàng sẽ chuyển sang trạng thái đã xác nhận để chuẩn bị xuất kho." data-xac-nhan-nut="Xác nhận">
             <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-check2" aria-hidden="true"></i> Xác nhận đơn</button>
         </form>
         <form th:if="${donHang.trangThai.name() == 'DA_XAC_NHAN'}" sec:authorize="hasAuthority('KHO_XUAT_HANG')"
               th:action="@{/admin/kho/don-hang/{ma}/xuat-kho(ma=${donHang.maDonHang})}" method="post"
-              class="d-inline-flex gap-1" onsubmit="return confirm('Lập phiếu xuất kho cho đơn hàng này?');">
+              class="d-inline-flex gap-1" data-xac-nhan-kieu="chinh" data-xac-nhan-tieu-de="Xuất kho"
+              data-xac-nhan="Lập phiếu xuất kho cho đơn hàng này? Đơn sẽ chuyển sang trạng thái đã xuất kho." data-xac-nhan-nut="Xuất kho"
+              data-xac-nhan-trich="ghiChu" data-xac-nhan-trich-nhan="Ghi chú">
             <input type="text" name="ghiChu" maxlength="500" class="form-control form-control-sm" placeholder="Ghi chú (không bắt buộc)">
             <button type="submit" class="btn btn-sm btn-primary text-nowrap"><i class="bi bi-box-seam" aria-hidden="true"></i> Xuất kho</button>
         </form>
@@ -26,7 +29,8 @@
         </form>
         <form th:if="${donHang.trangThai.name() == 'DANG_GIAO'}" sec:authorize="hasAuthority('DONHANG_XULY')"
               th:action="@{/admin/kho/don-hang/{ma}/da-giao(ma=${donHang.maDonHang})}" method="post" class="d-inline"
-              onsubmit="return confirm('Xác nhận khách đã nhận hàng?');">
+              data-xac-nhan-kieu="chinh" data-xac-nhan-tieu-de="Đã giao hàng"
+              data-xac-nhan="Xác nhận khách đã nhận hàng? Đơn hàng sẽ chuyển sang trạng thái đã giao." data-xac-nhan-nut="Đã giao">
             <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check2-circle" aria-hidden="true"></i> Đã giao</button>
         </form>
     </div>

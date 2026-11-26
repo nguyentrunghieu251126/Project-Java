@@ -26,7 +26,11 @@ import java.util.stream.Collectors;
 @Service
 public class PhanQuyenService {
     private static final String VAI_TRO_QUAN_TRI = "QUAN_TRI";
-    private static final String VAI_TRO_NHAN_VIEN = "NHAN_VIEN_KHO";
+    public static final String VAI_TRO_NHAN_VIEN_KHO = "NHAN_VIEN_KHO";
+    public static final String VAI_TRO_NHAN_VIEN_BAO_HANH = "NHAN_VIEN_BAO_HANH";
+    /** Các vai trò nhân viên được phân quyền theo chức năng. */
+    public static final List<String> DS_VAI_TRO_NHAN_VIEN = List.of(VAI_TRO_NHAN_VIEN_KHO,
+            VAI_TRO_NHAN_VIEN_BAO_HANH);
     private static final String QUYEN_TONG_QUAN = "TONGQUAN_XEM";
 
     private final VaiTroRepository vaiTroRepository;
@@ -57,7 +61,7 @@ public class PhanQuyenService {
             return maChucNang(quyenRepository.findAll());
         }
         Set<String> ketQua = maChucNang(taiKhoan.getVaiTro().getDsQuyen());
-        if (VAI_TRO_NHAN_VIEN.equals(tenVaiTro)) {
+        if (DS_VAI_TRO_NHAN_VIEN.contains(tenVaiTro)) {
             for (TaiKhoanQuyen rieng : taiKhoanQuyenRepository.findByTaiKhoanMaTaiKhoan(taiKhoan.getMaTaiKhoan())) {
                 if (rieng.isDuocCap()) {
                     ketQua.add(rieng.getQuyen().getMaChucNang());
@@ -69,29 +73,44 @@ public class PhanQuyenService {
         return ketQua;
     }
 
+    /** Danh sách vai trò nhân viên để chọn ở tab Toàn thể nhân viên. */
     @Transactional(readOnly = true)
-    public Set<String> quyenToanTheNhanVien() {
-        return maChucNang(vaiTroNhanVien().getDsQuyen());
+    public List<VaiTro> dsVaiTroNhanVien() {
+        return vaiTroRepository.findAll().stream()
+                .filter(v -> DS_VAI_TRO_NHAN_VIEN.contains(v.getTenVaiTro()))
+                .sorted(Comparator.comparing(VaiTro::getMaVaiTro))
+                .toList();
     }
 
-    // Cập nhật lại quyền cho toàn thể nhân viên
+    /** Tên vai trò hợp lệ; rỗng hoặc sai thì lấy nhân viên kho. */
+    public static String chuanHoaVaiTro(String tenVaiTro) {
+        // List.of(...).contains(null) ném NullPointerException nên phải kiểm tra null trước
+        return tenVaiTro != null && DS_VAI_TRO_NHAN_VIEN.contains(tenVaiTro) ? tenVaiTro : VAI_TRO_NHAN_VIEN_KHO;
+    }
+
+    @Transactional(readOnly = true)
+    public Set<String> quyenToanTheNhanVien(String tenVaiTro) {
+        return maChucNang(vaiTroNhanVien(tenVaiTro).getDsQuyen());
+    }
+
+    // Cập nhật lại quyền cho toàn thể nhân viên của một vai trò
     @Transactional
-    public void capNhatToanTheNhanVien(Collection<Integer> dsMaQuyen) {
+    public void capNhatToanTheNhanVien(String tenVaiTro, Collection<Integer> dsMaQuyen) {
         Set<Quyen> moi = layQuyen(dsMaQuyen);
-        Set<Quyen> dsQuyen = vaiTroNhanVien().getDsQuyen();
+        Set<Quyen> dsQuyen = vaiTroNhanVien(tenVaiTro).getDsQuyen();
         dsQuyen.retainAll(moi);
         dsQuyen.addAll(moi);
     }
 
     @Transactional(readOnly = true)
     public List<TaiKhoan> dsNhanVien() {
-        return taiKhoanRepository.findByVaiTroTenVaiTroOrderByHoTenAsc(VAI_TRO_NHAN_VIEN);
+        return taiKhoanRepository.findByVaiTroTenVaiTroInOrderByHoTenAsc(DS_VAI_TRO_NHAN_VIEN);
     }
 
     @Transactional(readOnly = true)
     public TaiKhoan nhanVien(Integer maTaiKhoan) {
         return taiKhoanRepository.findById(maTaiKhoan)
-                .filter(t -> VAI_TRO_NHAN_VIEN.equals(t.getVaiTro().getTenVaiTro()))
+                .filter(t -> DS_VAI_TRO_NHAN_VIEN.contains(t.getVaiTro().getTenVaiTro()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
@@ -119,10 +138,10 @@ public class PhanQuyenService {
         }
     }
 
-    private VaiTro vaiTroNhanVien() {
-        return vaiTroRepository.findAll().stream()
-                .filter(v -> VAI_TRO_NHAN_VIEN.equals(v.getTenVaiTro()))
-                .findFirst().orElseThrow();
+    private VaiTro vaiTroNhanVien(String tenVaiTro) {
+        String ten = chuanHoaVaiTro(tenVaiTro);
+        return vaiTroRepository.findByTenVaiTro(ten)
+                .orElseThrow(() -> new NghiepVuException("Chưa có vai trò " + ten + " trong cơ sở dữ liệu."));
     }
 
     private Set<Quyen> layQuyen(Collection<Integer> dsMaQuyen) {

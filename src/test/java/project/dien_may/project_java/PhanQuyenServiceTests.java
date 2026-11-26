@@ -33,6 +33,8 @@ class PhanQuyenServiceTests {
     private static final String QUAN_TRI = "admin1@dienmay.vn";
     private static final String NHAN_VIEN = "kho1@dienmay.vn";
     private static final String KHACH_HANG = "lan.bui7@gmail.com";
+    /** Vai trò của tài khoản NHAN_VIEN (kho1). */
+    private static final String VAI_TRO_NHAN_VIEN = PhanQuyenService.VAI_TRO_NHAN_VIEN_KHO;
 
     @Autowired
     private PhanQuyenService phanQuyenService;
@@ -74,15 +76,15 @@ class PhanQuyenServiceTests {
      */
     @BeforeEach
     void datQuyenToanTheBanDau() {
-        List<Integer> dsQuyen = new ArrayList<>(phanQuyenService.quyenToanTheNhanVien().stream()
+        List<Integer> dsQuyen = new ArrayList<>(phanQuyenService.quyenToanTheNhanVien(VAI_TRO_NHAN_VIEN).stream()
                 .filter(ma -> !ma.equals("TONGQUAN_XEM") && !ma.equals("SANPHAM_XEM")).map(this::maQuyen).toList());
         dsQuyen.add(maQuyen("SANPHAM_XEM"));
-        phanQuyenService.capNhatToanTheNhanVien(dsQuyen);
+        phanQuyenService.capNhatToanTheNhanVien(VAI_TRO_NHAN_VIEN, dsQuyen);
     }
 
     /** Mã quyền của toàn thể nhân viên, bỏ một quyền và thêm một quyền. */
     private List<Integer> toanTheBo(String quyenBo, String quyenThem) {
-        List<Integer> ketQua = new ArrayList<>(phanQuyenService.quyenToanTheNhanVien().stream()
+        List<Integer> ketQua = new ArrayList<>(phanQuyenService.quyenToanTheNhanVien(VAI_TRO_NHAN_VIEN).stream()
                 .filter(ma -> !ma.equals(quyenBo)).map(this::maQuyen).toList());
         ketQua.add(maQuyen(quyenThem));
         return ketQua;
@@ -127,14 +129,14 @@ class PhanQuyenServiceTests {
         phanQuyenService.capNhatNhanVien(ma, toanTheBo("SANPHAM_XEM", "TONGQUAN_XEM"));
 
         phanQuyenService.capNhatNhanVien(ma,
-                phanQuyenService.quyenToanTheNhanVien().stream().map(this::maQuyen).toList());
+                phanQuyenService.quyenToanTheNhanVien(VAI_TRO_NHAN_VIEN).stream().map(this::maQuyen).toList());
 
         assertTrue(phanQuyenService.quyenChinhRieng(ma).isEmpty());
     }
 
     @Test
     void quyenToanTheApDungChoNguoiChuaChinhRieng() {
-        phanQuyenService.capNhatToanTheNhanVien(toanTheBo("SANPHAM_XEM", "TONGQUAN_XEM"));
+        phanQuyenService.capNhatToanTheNhanVien(VAI_TRO_NHAN_VIEN, toanTheBo("SANPHAM_XEM", "TONGQUAN_XEM"));
 
         Set<String> quyen = quyenDangNhap(NHAN_VIEN);
         assertTrue(quyen.contains("TONGQUAN_XEM"));
@@ -156,7 +158,7 @@ class PhanQuyenServiceTests {
         Integer ma = taiKhoan(NHAN_VIEN).getMaTaiKhoan();
 
         assertThrows(NghiepVuException.class, () -> phanQuyenService.capNhatNhanVien(ma, List.of(999999)));
-        assertThrows(NghiepVuException.class, () -> phanQuyenService.capNhatToanTheNhanVien(List.of(999999)));
+        assertThrows(NghiepVuException.class, () -> phanQuyenService.capNhatToanTheNhanVien(VAI_TRO_NHAN_VIEN, List.of(999999)));
     }
 
     @Test

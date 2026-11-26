@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum PhuongThucThanhToan {
     COD("Thanh toán khi nhận hàng (COD)", "bi-cash-coin", "mh-pay-cod", "Trả tiền mặt cho nhân viên giao hàng."),
     CHUYEN_KHOAN("Chuyển khoản ngân hàng", "bi-bank", "mh-pay-bank",
-            "Chuyển khoản sau khi đặt, ghi mã đơn ở nội dung."),
-    THE("Thẻ ATM / Visa / Mastercard", "bi-credit-card", "mh-pay-card", "Quẹt thẻ qua máy POS khi nhận hàng."),
+            "Quét mã QR bằng ứng dụng ngân hàng sau khi đặt hàng."),
+    THE("Thẻ ATM / Visa / Mastercard", "bi-credit-card", "mh-pay-card", "Quét mã QR để thanh toán bằng thẻ sau khi đặt hàng."),
     ZALOPAY("Ví ZaloPay / Tài khoản trả sau", "bi-wallet2", "mh-pay-zalo", "Mua trước – thanh toán sau qua ZaloPay."),
     SACOMBANK("Thẻ quốc tế Sacombank", "bi-credit-card-2-front", "mh-pay-sacom",
             "Visa / Mastercard do Sacombank phát hành."),
@@ -22,4 +22,23 @@ public enum PhuongThucThanhToan {
     private final String icon;
     private final String logo;
     private final String moTa;
+
+    /** Mọi phương thức trừ COD đều thanh toán trước qua mã QR (mô phỏng). */
+    public boolean isQuetQr() {
+        return this != COD;
+    }
+
+    /** Ứng dụng khách dùng để quét mã QR. */
+    public String getUngDungQuet() {
+        return switch (this) {
+            case COD -> "";
+            case CHUYEN_KHOAN -> "ứng dụng ngân hàng hoặc ví điện tử";
+            case THE -> "ứng dụng ngân hàng phát hành thẻ";
+            case ZALOPAY -> "ứng dụng ZaloPay";
+            case SACOMBANK -> "ứng dụng Sacombank Pay";
+            case NAMA_JCB -> "ứng dụng Nam A Bank";
+            case HOME_PAYLATER -> "ứng dụng Home Credit";
+            case KREDIVO -> "ứng dụng Kredivo";
+        };
+    }
 }

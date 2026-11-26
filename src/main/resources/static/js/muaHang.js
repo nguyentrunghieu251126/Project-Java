@@ -276,17 +276,11 @@ document.querySelectorAll(".mh-copy-code").forEach((nut) => {
   });
 });
 
-// Đổi phương thức thanh toán: hiện thông tin chuyển khoản (nếu có) và tính lại ưu đãi
+// Đổi phương thức thanh toán: tính lại ưu đãi
 const radioThanhToan = document.querySelectorAll('input[name="phuongThucThanhToan"]');
 if (radioThanhToan.length) {
-  const hopChuyenKhoan = document.getElementById("thongTinChuyenKhoan");
-  const capNhatThanhToan = () => {
-    const chon = document.querySelector('input[name="phuongThucThanhToan"]:checked');
-    if (hopChuyenKhoan) hopChuyenKhoan.hidden = !chon || chon.value !== "CHUYEN_KHOAN";
-    capNhatTongThanhToan();
-  };
-  radioThanhToan.forEach((r) => r.addEventListener("change", capNhatThanhToan));
-  capNhatThanhToan();
+  radioThanhToan.forEach((r) => r.addEventListener("change", capNhatTongThanhToan));
+  capNhatTongThanhToan();
 }
 
 // Mã ưu đãi: chọn trong danh sách hoặc nhập mã, rồi tính lại tóm tắt (server kiểm tra lại khi đặt hàng)

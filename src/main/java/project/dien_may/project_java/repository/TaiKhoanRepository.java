@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import project.dien_may.project_java.entity.TaiKhoan;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,10 @@ public interface TaiKhoanRepository
 
         @EntityGraph(attributePaths = "vaiTro")
         List<TaiKhoan> findByVaiTroTenVaiTroOrderByHoTenAsc(String tenVaiTro);
+
+        /** Nhân viên của nhiều vai trò (nhân viên kho, nhân viên bảo hành). */
+        @EntityGraph(attributePaths = "vaiTro")
+        List<TaiKhoan> findByVaiTroTenVaiTroInOrderByHoTenAsc(Collection<String> dsTenVaiTro);
 
         @Query("""
                         SELECT CASE WHEN COUNT(t) > 0

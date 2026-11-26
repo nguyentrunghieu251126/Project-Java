@@ -375,7 +375,8 @@ SET IDENTITY_INSERT dbo.VaiTro ON;
 INSERT INTO dbo.VaiTro (MaVaiTro, TenVaiTro) VALUES
 (1, N'QUAN_TRI'),
 (2, N'NHAN_VIEN_KHO'),
-(3, N'KHACH_HANG');
+(3, N'KHACH_HANG'),
+(4, N'NHAN_VIEN_BAO_HANH');
 
 -- Bật lại cơ chế đánh số tự động
 SET IDENTITY_INSERT dbo.VaiTro OFF;
@@ -438,7 +439,9 @@ INSERT INTO dbo.VaiTro_Quyen (MaVaiTro, MaQuyen) VALUES
 -- Nhân viên kho
 (2, 1), (2, 20), (2, 22), (2, 23), (2, 24), (2, 25), (2, 26), (2, 27), (2, 37),
 -- Khách hàng
-(3, 29), (3, 30), (3, 31), (3, 32), (3, 33), (3, 34), (3, 35), (3, 36), (3, 37);
+(3, 29), (3, 30), (3, 31), (3, 32), (3, 33), (3, 34), (3, 35), (3, 36), (3, 37),
+-- Nhân viên bảo hành: chỉ tiếp nhận bảo hành, xử lý đổi trả và sửa thông tin cá nhân
+(4, 26), (4, 27), (4, 37);
 GO
 
 -- Tạm tắt cơ chế đánh số tự động
@@ -476,6 +479,11 @@ INSERT INTO dbo.TaiKhoan (MaTaiKhoan, HoTen, Email, MatKhau, SoDienThoai, DiaChi
 (28, N'Lê Anh Yến', 'yen.le28@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0952427316', N'250 Cách Mạng Tháng 8, Quận 7, TP. Hồ Chí Minh', 3, 1, '2026-03-21T19:00:00'),
 (29, N'Võ Bảo Phúc', 'phuc.vo29@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0956355150', N'174 Hoàng Văn Thụ, Quận Tân Bình, TP. Hồ Chí Minh', 3, 0, '2026-04-26T19:00:00'),
 (30, N'Nguyễn Gia Mai', 'mai.nguyen30@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0989481131', N'44 Võ Văn Tần, Quận 10, TP. Hồ Chí Minh', 3, 1, '2026-03-06T20:00:00');
+
+-- Thêm tài khoản nhân viên bảo hành
+INSERT INTO dbo.TaiKhoan (MaTaiKhoan, HoTen, Email, MatKhau, SoDienThoai, DiaChi, MaVaiTro, TrangThai, NgayTao) VALUES
+(31, N'Phan Thị Diễm', 'baohanh1@dienmay.vn', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0903112233', N'78 Nguyễn Thị Minh Khai, Quận 3, TP. Hồ Chí Minh', 4, 1, '2026-04-25T08:00:00'),
+(32, N'Trương Quốc Khánh', 'baohanh2@dienmay.vn', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0903445566', N'215 Lý Thường Kiệt, Quận Tân Bình, TP. Hồ Chí Minh', 4, 1, '2026-04-25T08:05:00');
 
 -- Bật lại cơ chế đánh số tự động
 SET IDENTITY_INSERT dbo.TaiKhoan OFF;

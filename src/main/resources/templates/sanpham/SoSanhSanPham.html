@@ -59,7 +59,7 @@
               <button class="btn" type="submit"><i class="bi bi-search"></i></button>
             </form>
             <ul class="navbar-nav align-items-lg-center gap-lg-2">
-              <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO')">
+              <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_BAO_HANH')">
                 <a class="nav-link admin-link" th:href="@{/admin}">
                   <i class="bi bi-speedometer2" aria-hidden="true"></i> Trang quản trị
                 </a>

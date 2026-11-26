@@ -46,7 +46,7 @@
         </form>
         <ul class="navbar-nav align-items-lg-center gap-lg-2">
           <!-- Quản trị viên đang xem cửa hàng: nút quay lại khu quản trị -->
-          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO')">
+          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_BAO_HANH')">
             <a class="nav-link admin-link" th:href="@{/admin}">
               <i class="bi bi-speedometer2" aria-hidden="true"></i> Trang quản trị
             </a>
@@ -169,7 +169,7 @@
 
 <!--
   TV3 – Thông tin bảo hành: sản phẩm thuộc đơn đã giao, hạn = ngày giao + BH chính hãng + BH mở rộng.
-  Nút "Yêu cầu bảo hành" trong ô chi tiết tạo phiếu PhieuBaoHanh cho nhân viên kho. Model: hoSo, diemThuong, dsBaoHanh (List<ThongTinBaoHanh>),
+  Nút "Yêu cầu bảo hành" trong ô chi tiết tạo phiếu PhieuBaoHanh cho nhân viên bảo hành. Model: hoSo, diemThuong, dsBaoHanh (List<ThongTinBaoHanh>),
   tuNgay, denNgay (LocalDate, có thể null), sapXep ("mua-gan-nhat" | "bao-hanh-gan-nhat" | "bao-hanh-xa-nhat"), toiDaKyTu;
   flash: thongBao, loi, moChiTiet (mã chi tiết cần mở lại), moTaLoiCu.
 -->
@@ -306,7 +306,7 @@
             <div class="mh-bh-request" th:if="${b.duocYeuCau()}">
               <div class="mh-bh-request-bar" th:if="${b.duocYeuCau()}">
                 <div class="mh-bh-request-text"><i class="bi bi-tools"></i>
-                  <span><strong>Sản phẩm gặp sự cố?</strong><small>Gửi yêu cầu, nhân viên kho sẽ tiếp nhận và liên hệ với bạn.</small></span></div>
+                  <span><strong>Sản phẩm gặp sự cố?</strong><small>Gửi yêu cầu, nhân viên bảo hành sẽ tiếp nhận và liên hệ với bạn.</small></span></div>
                 <button type="button" class="mh-btn-red" data-bs-toggle="collapse"
                         th:attr="data-bs-target=|#bh-form-${b.maChiTiet()}|,aria-controls=|bh-form-${b.maChiTiet()}|"
                         aria-expanded="false"><i class="bi bi-shield-plus"></i> Yêu cầu bảo hành</button>
@@ -333,7 +333,7 @@
               </form>
             </div>
 
-            <!-- Lịch sử sửa chữa: phiếu bảo hành nhân viên kho đã tiếp nhận / xử lý (bảng PhieuBaoHanh) -->
+            <!-- Lịch sử sửa chữa: phiếu bảo hành đã được nhân viên bảo hành tiếp nhận / xử lý (bảng PhieuBaoHanh) -->
             <div class="mh-bh-history" th:unless="${#lists.isEmpty(b.lichSuSuaChua())}">
               <div class="mh-bh-detail-title">Lịch sử bảo hành, sửa chữa</div>
               <ul>
