@@ -40,6 +40,8 @@ public class SecurityConfig {
                                                 .access(quyen("BAOCAO_BANCHAY"))
                                                 .requestMatchers("/admin/bao-cao/ton-kho")
                                                 .access(quyen("BAOCAO_TONKHO"))
+                                                .requestMatchers("/admin/kho/kiem-thu/**")
+                                                .access(quyen("KHO_XEM_TONKHO"))       
                                                 .requestMatchers("/admin/san-pham").access(quyen("SANPHAM_XEM"))
                                                 .requestMatchers("/admin/san-pham/them").access(quyen("SANPHAM_THEM"))
                                                 .requestMatchers("/admin/san-pham/*/sua").access(quyen("SANPHAM_SUA"))
