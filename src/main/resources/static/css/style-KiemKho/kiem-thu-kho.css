@@ -1,0 +1,148 @@
+body {
+    color: #172033;
+    background: #f5f7fb;
+}
+
+.kiem-thu-kho {
+    max-width: 980px;
+}
+
+.the-kho {
+    padding: 1.25rem;
+    border: 1px solid #e1e7f0;
+    border-radius: .9rem;
+    background: #fff;
+    box-shadow: 0 8px 24px rgb(23 32 51 / 5%);
+}
+
+.kiem-thu-san-pham-chon {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.kiem-thu-anh-wrap {
+    display: grid;
+    flex: 0 0 104px;
+    width: 104px;
+    height: 104px;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid #e1e7f0;
+    border-radius: .75rem;
+    color: #94a3b8;
+    background: #f8fafc;
+    font-size: 2rem;
+}
+
+.kiem-thu-anh-wrap img {
+    width: 100%;
+    height: 100%;
+    padding: .35rem;
+    object-fit: contain;
+}
+
+.kiem-thu-ton-kho {
+    display: grid;
+    gap: .25rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid #d5e4f6;
+    border-radius: .75rem;
+    background: #f3f8ff;
+}
+
+.kiem-thu-ton-kho span {
+    color: #334155;
+    font-weight: 600;
+}
+
+.kiem-thu-ton-kho strong {
+    color: #1456a0;
+    font-size: 1.75rem;
+}
+
+.kiem-thu-ton-kho small {
+    color: #64748b;
+}
+
+.kiem-thu-terminal {
+    overflow: hidden;
+    border: 1px solid #253247;
+    border-radius: .75rem;
+    color: #e2e8f0;
+    background: #101827;
+}
+
+.kiem-thu-terminal-dau {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+    padding: .9rem 1rem;
+    border-bottom: 1px solid #334155;
+}
+
+.kiem-thu-terminal-dau h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.kiem-thu-terminal-dau span {
+    color: #a7b3c5;
+    font-size: .85rem;
+}
+
+.terminal-chu-thich {
+    margin: 0;
+    padding: .8rem 1rem 0;
+    color: #c4cfdd;
+    font-size: .88rem;
+    line-height: 1.6;
+}
+
+#nhatKyMuaHang {
+    display: grid;
+    gap: .55rem;
+    max-height: 360px;
+    overflow: auto;
+    margin: 0;
+    padding: 1rem 1rem 1rem 2.8rem;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: .9rem;
+}
+
+#nhatKyMuaHang li {
+    padding-left: .2rem;
+    overflow-wrap: anywhere;
+}
+
+#nhatKyMuaHang .terminal-thanh-cong {
+    color: #63e6a3;
+}
+
+#nhatKyMuaHang .terminal-that-bai {
+    color: #ff8585;
+}
+
+#nhatKyMuaHang .terminal-goi-y {
+    color: #a7b3c5;
+}
+
+@media (max-width: 575.98px) {
+    .the-kho {
+        padding: 1rem;
+    }
+
+    .kiem-thu-san-pham-chon {
+        gap: .75rem;
+    }
+
+    .kiem-thu-anh-wrap {
+        flex-basis: 76px;
+        width: 76px;
+        height: 76px;
+    }
+}
