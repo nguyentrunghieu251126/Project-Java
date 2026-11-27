@@ -1,6 +1,7 @@
 package project.dien_may.project_java.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.dien_may.project_java.entity.SanPham;
@@ -15,6 +16,9 @@ public class TonKhoService {
 
     @Autowired(required = false)
     private SanPhamRepository sanPhamRepository;
+
+    @Autowired(required = false)
+    private JdbcTemplate jdbcTemplate;
 
     private final ConcurrentHashMap<Integer, ReentrantLock> locks = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, Integer> tonKhoTam = new ConcurrentHashMap<>();
@@ -59,22 +63,45 @@ public class TonKhoService {
                 return;
             }
 
-            SanPham sp = sanPhamRepository.findById(maSanPham)
-                    .orElseThrow(() -> new RuntimeException("Khong tim thay san pham co ID: " + maSanPham));
+            if (jdbcTemplate != null) {
+                sanPhamRepository.flush();
+                int soDongCapNhat = jdbcTemplate.update(
+                        "UPDATE dbo.SanPham SET SoLuong = SoLuong - ?, PhienBan = PhienBan + 1 "
+                                + "WHERE MaSanPham = ? AND SoLuong >= ?",
+                        soLuong, maSanPham, soLuong);
+                if (soDongCapNhat == 0) {
+                    SanPham sp = sanPhamRepository.findById(maSanPham)
+                            .orElseThrow(() -> new RuntimeException(
+                                    "Khong tim thay san pham co ID: " + maSanPham));
+                    int hienTai = sp.getSoLuong();
+                    System.out.println("[LUONG: " + threadName + "] LOI: Khong du ton kho! Con lai: " + hienTai);
+                    throw new TonKhoKhongDuException(
+                            "Ton kho khong du! Con lai: " + hienTai + ", Yeu cau: " + soLuong);
+                }
 
-            int hienTai = sp.getSoLuong();
-            System.out.println(
-                    "[LUONG: " + threadName + "] Ton kho hien tai tren SQL cua SP " + maSanPham + " la: " + hienTai);
+                int tonKhoMoi = jdbcTemplate.queryForObject(
+                        "SELECT SoLuong FROM dbo.SanPham WHERE MaSanPham = ?", Integer.class, maSanPham);
+                System.out.println(
+                        "[LUONG: " + threadName + "] THANH CONG. Ton kho moi tren SQL: " + tonKhoMoi);
+            } else {
+                SanPham sp = sanPhamRepository.khoaTheoMa(maSanPham)
+                        .orElseThrow(() -> new RuntimeException("Khong tim thay san pham co ID: " + maSanPham));
 
-            if (hienTai < soLuong) {
-                System.out.println("[LUONG: " + threadName + "] LOI: Khong du ton kho!");
-                throw new TonKhoKhongDuException("Ton kho khong du! Con lai: " + hienTai + ", Yeu cau: " + soLuong);
+                int hienTai = sp.getSoLuong();
+                System.out.println(
+                        "[LUONG: " + threadName + "] Ton kho hien tai tren SQL cua SP " + maSanPham + " la: " + hienTai);
+
+                if (hienTai < soLuong) {
+                    System.out.println("[LUONG: " + threadName + "] LOI: Khong du ton kho!");
+                    throw new TonKhoKhongDuException(
+                            "Ton kho khong du! Con lai: " + hienTai + ", Yeu cau: " + soLuong);
+                }
+
+                sp.setSoLuong(hienTai - soLuong);
+                sanPhamRepository.save(sp);
+
+                System.out.println("[LUONG: " + threadName + "] THANH CONG. Ton kho moi tren SQL: " + sp.getSoLuong());
             }
-
-            sp.setSoLuong(hienTai - soLuong);
-            sanPhamRepository.save(sp);
-
-            System.out.println("[LUONG: " + threadName + "] THANH CONG. Ton kho moi tren SQL: " + sp.getSoLuong());
         } finally {
             lock.unlock();
         }
