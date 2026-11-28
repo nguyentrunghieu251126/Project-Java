@@ -46,7 +46,11 @@
         </form>
         <ul class="navbar-nav align-items-lg-center gap-lg-2">
           <!-- Quản trị viên đang xem cửa hàng: nút quay lại khu quản trị -->
+<<<<<<< HEAD
           <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_BAO_HANH')">
+=======
+          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_GIAO_HANG')">
+>>>>>>> origin/chihai_nhiemvu_tv4_doitra
             <a class="nav-link admin-link" th:href="@{/admin}">
               <i class="bi bi-speedometer2" aria-hidden="true"></i> Trang quản trị
             </a>
@@ -246,6 +250,8 @@
                   th:action="@{/don-hang/{id}/mua-lai(id=${d.maDonHang})}">
               <button type="submit" class="mh-btn-outline"><i class="bi bi-arrow-repeat"></i> Mua lại</button>
             </form>
+            <a class="mh-btn-outline" th:if="${ct.duocDanhGia() and d.ngayGiao != null and !d.ngayGiao.toLocalDate().plusDays(30).isBefore(#temporals.createToday())}"
+               href="#" th:href="@{/don-hang/{id}/doi-tra(id=${d.maDonHang})}"><i class="bi bi-arrow-left-right"></i> Yêu cầu đổi trả</a>
             <button type="button" class="mh-btn-danger" th:if="${ct.duocHuy()}" data-bs-toggle="modal" data-bs-target="#modalHuyDon"
                     th:data-ma-don="${maHien}" th:data-action="@{/don-hang/{id}/huy(id=${d.maDonHang})}"><i class="bi bi-x-circle"></i> Hủy đơn</button>
           </div>
@@ -261,8 +267,13 @@
               <small th:text="${b.thoiGian() != null} ? ${#temporals.format(b.thoiGian(), 'HH:mm · dd/MM')} : (${b.xong()} ? 'Hoàn thành' : 'Chờ xử lý')">Thời gian</small>
             </li>
           </ol>
+          <!-- TV4: thông tin nhân viên giao hàng khi đơn đang giao -->
+          <p class="mt-3 mb-0 small" th:if="${d.trangThai.name() == 'DANG_GIAO' and d.nhanVienGiao != null}">
+            <i class="bi bi-truck"></i> Nhân viên giao hàng: <strong th:text="${d.nhanVienGiao.hoTen}">Tên</strong>
+            · <a th:href="|tel:${d.nhanVienGiao.soDienThoai}|" th:text="${d.nhanVienGiao.soDienThoai}">SĐT</a></p>
           <div class="mh-cancel-note" th:if="${ct.daHuy()}"><i class="bi bi-x-octagon"></i>
-            <div><strong>Đơn hàng đã bị hủy</strong>
+            <div><strong th:text="${d.lyDoGiaoThatBai != null} ? 'Giao hàng không thành công' : 'Đơn hàng đã bị hủy'">Đơn hàng đã bị hủy</strong>
+              <span th:if="${d.lyDoGiaoThatBai != null}" th:text="|Lý do: ${d.lyDoGiaoThatBai}.|">Lý do</span>
               <span>Sản phẩm đã được hoàn về kho. Nếu đã thanh toán, tiền sẽ được hoàn trong 3 – 5 ngày làm việc.</span></div></div>
         </section>
 
@@ -314,6 +325,9 @@
                             data-bs-toggle="modal" data-bs-target="#modalDanhGia"
                             th:data-ma-san-pham="${sp.maSanPham}" th:data-ten="${sp.tenSanPham}"
                             th:data-anh="${sp.hinhAnh != null} ? @{${sp.hinhAnh}} : ''"><i class="bi bi-star"></i> Đánh giá</button>
+                    <!-- TV4 – KH21: đổi trả sản phẩm này (tick sẵn trên trang yêu cầu đổi trả) -->
+                    <a class="mh-btn-outline mh-btn-sm ms-1" th:if="${d.ngayGiao != null and !d.ngayGiao.toLocalDate().plusDays(30).isBefore(#temporals.createToday())}"
+                       href="#" th:href="@{/don-hang/{id}/doi-tra(id=${d.maDonHang},chon=${c.maChiTietDonHang})}"><i class="bi bi-arrow-left-right"></i> Đổi trả</a>
                   </td>
                 </tr>
               </tbody>

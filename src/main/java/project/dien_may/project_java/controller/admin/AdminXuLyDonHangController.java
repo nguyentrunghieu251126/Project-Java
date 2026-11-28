@@ -38,22 +38,6 @@ public class AdminXuLyDonHangController {
         });
     }
 
-    @PostMapping("/giao-hang")
-    public String giaoHang(@PathVariable Integer ma, RedirectAttributes redirect) {
-        return thucHien(ma, redirect, () -> {
-            xuLyDonHangService.batDauGiao(ma);
-            return "Đơn hàng #" + ma + " chuyển sang đang giao.";
-        });
-    }
-
-    @PostMapping("/da-giao")
-    public String daGiao(@PathVariable Integer ma, RedirectAttributes redirect) {
-        return thucHien(ma, redirect, () -> {
-            xuLyDonHangService.daGiao(ma);
-            return "Đã xác nhận giao thành công đơn hàng #" + ma + ".";
-        });
-    }
-
     private String thucHien(Integer ma, RedirectAttributes redirect, ThaoTac thaoTac) {
         try {
             redirect.addFlashAttribute("thongBao", thaoTac.chay());

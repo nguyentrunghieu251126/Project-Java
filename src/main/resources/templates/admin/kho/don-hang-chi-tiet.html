@@ -23,6 +23,7 @@
             <input type="text" name="ghiChu" maxlength="500" class="form-control form-control-sm" placeholder="Ghi chú (không bắt buộc)">
             <button type="submit" class="btn btn-sm btn-primary text-nowrap"><i class="bi bi-box-seam" aria-hidden="true"></i> Xuất kho</button>
         </form>
+<<<<<<< HEAD
         <form th:if="${donHang.trangThai.name() == 'DA_XUAT_KHO'}" sec:authorize="hasAuthority('DONHANG_XULY')"
               th:action="@{/admin/kho/don-hang/{ma}/giao-hang(ma=${donHang.maDonHang})}" method="post" class="d-inline">
             <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-truck" aria-hidden="true"></i> Bắt đầu giao</button>
@@ -33,6 +34,11 @@
               data-xac-nhan="Xác nhận khách đã nhận hàng? Đơn hàng sẽ chuyển sang trạng thái đã giao." data-xac-nhan-nut="Đã giao">
             <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check2-circle" aria-hidden="true"></i> Đã giao</button>
         </form>
+=======
+        <!-- TV4: sau khi xuất kho, nhân viên giao hàng nhận đơn và cập nhật giao hàng -->
+        <span class="text-muted small" th:if="${donHang.trangThai.name() == 'DA_XUAT_KHO'}">
+            <i class="bi bi-hourglass-split" aria-hidden="true"></i> Chờ nhân viên giao hàng nhận đơn</span>
+>>>>>>> origin/chihai_nhiemvu_tv4_doitra
     </div>
 
     <div class="row g-3 mb-3">
@@ -57,6 +63,12 @@
                     <dt>Khuyến mãi</dt>
                     <dd th:text="${donHang.khuyenMai != null} ? ${donHang.khuyenMai.maGiamGia} : 'Không dùng'"></dd>
                     <!-- TV4: thông tin phiếu xuất kho -->
+                    <dt>Nhân viên giao</dt>
+                    <dd th:text="${donHang.nhanVienGiao != null}
+                        ? |${donHang.nhanVienGiao.hoTen} – ${donHang.nhanVienGiao.soDienThoai}| : 'Chưa có'"></dd>
+                    <th:block th:if="${donHang.lyDoGiaoThatBai != null}">
+                        <dt>Giao thất bại</dt><dd class="text-danger" th:text="${donHang.lyDoGiaoThatBai}"></dd>
+                    </th:block>
                     <dt>Phiếu xuất</dt>
                     <dd th:text="${phieuXuat != null}
                         ? |Số ${phieuXuat.maPhieuXuat} – ${#temporals.format(phieuXuat.ngayXuat, 'dd/MM/yyyy HH:mm')} – ${phieuXuat.taiKhoan.hoTen}|

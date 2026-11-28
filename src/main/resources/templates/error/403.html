@@ -30,8 +30,13 @@
       <h1 class="error-title" id="error-title">Bạn không có quyền truy cập</h1>
       <p class="error-description">Tài khoản hiện tại không có quyền truy cập trang này. Vui lòng quay về trang chủ hoặc sử dụng tài khoản có quyền phù hợp.</p>
       <div class="error-actions">
+<<<<<<< HEAD
         <a sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_BAO_HANH')" class="error-button error-button-primary" th:href="@{/admin}" href="/admin"><i class="bi bi-speedometer2" aria-hidden="true"></i> Về trang quản trị</a>
         <a sec:authorize="!hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_BAO_HANH')" class="error-button error-button-primary" th:href="@{/}" href="/"><i class="bi bi-house-door-fill" aria-hidden="true"></i> Về trang chủ</a>
+=======
+        <a sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_GIAO_HANG')" class="error-button error-button-primary" th:href="@{/admin}" href="/admin"><i class="bi bi-speedometer2" aria-hidden="true"></i> Về trang quản trị</a>
+        <a sec:authorize="!hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_GIAO_HANG')" class="error-button error-button-primary" th:href="@{/}" href="/"><i class="bi bi-house-door-fill" aria-hidden="true"></i> Về trang chủ</a>
+>>>>>>> origin/chihai_nhiemvu_tv4_doitra
         <a class="error-button error-button-secondary" th:href="@{/#product-list}" href="/#product-list"><i class="bi bi-arrow-left" aria-hidden="true"></i> Xem sản phẩm</a>
       </div>
       <hr class="error-divider" />

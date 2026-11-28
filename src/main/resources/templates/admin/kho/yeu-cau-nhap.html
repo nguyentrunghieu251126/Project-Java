@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{admin/layout :: layout('Yêu cầu nhập hàng', 'yeu-cau-nhap', ~{::main})}">
 <body>
 <main>
     <section class="the">
+        <!-- TV4 – NVK09: lập một yêu cầu gồm nhiều sản phẩm -->
+        <div class="d-flex justify-content-end mb-2" sec:authorize="hasAuthority('KHO_YEUCAU_NHAP')">
+            <a class="btn btn-sm btn-chinh" th:href="@{/admin/kho/yeu-cau-nhap/lap}">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i> Lập yêu cầu nhập</a>
+        </div>
         <div class="tien-trinh mb-3">
             <a class="chip-loc" th:classappend="${trangThai == null} ? 'active'" th:href="@{/admin/kho/yeu-cau-nhap}">Tất cả</a>
             <a class="chip-loc" th:each="t : ${dsTrangThai}" th:classappend="${trangThai == t} ? 'active'"

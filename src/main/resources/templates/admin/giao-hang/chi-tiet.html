@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout(${'Giao đơn #' + ct.donHang().maDonHang}, 'giao-hang', ~{::main})}">
+<body>
+<!-- TV4 – NVGH01 – NVGH04: chi tiết đơn cho nhân viên giao hàng. Model: ct (GiaoHangService.ChiTietGiao). -->
+<main th:with="d=${ct.donHang()},
+                dangGiaoCuaToi=${ct.cuaToi() and ct.donHang().trangThai.name() == 'DANG_GIAO'},
+                tabVe=${ct.donHang().trangThai.name() == 'DA_XUAT_KHO'} ? 'CHO_NHAN'
+                      : (${ct.donHang().trangThai.name() == 'DANG_GIAO'} ? 'DANG_GIAO' : 'DA_XONG')">
+    <div class="thanh-hanh-dong">
+        <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/giao-hang(tab=${tabVe})}">
+            <i class="bi bi-arrow-left" aria-hidden="true"></i> Danh sách</a>
+        <span th:replace="~{admin/fragments :: nhan(${d.trangThai})}"></span>
+
+        <form th:if="${d.trangThai.name() == 'DA_XUAT_KHO' and d.nhanVienGiao == null}" class="d-inline" method="post"
+              th:action="@{/admin/giao-hang/{ma}/nhan(ma=${d.maDonHang})}"
+              th:data-xac-nhan="|Nhận đơn #${d.maDonHang} để đi giao?|">
+            <button class="btn btn-sm btn-chinh" type="submit"><i class="bi bi-hand-index" aria-hidden="true"></i> Nhận đơn</button>
+        </form>
+        <th:block th:if="${dangGiaoCuaToi}">
+            <form class="d-inline" method="post" th:action="@{/admin/giao-hang/{ma}/da-giao(ma=${d.maDonHang})}"
+                  th:data-xac-nhan="${ct.tienThuHo().signum() > 0}
+                      ? |Xác nhận đã giao đơn #${d.maDonHang} và đã thu ${#numbers.formatInteger(ct.tienThuHo(), 1, 'POINT')} ₫?|
+                      : |Xác nhận đã giao đơn #${d.maDonHang}?|">
+                <button class="btn btn-sm btn-success" type="submit"><i class="bi bi-check2-circle" aria-hidden="true"></i> Đã giao</button>
+            </form>
+            <button class="btn btn-sm btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#hopThatBai">
+                <i class="bi bi-x-circle" aria-hidden="true"></i> Giao thất bại</button>
+        </th:block>
+    </div>
+
+    <!-- Số tiền cần thu khi giao: thứ nhân viên cần nhìn đầu tiên -->
+    <div class="alert d-flex align-items-center gap-3"
+         th:classappend="${ct.tienThuHo().signum() > 0} ? 'alert-warning' : 'alert-success'"
+         th:if="${d.trangThai.name() == 'DA_XUAT_KHO' or d.trangThai.name() == 'DANG_GIAO'}">
+        <i class="bi fs-4" th:classappend="${ct.tienThuHo().signum() > 0} ? 'bi-cash-coin' : 'bi-check2-circle'" aria-hidden="true"></i>
+        <div th:if="${ct.tienThuHo().signum() > 0}">
+            Thu của khách: <strong class="fs-5" th:text="|${#numbers.formatInteger(ct.tienThuHo(), 1, 'POINT')} ₫|">0 ₫</strong>
+            <span class="text-muted" th:if="${ct.thanhToan() != null}" th:text="|(${ct.thanhToan().phuongThuc.nhan})|"></span>
+        </div>
+        <div th:unless="${ct.tienThuHo().signum() > 0}">Khách đã thanh toán trước, <strong>không thu tiền</strong> khi giao.</div>
+    </div>
+    <div class="alert alert-danger d-flex gap-2" th:if="${d.lyDoGiaoThatBai != null}">
+        <i class="bi bi-x-octagon" aria-hidden="true"></i>
+        <div><strong>Giao không thành công:</strong> <span th:text="${d.lyDoGiaoThatBai}"></span>
+            <div class="small">Hàng đã được hoàn về kho.</div></div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <section class="the h-100 mb-0">
+                <div class="the-tieu-de"><h2>Người nhận</h2></div>
+                <dl class="bang-thong-tin">
+                    <dt>Họ tên</dt><dd th:text="${d.hoTenNguoiNhan}"></dd>
+                    <dt>Điện thoại</dt>
+                    <dd><a th:href="|tel:${d.soDienThoaiNguoiNhan}|" th:text="${d.soDienThoaiNguoiNhan}"></a></dd>
+                    <dt>Địa chỉ</dt><dd th:text="${d.diaChiGiaoHang}"></dd>
+                </dl>
+            </section>
+        </div>
+        <div class="col-lg-6">
+            <section class="the h-100 mb-0">
+                <div class="the-tieu-de"><h2>Thông tin đơn</h2></div>
+                <dl class="bang-thong-tin">
+                    <dt>Ngày đặt</dt><dd th:text="${#temporals.format(d.ngayDat, 'dd/MM/yyyy HH:mm')}"></dd>
+                    <dt>Thanh toán</dt>
+                    <dd th:text="${ct.thanhToan() != null}
+                        ? |${ct.thanhToan().phuongThuc.nhan} – ${ct.thanhToan().trangThai.nhan}| : 'Thanh toán khi nhận hàng'"></dd>
+                    <dt>Nhân viên giao</dt>
+                    <dd th:text="${d.nhanVienGiao != null} ? ${d.nhanVienGiao.hoTen} : 'Chưa có ai nhận'"></dd>
+                    <dt>Ngày giao</dt>
+                    <dd th:text="${d.ngayGiao != null} ? ${#temporals.format(d.ngayGiao, 'dd/MM/yyyy HH:mm')} : 'Chưa giao'"></dd>
+                </dl>
+            </section>
+        </div>
+    </div>
+
+    <section class="the">
+        <div class="the-tieu-de"><h2>Hàng cần giao</h2>
+            <span class="chu-thich" th:text="|${#lists.size(ct.dsChiTiet())} sản phẩm|"></span></div>
+        <div class="table-responsive">
+            <table class="table bang">
+                <thead><tr><th>Sản phẩm</th><th class="so">Số lượng</th><th class="so">Thành tiền</th></tr></thead>
+                <tbody>
+                <tr th:each="c : ${ct.dsChiTiet()}">
+                    <td><span class="ten-chinh" th:text="${c.sanPham.tenSanPham}"></span>
+                        <span class="ten-phu" th:text="${c.sanPham.maModel}"></span></td>
+                    <td class="so ten-chinh" th:text="${c.soLuong}"></td>
+                    <td class="so" th:text="|${#numbers.formatInteger(c.thanhTien, 1, 'POINT')} ₫|"></td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="2" class="so">Tổng thanh toán</td>
+                    <td class="so ten-chinh" th:text="|${#numbers.formatInteger(d.tongTien, 1, 'POINT')} ₫|"></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </section>
+
+    <!-- NVGH04: hộp nhập lý do giao thất bại -->
+    <div class="modal fade" id="hopThatBai" tabindex="-1" aria-labelledby="hopThatBaiTieuDe" aria-hidden="true"
+         th:if="${dangGiaoCuaToi}">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" method="post" th:action="@{/admin/giao-hang/{ma}/that-bai(ma=${d.maDonHang})}">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="hopThatBaiTieuDe" th:text="|Giao thất bại đơn #${d.maDonHang}|">Giao thất bại</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted">Đơn sẽ chuyển sang "Đã hủy", hàng được hoàn về kho và khách được hoàn tiền,
+                        điểm thưởng (nếu có).</p>
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary goi-y-ly-do">Khách không nghe máy</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary goi-y-ly-do">Khách từ chối nhận hàng</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary goi-y-ly-do">Sai địa chỉ giao hàng</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary goi-y-ly-do">Khách hẹn giao lại nhưng không liên lạc được</button>
+                    </div>
+                    <label class="form-label" for="lyDoThatBai">Lý do <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="lyDoThatBai" name="lyDo" rows="3" maxlength="500" required
+                              placeholder="Mô tả ngắn lý do giao không thành công"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-x-circle" aria-hidden="true"></i> Xác nhận giao thất bại</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.querySelectorAll(".goi-y-ly-do").forEach(function (nut) {
+            nut.addEventListener("click", function () {
+                const o = document.getElementById("lyDoThatBai");
+                o.value = nut.textContent.trim();
+                o.focus();
+            });
+        });
+    </script>
+</main>
+</body>
+</html>

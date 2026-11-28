@@ -42,9 +42,9 @@ CREATE TABLE dbo.TaiKhoan (
 -- Bảng phân quyền theo chức năng
 CREATE TABLE dbo.Quyen (
     MaQuyen INT IDENTITY (1, 1) NOT NULL,
-    MaChucNang VARCHAR (50) NOT NULL, 
-    TenQuyen NVARCHAR (100) NOT NULL, 
-    NhomChucNang NVARCHAR (50) NOT NULL, 
+    MaChucNang VARCHAR (50) NOT NULL,
+    TenQuyen NVARCHAR (100) NOT NULL,
+    NhomChucNang NVARCHAR (50) NOT NULL,
     MoTa NVARCHAR (255) NULL,
     CONSTRAINT PK_Quyen PRIMARY KEY (MaQuyen),
     CONSTRAINT UQ_Quyen_MaChucNang UNIQUE (MaChucNang)
@@ -64,7 +64,7 @@ CREATE TABLE dbo.TaiKhoan_Quyen (
     MaTaiKhoanQuyen INT IDENTITY (1, 1) NOT NULL,
     MaTaiKhoan INT NOT NULL,
     MaQuyen INT NOT NULL,
-    DuocCap BIT NOT NULL, 
+    DuocCap BIT NOT NULL,
     CONSTRAINT PK_TaiKhoan_Quyen PRIMARY KEY (MaTaiKhoanQuyen),
     CONSTRAINT UQ_TaiKhoan_Quyen UNIQUE (MaTaiKhoan, MaQuyen),
     CONSTRAINT FK_TKQ_TaiKhoan FOREIGN KEY (MaTaiKhoan) REFERENCES dbo.TaiKhoan (MaTaiKhoan) ON DELETE CASCADE,
@@ -83,18 +83,18 @@ CREATE TABLE dbo.DanhMuc (
 -- Bảng sản phẩm
 CREATE TABLE dbo.SanPham (
     MaSanPham INT IDENTITY (1, 1) NOT NULL,
-    MaModel VARCHAR (50) NOT NULL, 
+    MaModel VARCHAR (50) NOT NULL,
     TenSanPham NVARCHAR (200) NOT NULL,
     ThuongHieu NVARCHAR (50) NOT NULL,
     DonGia DECIMAL (18, 0) NOT NULL,
-    SoLuong INT CONSTRAINT DF_SanPham_SoLuong DEFAULT 0 NOT NULL, 
+    SoLuong INT CONSTRAINT DF_SanPham_SoLuong DEFAULT 0 NOT NULL,
     MoTa NVARCHAR (MAX) NULL,
     HinhAnh VARCHAR (255) NULL,
-    ThoiGianBaoHanh INT CONSTRAINT DF_SanPham_BaoHanh DEFAULT 12 NOT NULL, 
+    ThoiGianBaoHanh INT CONSTRAINT DF_SanPham_BaoHanh DEFAULT 12 NOT NULL,
     MaDanhMuc INT NOT NULL,
-    MucTonToiThieu INT CONSTRAINT DF_SanPham_MucTon DEFAULT 5 NOT NULL, 
-    DangKinhDoanh BIT CONSTRAINT DF_SanPham_DangKD DEFAULT 1 NOT NULL, 
-    PhienBan INT CONSTRAINT DF_SanPham_PhienBan DEFAULT 0 NOT NULL, 
+    MucTonToiThieu INT CONSTRAINT DF_SanPham_MucTon DEFAULT 5 NOT NULL,
+    DangKinhDoanh BIT CONSTRAINT DF_SanPham_DangKD DEFAULT 1 NOT NULL,
+    PhienBan INT CONSTRAINT DF_SanPham_PhienBan DEFAULT 0 NOT NULL,
     CONSTRAINT PK_SanPham PRIMARY KEY (MaSanPham),
     CONSTRAINT UQ_SanPham_MaModel UNIQUE (MaModel),
     CONSTRAINT FK_SanPham_DanhMuc FOREIGN KEY (MaDanhMuc) REFERENCES dbo.DanhMuc (MaDanhMuc),
@@ -114,8 +114,8 @@ CREATE TABLE dbo.ThongSoKyThuat (
     MaThongSo INT IDENTITY (1, 1) NOT NULL,
     MaSanPham INT NOT NULL,
     TenThongSo NVARCHAR (100) NOT NULL,
-    GiaTri NVARCHAR (255) NOT NULL, 
-    ThuTu INT CONSTRAINT DF_ThongSo_ThuTu DEFAULT 1 NOT NULL, 
+    GiaTri NVARCHAR (255) NOT NULL,
+    ThuTu INT CONSTRAINT DF_ThongSo_ThuTu DEFAULT 1 NOT NULL,
     CONSTRAINT PK_ThongSoKyThuat PRIMARY KEY (MaThongSo),
     CONSTRAINT UQ_ThongSoKyThuat UNIQUE (MaSanPham, TenThongSo),
     CONSTRAINT FK_ThongSo_SanPham FOREIGN KEY (MaSanPham) REFERENCES dbo.SanPham (MaSanPham) ON DELETE CASCADE
@@ -127,7 +127,7 @@ CREATE TABLE dbo.GioHang (
     MaTaiKhoan INT NOT NULL,
     NgayTao DATETIME2 (0) CONSTRAINT DF_GioHang_NgayTao DEFAULT SYSDATETIME() NOT NULL,
     CONSTRAINT PK_GioHang PRIMARY KEY (MaGioHang),
-    CONSTRAINT UQ_GioHang_MaTaiKhoan UNIQUE (MaTaiKhoan), 
+    CONSTRAINT UQ_GioHang_MaTaiKhoan UNIQUE (MaTaiKhoan),
     CONSTRAINT FK_GioHang_TaiKhoan FOREIGN KEY (MaTaiKhoan) REFERENCES dbo.TaiKhoan (MaTaiKhoan)
 );
 
@@ -140,7 +140,7 @@ CREATE TABLE dbo.ChiTietGioHang (
     CONSTRAINT PK_ChiTietGioHang PRIMARY KEY (MaChiTietGioHang),
     CONSTRAINT UQ_ChiTietGioHang UNIQUE (MaGioHang, MaSanPham),
     CONSTRAINT FK_CTGH_GioHang FOREIGN KEY (MaGioHang) REFERENCES dbo.GioHang (MaGioHang) ON DELETE CASCADE,
-    CONSTRAINT FK_CTGH_SanPham FOREIGN KEY (MaSanPham) REFERENCES dbo.SanPham (MaSanPham) ON DELETE CASCADE, -- xóa sản phẩm thì tự xóa khỏi giỏ
+    CONSTRAINT FK_CTGH_SanPham FOREIGN KEY (MaSanPham) REFERENCES dbo.SanPham (MaSanPham) ON DELETE CASCADE,
     CONSTRAINT CK_CTGH_SoLuong CHECK (SoLuong > 0)
 );
 
@@ -149,11 +149,11 @@ CREATE TABLE dbo.KhuyenMai (
     MaKhuyenMai INT IDENTITY (1, 1) NOT NULL,
     TenKhuyenMai NVARCHAR (200) NOT NULL,
     MaGiamGia VARCHAR (30) NOT NULL,
-    LoaiGiamGia VARCHAR (20) NOT NULL, 
+    LoaiGiamGia VARCHAR (20) NOT NULL,
     GiaTriGiam DECIMAL (18, 0) NOT NULL,
     NgayBatDau DATE NOT NULL,
     NgayKetThuc DATE NOT NULL,
-    SoLuotToiDa INT NULL, 
+    SoLuotToiDa INT NULL,
     SoLuotDaDung INT CONSTRAINT DF_KhuyenMai_DaDung DEFAULT 0 NOT NULL,
     TrangThai BIT CONSTRAINT DF_KhuyenMai_TrangThai DEFAULT 1 NOT NULL,
     CONSTRAINT PK_KhuyenMai PRIMARY KEY (MaKhuyenMai),
@@ -176,9 +176,12 @@ CREATE TABLE dbo.DonHang (
     TienGiam DECIMAL (18, 0) CONSTRAINT DF_DonHang_TienGiam DEFAULT 0 NOT NULL,
     TongTien DECIMAL (18, 0) NOT NULL,
     TrangThaiDonHang VARCHAR (20) CONSTRAINT DF_DonHang_TrangThai DEFAULT 'CHO_XAC_NHAN' NOT NULL,
-    NgayGiao DATETIME2 (0) NULL, 
+    NgayGiao DATETIME2 (0) NULL,
+    MaNhanVienGiao INT NULL,
+    LyDoGiaoThatBai NVARCHAR (500) NULL,
     CONSTRAINT PK_DonHang PRIMARY KEY (MaDonHang),
     CONSTRAINT FK_DonHang_TaiKhoan FOREIGN KEY (MaTaiKhoan) REFERENCES dbo.TaiKhoan (MaTaiKhoan),
+    CONSTRAINT FK_DonHang_NhanVienGiao FOREIGN KEY (MaNhanVienGiao) REFERENCES dbo.TaiKhoan (MaTaiKhoan),
     CONSTRAINT FK_DonHang_KhuyenMai FOREIGN KEY (MaKhuyenMai) REFERENCES dbo.KhuyenMai (MaKhuyenMai),
     CONSTRAINT CK_DonHang_Tien CHECK (TongTien >= 0 AND TienGiam >= 0),
     CONSTRAINT CK_DonHang_TrangThai CHECK (TrangThaiDonHang IN ('CHO_XAC_NHAN', 'DA_XAC_NHAN', 'DA_XUAT_KHO', 'DANG_GIAO', 'DA_GIAO', 'DA_HUY')),
@@ -186,9 +189,10 @@ CREATE TABLE dbo.DonHang (
 );
 
 -- Tạo chỉ mục cho đơn hàng tăng tốc độ tìm kiếm
-CREATE INDEX IX_DonHang_NgayDat ON dbo.DonHang (NgayDat); 
+CREATE INDEX IX_DonHang_NgayDat ON dbo.DonHang (NgayDat);
 CREATE INDEX IX_DonHang_MaTaiKhoan ON dbo.DonHang (MaTaiKhoan);
 CREATE INDEX IX_DonHang_TrangThai ON dbo.DonHang (TrangThaiDonHang);
+CREATE INDEX IX_DonHang_NhanVienGiao ON dbo.DonHang (MaNhanVienGiao);
 
 -- Bảng chi tiết đơn hàng
 CREATE TABLE dbo.ChiTietDonHang (
@@ -197,7 +201,7 @@ CREATE TABLE dbo.ChiTietDonHang (
     MaSanPham INT NOT NULL,
     SoLuong INT NOT NULL,
     DonGia DECIMAL (18, 0) NOT NULL,
-    ThanhTien DECIMAL (18, 0) NOT NULL, 
+    ThanhTien DECIMAL (18, 0) NOT NULL,
     CONSTRAINT PK_ChiTietDonHang PRIMARY KEY (MaChiTietDonHang),
     CONSTRAINT UQ_ChiTietDonHang UNIQUE (MaDonHang, MaSanPham),
     CONSTRAINT FK_CTDH_DonHang FOREIGN KEY (MaDonHang) REFERENCES dbo.DonHang (MaDonHang),
@@ -212,7 +216,7 @@ CREATE TABLE dbo.ThanhToan (
     MaDonHang INT NOT NULL,
     PhuongThucThanhToan VARCHAR (20) NOT NULL,
     SoTienThanhToan DECIMAL (18, 0) NOT NULL,
-    NgayThanhToan DATETIME2 (0) NULL, 
+    NgayThanhToan DATETIME2 (0) NULL,
     TrangThaiThanhToan VARCHAR (20) CONSTRAINT DF_ThanhToan_TrangThai DEFAULT 'CHUA_THANH_TOAN' NOT NULL,
     CONSTRAINT PK_ThanhToan PRIMARY KEY (MaThanhToan),
     CONSTRAINT FK_ThanhToan_DonHang FOREIGN KEY (MaDonHang) REFERENCES dbo.DonHang (MaDonHang),
@@ -225,7 +229,7 @@ CREATE TABLE dbo.ThanhToan (
 CREATE TABLE dbo.YeuCauNhapHang (
     MaYeuCauNhap INT IDENTITY (1, 1) NOT NULL,
     MaTaiKhoan INT NOT NULL,
-    MaNguoiDuyet INT NULL, 
+    MaNguoiDuyet INT NULL,
     NgayYeuCau DATETIME2 (0) CONSTRAINT DF_YCNH_NgayYeuCau DEFAULT SYSDATETIME() NOT NULL,
     TrangThai VARCHAR (20) CONSTRAINT DF_YCNH_TrangThai DEFAULT 'CHO_DUYET' NOT NULL,
     NgayDuyet DATETIME2 (0) NULL,
@@ -254,7 +258,7 @@ CREATE TABLE dbo.ChiTietYeuCauNhapHang (
 CREATE TABLE dbo.PhieuNhap (
     MaPhieuNhap INT IDENTITY (1, 1) NOT NULL,
     MaYeuCauNhap INT NOT NULL,
-    MaTaiKhoan INT NOT NULL, 
+    MaTaiKhoan INT NOT NULL,
     NgayNhap DATETIME2 (0) CONSTRAINT DF_PhieuNhap_NgayNhap DEFAULT SYSDATETIME() NOT NULL,
     TongTienNhap DECIMAL (18, 0) CONSTRAINT DF_PhieuNhap_TongTien DEFAULT 0 NOT NULL,
     GhiChu NVARCHAR (500) NULL,
@@ -284,11 +288,11 @@ CREATE TABLE dbo.ChiTietPhieuNhap (
 CREATE TABLE dbo.PhieuXuat (
     MaPhieuXuat INT IDENTITY (1, 1) NOT NULL,
     MaDonHang INT NOT NULL,
-    MaTaiKhoan INT NOT NULL, 
+    MaTaiKhoan INT NOT NULL,
     NgayXuat DATETIME2 (0) CONSTRAINT DF_PhieuXuat_NgayXuat DEFAULT SYSDATETIME() NOT NULL,
     GhiChu NVARCHAR (500) NULL,
     CONSTRAINT PK_PhieuXuat PRIMARY KEY (MaPhieuXuat),
-    CONSTRAINT UQ_PhieuXuat_MaDonHang UNIQUE (MaDonHang), 
+    CONSTRAINT UQ_PhieuXuat_MaDonHang UNIQUE (MaDonHang),
     CONSTRAINT FK_PhieuXuat_DonHang FOREIGN KEY (MaDonHang) REFERENCES dbo.DonHang (MaDonHang),
     CONSTRAINT FK_PhieuXuat_TaiKhoan FOREIGN KEY (MaTaiKhoan) REFERENCES dbo.TaiKhoan (MaTaiKhoan)
 );
@@ -315,7 +319,7 @@ CREATE TABLE dbo.DanhGia (
     NoiDungDanhGia NVARCHAR (1000) NULL,
     NgayDanhGia DATETIME2 (0) CONSTRAINT DF_DanhGia_Ngay DEFAULT SYSDATETIME() NOT NULL,
     CONSTRAINT PK_DanhGia PRIMARY KEY (MaDanhGia),
-    CONSTRAINT UQ_DanhGia UNIQUE (MaTaiKhoan, MaSanPham), 
+    CONSTRAINT UQ_DanhGia UNIQUE (MaTaiKhoan, MaSanPham),
     CONSTRAINT FK_DanhGia_TaiKhoan FOREIGN KEY (MaTaiKhoan) REFERENCES dbo.TaiKhoan (MaTaiKhoan),
     CONSTRAINT FK_DanhGia_SanPham FOREIGN KEY (MaSanPham) REFERENCES dbo.SanPham (MaSanPham),
     CONSTRAINT CK_DanhGia_SoSao CHECK (SoSao BETWEEN 1 AND 5)
@@ -339,7 +343,7 @@ CREATE TABLE dbo.YeuCauHoTro (
 CREATE TABLE dbo.PhieuBaoHanh (
     MaPhieuBaoHanh INT IDENTITY (1, 1) NOT NULL,
     MaChiTietDonHang INT NOT NULL,
-    MaTaiKhoan INT NULL, 
+    MaTaiKhoan INT NULL,
     NgayYeuCau DATETIME2 (0) CONSTRAINT DF_PBH_NgayYeuCau DEFAULT SYSDATETIME() NOT NULL,
     NgayTiepNhan DATETIME2 (0) NULL,
     MoTaLoi NVARCHAR (1000) NOT NULL,
@@ -371,12 +375,13 @@ GO
 -- Tạm tắt cơ chế đánh số tự động
 SET IDENTITY_INSERT dbo.VaiTro ON;
 
--- Thêm dữ liệu bảng vai trò
+-- Thêm dữ liệu bảng vai trò (gộp cả nhân viên giao hàng và nhân viên bảo hành)
 INSERT INTO dbo.VaiTro (MaVaiTro, TenVaiTro) VALUES
 (1, N'QUAN_TRI'),
 (2, N'NHAN_VIEN_KHO'),
 (3, N'KHACH_HANG'),
-(4, N'NHAN_VIEN_BAO_HANH');
+(4, N'NHAN_VIEN_GIAO_HANG'),
+(5, N'NHAN_VIEN_BAO_HANH');
 
 -- Bật lại cơ chế đánh số tự động
 SET IDENTITY_INSERT dbo.VaiTro OFF;
@@ -424,7 +429,8 @@ INSERT INTO dbo.Quyen (MaQuyen, MaChucNang, TenQuyen, NhomChucNang, MoTa) VALUES
 (35, 'DANHGIA_VIET', N'Đánh giá sản phẩm', N'Mua hàng', N'KH22'),
 (36, 'HOTRO_GUI', N'Gửi yêu cầu hỗ trợ', N'Hỗ trợ', N'KH23'),
 (37, 'TAIKHOAN_CANHAN', N'Cập nhật thông tin cá nhân', N'Tài khoản', N'KH04 và mọi vai trò'),
-(38, 'TONGQUAN_XEM', N'Xem trang tổng quan', N'Tổng quan', N'QT08');
+(38, 'TONGQUAN_XEM', N'Xem trang tổng quan', N'Tổng quan', N'QT08'),
+(39, 'GIAOHANG_XULY', N'Nhận và giao đơn hàng', N'Giao hàng', N'NVGH01 – NVGH04');
 
 -- Bật lại cơ chế đánh số tự động
 SET IDENTITY_INSERT dbo.Quyen OFF;
@@ -440,8 +446,10 @@ INSERT INTO dbo.VaiTro_Quyen (MaVaiTro, MaQuyen) VALUES
 (2, 1), (2, 20), (2, 22), (2, 23), (2, 24), (2, 25), (2, 26), (2, 27), (2, 37),
 -- Khách hàng
 (3, 29), (3, 30), (3, 31), (3, 32), (3, 33), (3, 34), (3, 35), (3, 36), (3, 37),
--- Nhân viên bảo hành: chỉ tiếp nhận bảo hành, xử lý đổi trả và sửa thông tin cá nhân
-(4, 26), (4, 27), (4, 37);
+-- Nhân viên giao hàng (TV4)
+(4, 37), (4, 39),
+-- Nhân viên bảo hành
+(5, 26), (5, 27), (5, 37);
 GO
 
 -- Tạm tắt cơ chế đánh số tự động
@@ -478,12 +486,13 @@ INSERT INTO dbo.TaiKhoan (MaTaiKhoan, HoTen, Email, MatKhau, SoDienThoai, DiaChi
 (27, N'Phạm Hoàng Giang', 'giang.pham27@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0961675136', N'38 Điện Biên Phủ, Quận 10, TP. Hồ Chí Minh', 3, 1, '2026-06-09T09:00:00'),
 (28, N'Lê Anh Yến', 'yen.le28@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0952427316', N'250 Cách Mạng Tháng 8, Quận 7, TP. Hồ Chí Minh', 3, 1, '2026-03-21T19:00:00'),
 (29, N'Võ Bảo Phúc', 'phuc.vo29@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0956355150', N'174 Hoàng Văn Thụ, Quận Tân Bình, TP. Hồ Chí Minh', 3, 0, '2026-04-26T19:00:00'),
-(30, N'Nguyễn Gia Mai', 'mai.nguyen30@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0989481131', N'44 Võ Văn Tần, Quận 10, TP. Hồ Chí Minh', 3, 1, '2026-03-06T20:00:00');
-
--- Thêm tài khoản nhân viên bảo hành
-INSERT INTO dbo.TaiKhoan (MaTaiKhoan, HoTen, Email, MatKhau, SoDienThoai, DiaChi, MaVaiTro, TrangThai, NgayTao) VALUES
-(31, N'Phan Thị Diễm', 'baohanh1@dienmay.vn', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0903112233', N'78 Nguyễn Thị Minh Khai, Quận 3, TP. Hồ Chí Minh', 4, 1, '2026-04-25T08:00:00'),
-(32, N'Trương Quốc Khánh', 'baohanh2@dienmay.vn', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0903445566', N'215 Lý Thường Kiệt, Quận Tân Bình, TP. Hồ Chí Minh', 4, 1, '2026-04-25T08:05:00');
+(30, N'Nguyễn Gia Mai', 'mai.nguyen30@gmail.com', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0989481131', N'44 Võ Văn Tần, Quận 10, TP. Hồ Chí Minh', 3, 1, '2026-03-06T20:00:00'),
+-- Nhân viên giao hàng (TV4)
+(31, N'Trần Văn Lực', 'giaohang1@dienmay.vn', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0938112233', N'18 Nguyễn Thị Thập, Quận 7, TP. Hồ Chí Minh', 4, 1, '2026-05-02T08:00:00'),
+(32, N'Phạm Minh Khoa', 'giaohang2@dienmay.vn', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0907445566', N'72 Lê Văn Việt, TP. Thủ Đức, TP. Hồ Chí Minh', 4, 1, '2026-05-10T08:00:00'),
+-- Nhân viên bảo hành
+(33, N'Phan Thị Diễm', 'baohanh1@dienmay.vn', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0903112233', N'78 Nguyễn Thị Minh Khai, Quận 3, TP. Hồ Chí Minh', 5, 1, '2026-04-25T08:00:00'),
+(34, N'Trương Quốc Khánh', 'baohanh2@dienmay.vn', '$2a$10$HTw0S0isa8xJcfibtVx.3.6yoywZl7JSLgkIf80GYO5XE/9ouWBKO', '0903445566', N'215 Lý Thường Kiệt, Quận Tân Bình, TP. Hồ Chí Minh', 5, 1, '2026-04-25T08:05:00');
 
 -- Bật lại cơ chế đánh số tự động
 SET IDENTITY_INSERT dbo.TaiKhoan OFF;
@@ -492,20 +501,21 @@ GO
 -- Tạm tắt cơ chế đánh số tự động
 SET IDENTITY_INSERT dbo.TaiKhoan_Quyen ON;
 
--- Thêm dữ liệu quyền riêng của từng nhân viên kho 
+-- Thêm dữ liệu quyền riêng của từng nhân viên kho
 INSERT INTO dbo.TaiKhoan_Quyen (MaTaiKhoanQuyen, MaTaiKhoan, MaQuyen, DuocCap) VALUES
-(1, 4, 13, 1), 
-(2, 4, 19, 1), 
-(3, 5, 22, 0), 
-(4, 5, 23, 0), 
-(5, 5, 25, 0), 
+(1, 4, 13, 1),
+(2, 4, 19, 1),
+(3, 5, 22, 0),
+(4, 5, 23, 0),
+(5, 5, 25, 0),
 (6, 6, 26, 0),
-(7, 6, 27, 0), 
-(8, 5, 19, 1); 
+(7, 6, 27, 0),
+(8, 5, 19, 1);
 
 -- Bật lại cơ chế đánh số tự động
 SET IDENTITY_INSERT dbo.TaiKhoan_Quyen OFF;
 GO
+
 -- Tạm tắt cơ chế đánh số tự động
 SET IDENTITY_INSERT dbo.DanhMuc ON;
 
@@ -595,230 +605,186 @@ SET IDENTITY_INSERT dbo.ThongSoKyThuat ON;
 
 -- Thêm dữ liệu bảng thông số kỹ thuật
 INSERT INTO dbo.ThongSoKyThuat (MaThongSo, MaSanPham, TenThongSo, GiaTri, ThuTu) VALUES
--- Sản phẩm 1: Samsung Galaxy S24 Ultra 256GB
 (1, 1, N'Màn hình', N'6.8 inch, Dynamic AMOLED 2X', 1),
 (2, 1, N'Chip', N'Snapdragon 8 Gen 3', 2),
 (3, 1, N'RAM', N'12 GB', 3),
 (4, 1, N'Bộ nhớ trong', N'256 GB', 4),
 (5, 1, N'Pin', N'5000 mAh', 5),
--- Sản phẩm 2: iPhone 15 Pro Max 256GB
 (6, 2, N'Màn hình', N'6.7 inch, Super Retina XDR OLED', 1),
 (7, 2, N'Chip', N'Apple A17 Pro', 2),
 (8, 2, N'RAM', N'8 GB', 3),
 (9, 2, N'Bộ nhớ trong', N'256 GB', 4),
 (10, 2, N'Pin', N'4441 mAh', 5),
--- Sản phẩm 3: Xiaomi Redmi Note 13 8GB/128GB
 (11, 3, N'Màn hình', N'6.67 inch, AMOLED', 1),
 (12, 3, N'Chip', N'Snapdragon 685', 2),
 (13, 3, N'RAM', N'8 GB', 3),
 (14, 3, N'Bộ nhớ trong', N'128 GB', 4),
 (15, 3, N'Pin', N'5000 mAh', 5),
--- Sản phẩm 4: iPad Air M2 11 inch WiFi 128GB
 (16, 4, N'Màn hình', N'11 inch, Liquid Retina', 1),
 (17, 4, N'Chip', N'Apple M2', 2),
 (18, 4, N'RAM', N'8 GB', 3),
 (19, 4, N'Bộ nhớ trong', N'128 GB', 4),
 (20, 4, N'Kết nối', N'WiFi 6E', 5),
--- Sản phẩm 5: Samsung Galaxy Tab S9 FE WiFi
 (21, 5, N'Màn hình', N'10.9 inch, TFT LCD', 1),
 (22, 5, N'Chip', N'Exynos 1380', 2),
 (23, 5, N'RAM', N'6 GB', 3),
 (24, 5, N'Bộ nhớ trong', N'128 GB', 4),
 (25, 5, N'Kết nối', N'WiFi 6', 5),
--- Sản phẩm 6: MacBook Air M3 13 inch 8GB/256GB
 (26, 6, N'CPU', N'Apple M3 8 nhân', 1),
 (27, 6, N'RAM', N'8 GB', 2),
 (28, 6, N'Ổ cứng', N'SSD 256 GB', 3),
 (29, 6, N'Màn hình', N'13.6 inch, Liquid Retina', 4),
 (30, 6, N'Trọng lượng', N'1.24 kg', 5),
--- Sản phẩm 7: Dell Inspiron 15 3530 i5
 (31, 7, N'CPU', N'Intel Core i5-1335U', 1),
 (32, 7, N'RAM', N'8 GB DDR4', 2),
 (33, 7, N'Ổ cứng', N'SSD 512 GB', 3),
 (34, 7, N'Màn hình', N'15.6 inch, Full HD 120Hz', 4),
 (35, 7, N'Trọng lượng', N'1.65 kg', 5),
--- Sản phẩm 8: ASUS Vivobook 15 OLED i5
 (36, 8, N'CPU', N'Intel Core i5-13500H', 1),
 (37, 8, N'RAM', N'16 GB DDR4', 2),
 (38, 8, N'Ổ cứng', N'SSD 512 GB', 3),
 (39, 8, N'Màn hình', N'15.6 inch, OLED Full HD', 4),
 (40, 8, N'Trọng lượng', N'1.70 kg', 5),
--- Sản phẩm 9: Smart Tivi Samsung 4K 55 inch
 (41, 9, N'Kích thước màn hình', N'55 inch', 1),
 (42, 9, N'Độ phân giải', N'4K Ultra HD', 2),
 (43, 9, N'Tấm nền', N'LED', 3),
 (44, 9, N'Hệ điều hành', N'Tizen OS', 4),
--- Sản phẩm 10: Smart Tivi LG OLED evo 55 inch
 (45, 10, N'Kích thước màn hình', N'55 inch', 1),
 (46, 10, N'Độ phân giải', N'4K Ultra HD', 2),
 (47, 10, N'Tấm nền', N'OLED evo', 3),
 (48, 10, N'Hệ điều hành', N'webOS 24', 4),
--- Sản phẩm 11: Google Tivi Sony 4K 50 inch
 (49, 11, N'Kích thước màn hình', N'50 inch', 1),
 (50, 11, N'Độ phân giải', N'4K Ultra HD', 2),
 (51, 11, N'Tấm nền', N'LED', 3),
 (52, 11, N'Hệ điều hành', N'Google TV', 4),
--- Sản phẩm 12: Tủ lạnh Panasonic Inverter 322 lít
 (53, 12, N'Dung tích', N'322 lít', 1),
 (54, 12, N'Kiểu tủ', N'Ngăn đá dưới', 2),
 (55, 12, N'Công nghệ tiết kiệm điện', N'Inverter', 3),
 (56, 12, N'Số cánh', N'2 cánh', 4),
--- Sản phẩm 13: Tủ lạnh Samsung Inverter 236 lít
 (57, 13, N'Dung tích', N'236 lít', 1),
 (58, 13, N'Kiểu tủ', N'Ngăn đá trên', 2),
 (59, 13, N'Công nghệ tiết kiệm điện', N'Digital Inverter', 3),
 (60, 13, N'Số cánh', N'2 cánh', 4),
--- Sản phẩm 14: Tủ lạnh LG Inverter 335 lít
 (61, 14, N'Dung tích', N'335 lít', 1),
 (62, 14, N'Kiểu tủ', N'Ngăn đá dưới', 2),
 (63, 14, N'Công nghệ tiết kiệm điện', N'Smart Inverter', 3),
 (64, 14, N'Số cánh', N'2 cánh', 4),
--- Sản phẩm 15: Máy giặt LG Inverter 10 kg
 (65, 15, N'Khối lượng giặt', N'10 kg', 1),
 (66, 15, N'Loại máy', N'Cửa trước', 2),
 (67, 15, N'Tốc độ quay vắt', N'1400 vòng/phút', 3),
 (68, 15, N'Công nghệ', N'Inverter, AI DD', 4),
--- Sản phẩm 16: Máy giặt Electrolux Inverter 9 kg
 (69, 16, N'Khối lượng giặt', N'9 kg', 1),
 (70, 16, N'Loại máy', N'Cửa trước', 2),
 (71, 16, N'Tốc độ quay vắt', N'1200 vòng/phút', 3),
 (72, 16, N'Công nghệ', N'Inverter, UltraMix', 4),
--- Sản phẩm 17: Điều hòa Daikin Inverter 1 HP
 (73, 17, N'Công suất', N'1 HP', 1),
 (74, 17, N'Phạm vi làm lạnh', N'Dưới 15 m²', 2),
 (75, 17, N'Công nghệ', N'Inverter', 3),
 (76, 17, N'Loại máy', N'1 chiều', 4),
--- Sản phẩm 18: Điều hòa Panasonic Inverter 1.5 HP
 (77, 18, N'Công suất', N'1.5 HP', 1),
 (78, 18, N'Phạm vi làm lạnh', N'15 – 20 m²', 2),
 (79, 18, N'Công nghệ', N'Inverter, Nanoe-G', 3),
 (80, 18, N'Loại máy', N'1 chiều', 4),
--- Sản phẩm 19: Máy lọc nước Kangaroo RO 10 lõi
 (81, 19, N'Công nghệ lọc', N'RO', 1),
 (82, 19, N'Số lõi lọc', N'10 lõi', 2),
 (83, 19, N'Công suất lọc', N'10 – 15 lít/giờ', 3),
 (84, 19, N'Kiểu lắp đặt', N'Tủ đứng', 4),
--- Sản phẩm 20: Máy lọc nước Karofi RO 9 lõi
 (85, 20, N'Công nghệ lọc', N'RO', 1),
 (86, 20, N'Số lõi lọc', N'9 lõi', 2),
 (87, 20, N'Công suất lọc', N'10 – 12 lít/giờ', 3),
 (88, 20, N'Kiểu lắp đặt', N'Tủ đứng', 4),
--- Sản phẩm 21: Nồi cơm điện Toshiba 1.8 lít
 (89, 21, N'Dung tích', N'1.8 lít', 1),
 (90, 21, N'Loại nồi', N'Nồi cơm điện tử', 2),
 (91, 21, N'Công suất', N'860 W', 3),
 (92, 21, N'Chất liệu lòng nồi', N'Hợp kim nhôm phủ chống dính', 4),
--- Sản phẩm 22: Nồi cơm điện Cuckoo 1.8 lít
 (93, 22, N'Dung tích', N'1.8 lít', 1),
 (94, 22, N'Loại nồi', N'Nồi cơm điện tử', 2),
 (95, 22, N'Công suất', N'800 W', 3),
 (96, 22, N'Chất liệu lòng nồi', N'Hợp kim nhôm phủ chống dính', 4),
--- Sản phẩm 23: Lò vi sóng Sharp 20 lít
 (97, 23, N'Dung tích', N'20 lít', 1),
 (98, 23, N'Công suất', N'800 W', 2),
 (99, 23, N'Chức năng', N'Hâm, rã đông', 3),
 (100, 23, N'Kiểu điều khiển', N'Núm vặn cơ', 4),
--- Sản phẩm 24: Lò vi sóng Electrolux 23 lít
 (101, 24, N'Dung tích', N'23 lít', 1),
 (102, 24, N'Công suất', N'800 W', 2),
 (103, 24, N'Chức năng', N'Hâm, rã đông, nướng', 3),
 (104, 24, N'Kiểu điều khiển', N'Nút bấm điện tử', 4),
--- Sản phẩm 25: Robot hút bụi Xiaomi S10
 (105, 25, N'Loại máy', N'Robot hút bụi lau nhà', 1),
 (106, 25, N'Lực hút', N'4000 Pa', 2),
 (107, 25, N'Dung lượng pin', N'3200 mAh', 3),
 (108, 25, N'Thời gian hoạt động', N'130 phút', 4),
--- Sản phẩm 26: Máy hút bụi Dyson V8 Slim
 (109, 26, N'Loại máy', N'Máy hút bụi cầm tay không dây', 1),
 (110, 26, N'Lực hút', N'115 AW', 2),
 (111, 26, N'Dung lượng pin', N'2100 mAh', 3),
 (112, 26, N'Thời gian hoạt động', N'40 phút', 4),
--- Sản phẩm 27: Quạt đứng Panasonic F-409K
 (113, 27, N'Loại quạt', N'Quạt đứng', 1),
 (114, 27, N'Công suất', N'47 W', 2),
 (115, 27, N'Số mức gió', N'3 mức', 3),
 (116, 27, N'Điều khiển', N'Remote', 4),
--- Sản phẩm 28: Quạt đứng Toshiba F-LSA10
 (117, 28, N'Loại quạt', N'Quạt đứng', 1),
 (118, 28, N'Công suất', N'50 W', 2),
 (119, 28, N'Số mức gió', N'3 mức', 3),
 (120, 28, N'Điều khiển', N'Remote', 4),
--- Sản phẩm 29: Tai nghe AirPods Pro 2 USB-C
 (121, 29, N'Kiểu tai nghe', N'True Wireless nhét tai', 1),
 (122, 29, N'Chống ồn', N'Chủ động (ANC)', 2),
 (123, 29, N'Thời lượng pin', N'6 giờ (30 giờ kèm hộp)', 3),
 (124, 29, N'Cổng sạc', N'USB-C', 4),
--- Sản phẩm 30: Tai nghe Sony WH-1000XM5
 (125, 30, N'Kiểu tai nghe', N'Chụp tai không dây', 1),
 (126, 30, N'Chống ồn', N'Chủ động (ANC)', 2),
 (127, 30, N'Thời lượng pin', N'30 giờ', 3),
 (128, 30, N'Cổng sạc', N'USB-C', 4),
--- Sản phẩm 31: Loa Bluetooth JBL Charge 5
 (129, 31, N'Công suất', N'40 W', 1),
 (130, 31, N'Thời lượng pin', N'20 giờ', 2),
 (131, 31, N'Chống nước', N'IP67', 3),
 (132, 31, N'Kết nối', N'Bluetooth 5.1', 4),
--- Sản phẩm 32: Loa Bluetooth Marshall Emberton II
 (133, 32, N'Công suất', N'20 W', 1),
 (134, 32, N'Thời lượng pin', N'30 giờ', 2),
 (135, 32, N'Chống nước', N'IP67', 3),
 (136, 32, N'Kết nối', N'Bluetooth 5.1', 4),
--- Sản phẩm 33: Apple Watch Series 9 GPS 41mm
 (137, 33, N'Màn hình', N'1.69 inch, LTPO OLED', 1),
 (138, 33, N'Thời lượng pin', N'18 giờ', 2),
 (139, 33, N'Chống nước', N'WR50', 3),
 (140, 33, N'Tương thích', N'iOS', 4),
--- Sản phẩm 34: Samsung Galaxy Watch6 40mm
 (141, 34, N'Màn hình', N'1.31 inch, Super AMOLED', 1),
 (142, 34, N'Thời lượng pin', N'40 giờ', 2),
 (143, 34, N'Chống nước', N'5 ATM, IP68', 3),
 (144, 34, N'Tương thích', N'Android', 4),
--- Sản phẩm 35: Máy ảnh Canon EOS R50 Kit 18-45mm
 (145, 35, N'Cảm biến', N'APS-C 24.2 MP', 1),
 (146, 35, N'Ống kính kèm theo', N'RF-S 18-45mm', 2),
 (147, 35, N'Quay video', N'4K 30fps', 3),
 (148, 35, N'Trọng lượng', N'375 g', 4),
--- Sản phẩm 36: Máy ảnh Sony ZV-E10 Kit 16-50mm
 (149, 36, N'Cảm biến', N'APS-C 24.2 MP', 1),
 (150, 36, N'Ống kính kèm theo', N'E PZ 16-50mm', 2),
 (151, 36, N'Quay video', N'4K 30fps', 3),
 (152, 36, N'Trọng lượng', N'343 g', 4),
--- Sản phẩm 37: Màn hình LG UltraGear 27 inch 2K
 (153, 37, N'Kích thước', N'27 inch', 1),
 (154, 37, N'Độ phân giải', N'2K QHD', 2),
 (155, 37, N'Tần số quét', N'180 Hz', 3),
 (156, 37, N'Tấm nền', N'IPS', 4),
--- Sản phẩm 38: Màn hình Dell UltraSharp 24 inch
 (157, 38, N'Kích thước', N'23.8 inch', 1),
 (158, 38, N'Độ phân giải', N'Full HD', 2),
 (159, 38, N'Tần số quét', N'120 Hz', 3),
 (160, 38, N'Tấm nền', N'IPS', 4),
--- Sản phẩm 39: Máy in laser Canon LBP2900
 (161, 39, N'Loại máy in', N'Laser trắng đen', 1),
 (162, 39, N'Tốc độ in', N'12 trang/phút', 2),
 (163, 39, N'In hai mặt', N'Thủ công', 3),
 (164, 39, N'Kết nối', N'USB', 4),
--- Sản phẩm 40: Máy in laser HP M211dw
 (165, 40, N'Loại máy in', N'Laser trắng đen', 1),
 (166, 40, N'Tốc độ in', N'29 trang/phút', 2),
 (167, 40, N'In hai mặt', N'Tự động', 3),
 (168, 40, N'Kết nối', N'USB, WiFi', 4),
--- Sản phẩm 41: Bàn phím Logitech MX Keys S
 (169, 41, N'Loại thiết bị', N'Bàn phím không dây', 1),
 (170, 41, N'Kết nối', N'Bluetooth, Logi Bolt', 2),
 (171, 41, N'Thời lượng pin', N'10 ngày (bật đèn nền)', 3),
 (172, 41, N'Đèn nền', N'Có', 4),
--- Sản phẩm 42: Chuột Logitech MX Master 3S
 (173, 42, N'Loại thiết bị', N'Chuột không dây', 1),
 (174, 42, N'Kết nối', N'Bluetooth, Logi Bolt', 2),
 (175, 42, N'Thời lượng pin', N'70 ngày', 3),
 (176, 42, N'Độ phân giải cảm biến', N'8000 DPI', 4),
--- Sản phẩm 43: Pin sạc dự phòng Anker 10000mAh
 (177, 43, N'Dung lượng', N'10000 mAh', 1),
 (178, 43, N'Công suất sạc tối đa', N'22.5 W', 2),
 (179, 43, N'Cổng ra', N'1 USB-A, 1 USB-C', 3),
 (180, 43, N'Trọng lượng', N'215 g', 4),
--- Sản phẩm 44: Củ sạc nhanh Samsung 25W
 (181, 44, N'Công suất', N'25 W', 1),
 (182, 44, N'Công nghệ sạc', N'Super Fast Charging', 2),
 (183, 44, N'Cổng ra', N'1 USB-C', 3),
@@ -1507,7 +1473,7 @@ INSERT INTO dbo.PhieuDoiTra (MaPhieuDoiTra, MaChiTietDonHang, MaTaiKhoan, NgayYe
 SET IDENTITY_INSERT dbo.PhieuDoiTra OFF;
 GO
 
--- Kiểm tra số bảng ghi
+-- Kiểm tra số bản ghi
 SELECT N'VaiTro' AS Bang, COUNT(*) AS SoBanGhi FROM dbo.VaiTro UNION ALL
 SELECT N'TaiKhoan' AS Bang, COUNT(*) AS SoBanGhi FROM dbo.TaiKhoan UNION ALL
 SELECT N'Quyen' AS Bang, COUNT(*) AS SoBanGhi FROM dbo.Quyen UNION ALL
@@ -1542,7 +1508,7 @@ IF OBJECT_ID(N'dbo.SoDiaChi', N'U') IS NULL
         TenNguoiNhan NVARCHAR (100) NOT NULL,
         SoDienThoai VARCHAR (15) NOT NULL,
         KhuVuc NVARCHAR (50) NOT NULL,
-        DiaChiChiTiet NVARCHAR (200) NOT NULL, 
+        DiaChiChiTiet NVARCHAR (200) NOT NULL,
         LoaiDiaChi NVARCHAR (20) CONSTRAINT DF_SoDiaChi_Loai DEFAULT N'Nhà riêng' NOT NULL,
         LaMacDinh BIT CONSTRAINT DF_SoDiaChi_MacDinh DEFAULT 0 NOT NULL,
         NgayTao DATETIME2 (0) CONSTRAINT DF_SoDiaChi_NgayTao DEFAULT SYSDATETIME() NOT NULL,
@@ -1580,7 +1546,7 @@ GO
 
 -- Phương thức thanh toán, ưu đãi thanh toán lần đầu
 IF COL_LENGTH(N'dbo.ThanhToan', N'UuDaiThanhToan') IS NULL
-    ALTER TABLE dbo.ThanhToan ADD UuDaiThanhToan NVARCHAR (200) NULL; 
+    ALTER TABLE dbo.ThanhToan ADD UuDaiThanhToan NVARCHAR (200) NULL;
 GO
 
 IF COL_LENGTH(N'dbo.ThanhToan', N'TienGiamThanhToan') IS NULL
@@ -1608,7 +1574,7 @@ IF OBJECT_ID(N'dbo.LichSuDiemThuong', N'U') IS NULL
     CREATE TABLE dbo.LichSuDiemThuong (
         MaLichSu INT IDENTITY (1, 1) NOT NULL,
         MaTaiKhoan INT NOT NULL,
-        MaDonHang INT NULL, 
+        MaDonHang INT NULL,
         LoaiGiaoDich VARCHAR (10) NOT NULL,
         SoDiem INT NOT NULL,
         MoTa NVARCHAR (255) NULL,
@@ -1633,7 +1599,7 @@ SELECT d.MaTaiKhoan, d.MaDonHang, 'CONG', CAST(FLOOR(d.TongTien / 100000) AS INT
        N'Tích điểm từ đơn #DH' + RIGHT('000000' + CAST(d.MaDonHang AS VARCHAR(10)), 6), d.NgayDat
 FROM dbo.DonHang d
 JOIN dbo.TaiKhoan t ON t.MaTaiKhoan = d.MaTaiKhoan
-JOIN dbo.VaiTro v ON v.MaVaiTro = t.MaVaiTro AND v.TenVaiTro = 'KHACH_HANG' 
+JOIN dbo.VaiTro v ON v.MaVaiTro = t.MaVaiTro AND v.TenVaiTro = 'KHACH_HANG'
 WHERE d.TrangThaiDonHang <> 'DA_HUY'
   AND FLOOR(d.TongTien / 100000) > 0
   AND NOT EXISTS (SELECT 1 FROM dbo.LichSuDiemThuong l WHERE l.MaDonHang = d.MaDonHang);
@@ -1654,7 +1620,7 @@ IF COL_LENGTH(N'dbo.ChiTietDonHang', N'SoSeri') IS NULL
     ALTER TABLE dbo.ChiTietDonHang ADD SoSeri VARCHAR (50) NULL;
 GO
 
--- Bảo hành 12 tháng cho Laptop, Tivi, Tủ lạnh, Máy giặt, Điều hòa 
+-- Bảo hành 12 tháng cho Laptop, Tivi, Tủ lạnh, Máy giặt, Điều hòa
 UPDATE dbo.SanPham
 SET ThoiGianBaoHanhMoRong = 12
 WHERE MaDanhMuc IN (3, 4, 5, 6, 7);
@@ -1665,4 +1631,12 @@ FROM dbo.ChiTietDonHang ct
 JOIN dbo.SanPham sp ON sp.MaSanPham = ct.MaSanPham
 JOIN dbo.DonHang d ON d.MaDonHang = ct.MaDonHang
 WHERE d.TrangThaiDonHang IN ('DA_XUAT_KHO', 'DANG_GIAO', 'DA_GIAO');
+GO
+
+/* ===================== TV4 – NHÂN VIÊN GIAO HÀNG ===================== */
+-- Dữ liệu mẫu: các đơn đang giao và đã giao được gán cho 2 nhân viên giao hàng (tài khoản 31, 32).
+UPDATE dbo.DonHang
+SET    MaNhanVienGiao = CASE WHEN MaDonHang % 2 = 0 THEN 31 ELSE 32 END
+WHERE  TrangThaiDonHang IN ('DANG_GIAO', 'DA_GIAO')
+  AND  MaNhanVienGiao IS NULL;
 GO

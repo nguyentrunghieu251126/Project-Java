@@ -122,6 +122,11 @@ public interface SanPhamRepository
                         """)
         List<SanPham> danhSachCanNhap();
 
+        /** TV4: mọi sản phẩm đang kinh doanh, kèm danh mục, cho trang lập yêu cầu nhập. */
+        @EntityGraph(attributePaths = "danhMuc")
+        @Query("SELECT s FROM SanPham s WHERE s.dangKinhDoanh = true ORDER BY s.tenSanPham ASC")
+        List<SanPham> danhSachDangKinhDoanh();
+
         @Modifying(flushAutomatically = true, clearAutomatically = true)
         @Query("UPDATE SanPham s SET s.soLuong = s.soLuong + :soLuong WHERE s.maSanPham = :maSanPham")
         int congTonKho(@Param("maSanPham") Integer maSanPham, @Param("soLuong") int soLuong);

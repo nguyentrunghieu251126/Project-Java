@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * TV4 – Nhân viên kho xử lý đơn hàng (NVK03 – NVK06).
- * Luồng trạng thái: CHO_XAC_NHAN → DA_XAC_NHAN → DA_XUAT_KHO → DANG_GIAO → DA_GIAO.
+ * Luồng trạng thái: CHO_XAC_NHAN → DA_XAC_NHAN → DA_XUAT_KHO (kho), rồi DANG_GIAO → DA_GIAO do nhân viên giao hàng.
  * Tồn kho đã bị trừ lúc khách đặt hàng (KH12), nên khi xuất kho chỉ lập phiếu xuất, không trừ kho lần nữa.
  */
 @Service
@@ -86,20 +86,7 @@ public class XuLyDonHangService {
         return phieu;
     }
 
-    /** NVK06: Giao cho đơn vị vận chuyển. */
-    @Transactional
-    public void batDauGiao(Integer maDonHang) {
-        doiTrangThai(maDonHang, TrangThaiDonHang.DA_XUAT_KHO, TrangThaiDonHang.DANG_GIAO);
-    }
-
-    /** NVK06: Khách đã nhận hàng. */
-    @Transactional
-    public void daGiao(Integer maDonHang) {
-        timDonHang(maDonHang);
-        if (donHangRepository.xacNhanDaGiao(maDonHang, LocalDateTime.now()) == 0) {
-            throw new NghiepVuException("Chỉ xác nhận đã giao được đơn đang giao.");
-        }
-    }
+    // TV4: các bước "Đang giao" và "Đã giao" chuyển sang nhân viên giao hàng (GiaoHangService).
 
     @Transactional(readOnly = true)
     public PhieuXuat timPhieuXuat(Integer maDonHang) {

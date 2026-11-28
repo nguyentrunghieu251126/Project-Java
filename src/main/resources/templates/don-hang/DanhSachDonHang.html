@@ -46,7 +46,11 @@
         </form>
         <ul class="navbar-nav align-items-lg-center gap-lg-2">
           <!-- Quản trị viên đang xem cửa hàng: nút quay lại khu quản trị -->
+<<<<<<< HEAD
           <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_BAO_HANH')">
+=======
+          <li class="nav-item" sec:authorize="hasAnyRole('QUAN_TRI','NHAN_VIEN_KHO','NHAN_VIEN_GIAO_HANG')">
+>>>>>>> origin/chihai_nhiemvu_tv4_doitra
             <a class="nav-link admin-link" th:href="@{/admin}">
               <i class="bi bi-speedometer2" aria-hidden="true"></i> Trang quản trị
             </a>
@@ -287,6 +291,9 @@
               </form>
               <a class="mh-btn-primary" th:if="${d.trangThai.name() == 'DA_GIAO'}"
                  href="#" th:href="@{/don-hang/{id}(id=${d.maDonHang})} + '#san-pham'"><i class="bi bi-star"></i> Đánh giá</a>
+              <!-- TV4 – KH21: đổi trả trong 30 ngày kể từ ngày giao, đặt cạnh nút Đánh giá -->
+              <a class="mh-btn-outline" th:if="${d.trangThai.name() == 'DA_GIAO' and d.ngayGiao != null and !d.ngayGiao.toLocalDate().plusDays(30).isBefore(#temporals.createToday())}"
+                 href="#" th:href="@{/don-hang/{id}/doi-tra(id=${d.maDonHang})}"><i class="bi bi-arrow-left-right"></i> Đổi trả</a>
               <a class="mh-btn-outline" href="#" th:href="@{/don-hang/{id}(id=${d.maDonHang})}">
                 <i class="bi bi-receipt" th:if="${d.trangThai.name() == 'DA_GIAO'}"></i>
                 <th:block th:text="${d.trangThai.name() == 'DA_GIAO'} ? 'Xem hóa đơn' : 'Xem chi tiết'">Xem chi tiết</th:block></a>

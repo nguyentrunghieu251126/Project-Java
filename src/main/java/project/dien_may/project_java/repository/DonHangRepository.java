@@ -9,9 +9,11 @@ import org.springframework.data.repository.query.Param;
 import project.dien_may.project_java.dto.baocao.DemTrangThaiDon;
 import project.dien_may.project_java.dto.baocao.DoanhThuNgay;
 import project.dien_may.project_java.entity.DonHang;
+import project.dien_may.project_java.entity.TaiKhoan;
 import project.dien_may.project_java.entity.TrangThaiDonHang;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public interface DonHangRepository extends JpaRepository<DonHang, Integer> {
@@ -63,12 +65,60 @@ public interface DonHangRepository extends JpaRepository<DonHang, Integer> {
                         @Param("trangThaiCu") TrangThaiDonHang trangThaiCu,
                         @Param("trangThaiMoi") TrangThaiDonHang trangThaiMoi);
 
+        // ===== TV4: nhân viên giao hàng (NVGH01 – NVGH04) =====
+
+        /** Đơn đã xuất kho, chưa có nhân viên giao hàng nào nhận. */
+        @Query("""
+                        SELECT d FROM DonHang d
+                        WHERE d.trangThai = project.dien_may.project_java.entity.TrangThaiDonHang.DA_XUAT_KHO
+                          AND d.nhanVienGiao IS NULL
+                        """)
+        Page<DonHang> donChoNhanGiao(Pageable pageable);
+
+        @Query("""
+                        SELECT d FROM DonHang d
+                        WHERE d.nhanVienGiao = :nhanVien AND d.trangThai IN :dsTrangThai
+                        """)
+        Page<DonHang> donCuaNhanVienGiao(@Param("nhanVien") TaiKhoan nhanVien,
+                        @Param("dsTrangThai") Collection<TrangThaiDonHang> dsTrangThai,
+                        Pageable pageable);
+
+        long countByTrangThaiAndNhanVienGiaoIsNull(TrangThaiDonHang trangThai);
+
+        long countByNhanVienGiaoAndTrangThai(TaiKhoan nhanVien, TrangThaiDonHang trangThai);
+
+        /** Nhận đơn: chỉ thành công khi đơn vẫn "Đã xuất kho" và chưa ai nhận (hai người bấm cùng lúc thì một người được). */
+        @Modifying(flushAutomatically = true, clearAutomatically = true)
+        @Query("""
+                        UPDATE DonHang d SET d.trangThai = project.dien_may.project_java.entity.TrangThaiDonHang.DANG_GIAO,
+                                             d.nhanVienGiao = :nhanVien
+                        WHERE d.maDonHang = :ma
+                          AND d.trangThai = project.dien_may.project_java.entity.TrangThaiDonHang.DA_XUAT_KHO
+                          AND d.nhanVienGiao IS NULL
+                        """)
+        int nhanDonGiao(@Param("ma") Integer maDonHang, @Param("nhanVien") TaiKhoan nhanVien);
+
+        /** Đã giao: chỉ người đang giao đơn đó mới xác nhận được; ghi ngày giao làm mốc bảo hành, đổi trả. */
         @Modifying(flushAutomatically = true, clearAutomatically = true)
         @Query("""
                         UPDATE DonHang d SET d.trangThai = project.dien_may.project_java.entity.TrangThaiDonHang.DA_GIAO,
                                              d.ngayGiao = :ngayGiao
                         WHERE d.maDonHang = :ma
                           AND d.trangThai = project.dien_may.project_java.entity.TrangThaiDonHang.DANG_GIAO
+                          AND d.nhanVienGiao = :nhanVien
                         """)
-        int xacNhanDaGiao(@Param("ma") Integer maDonHang, @Param("ngayGiao") LocalDateTime ngayGiao);
+        int xacNhanDaGiao(@Param("ma") Integer maDonHang, @Param("nhanVien") TaiKhoan nhanVien,
+                        @Param("ngayGiao") LocalDateTime ngayGiao);
+
+        /** Giao thất bại: đơn chuyển sang "Đã hủy" kèm lý do; hàng được hoàn kho ở tầng service. */
+        @Modifying(flushAutomatically = true, clearAutomatically = true)
+        @Query("""
+                        UPDATE DonHang d SET d.trangThai = project.dien_may.project_java.entity.TrangThaiDonHang.DA_HUY,
+                                             d.lyDoGiaoThatBai = :lyDo
+                        WHERE d.maDonHang = :ma
+                          AND d.trangThai = project.dien_may.project_java.entity.TrangThaiDonHang.DANG_GIAO
+                          AND d.nhanVienGiao = :nhanVien
+                        """)
+        int baoGiaoThatBai(@Param("ma") Integer maDonHang, @Param("nhanVien") TaiKhoan nhanVien,
+                        @Param("lyDo") String lyDo);
 }

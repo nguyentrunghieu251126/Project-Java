@@ -23,6 +23,11 @@
             <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-funnel" aria-hidden="true"></i> Lọc</button>
             <a class="btn btn-sm btn-link" th:href="@{/admin/kho/ton-kho}">Xóa lọc</a>
         </form>
+        <!-- TV4 – NVK09: chọn nhiều sản phẩm vào một yêu cầu nhập -->
+        <div class="d-flex justify-content-end mb-2" sec:authorize="hasAuthority('KHO_YEUCAU_NHAP')">
+            <a class="btn btn-sm btn-chinh" th:href="@{/admin/kho/yeu-cau-nhap/lap}">
+                <i class="bi bi-cart-plus" aria-hidden="true"></i> Lập yêu cầu nhập nhiều sản phẩm</a>
+        </div>
 
         <div class="table-responsive" th:if="${trang.hasContent()}">
             <table class="table table-hover bang bang-ton-kho">
@@ -43,7 +48,16 @@
                     <!-- Sản phẩm cảnh báo có ô nhập hàng; quản trị viên lập yêu cầu được duyệt luôn, nhân viên kho lập phiếu chờ duyệt; hàng vào kho khi lập phiếu nhập (TV4 – NVK10) -->
                     <td class="giua" sec:authorize="hasAnyAuthority('SANPHAM_SUA','KHO_YEUCAU_NHAP')">
                         <div class="nhom-nut">
-                            <form sec:authorize="hasAuthority('KHO_YEUCAU_NHAP')" th:if="${s.tinhTrangTonKho.name() != 'DU'}"
+                            <!-- TV4: sản phẩm đã có yêu cầu nhập chưa xong thì chỉ hiện link tới yêu cầu đó, không cho lập trùng -->
+                            <a sec:authorize="hasAnyAuthority('KHO_YEUCAU_NHAP','KHO_DUYET_NHAP')"
+                               th:if="${dangChoNhap[s.maSanPham] != null}"
+                               class="btn btn-sm btn-outline-warning text-nowrap"
+                               th:href="@{/admin/kho/yeu-cau-nhap/{ma}(ma=${dangChoNhap[s.maSanPham]})}"
+                               th:title="|Sản phẩm đang có yêu cầu nhập #${dangChoNhap[s.maSanPham]} chưa xử lý xong|">
+                                <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+                                <th:block th:text="|Đang chờ nhập #${dangChoNhap[s.maSanPham]}|">Đang chờ nhập</th:block></a>
+                            <form sec:authorize="hasAuthority('KHO_YEUCAU_NHAP')"
+                                  th:if="${s.tinhTrangTonKho.name() != 'DU' and dangChoNhap[s.maSanPham] == null}"
                                   class="o-nhap-hang input-group" method="post"
                                   th:action="@{/admin/kho/ton-kho/{ma}/yeu-cau-nhap(ma=${s.maSanPham})}"
                                   th:attr="data-xac-nhan=${#authorization.expression('hasRole(''QUAN_TRI'')')}
@@ -56,6 +70,13 @@
                                     <span th:text="${#authorization.expression('hasRole(''QUAN_TRI'')')} ? 'Yêu cầu nhập' : 'Lập phiếu'">Lập phiếu</span>
                                 </button>
                             </form>
+                            <!-- TV4: sản phẩm còn hàng vẫn nhập thêm được, qua trang lập yêu cầu nhiều sản phẩm -->
+                            <a sec:authorize="hasAuthority('KHO_YEUCAU_NHAP')"
+                               th:if="${s.tinhTrangTonKho.name() == 'DU' and dangChoNhap[s.maSanPham] == null}"
+                               class="btn btn-sm btn-outline-secondary text-nowrap"
+                               th:href="@{/admin/kho/yeu-cau-nhap/lap(chon=${s.maSanPham})}"
+                               th:aria-label="|Nhập thêm ${s.tenSanPham}|">
+                                <i class="bi bi-plus-lg" aria-hidden="true"></i> Nhập thêm</a>
                             <a sec:authorize="hasAuthority('SANPHAM_SUA')" class="btn btn-sm btn-outline-secondary nut-vuong"
                                th:href="@{/admin/san-pham/{ma}/sua(ma=${s.maSanPham})}" title="Sửa mức tồn tối thiểu"
                                th:aria-label="|Sửa mức tồn của ${s.tenSanPham}|"><i class="bi bi-sliders" aria-hidden="true"></i></a>

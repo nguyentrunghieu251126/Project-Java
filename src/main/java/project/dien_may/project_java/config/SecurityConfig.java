@@ -19,9 +19,9 @@ import java.util.Set;
 
 @Configuration
 public class SecurityConfig {
-        private static final String[] VAI_TRO_KHU_QUAN_LY = { "QUAN_TRI", "NHAN_VIEN_KHO", "NHAN_VIEN_BAO_HANH" };
+        private static final String[] VAI_TRO_KHU_QUAN_LY = { "QUAN_TRI", "NHAN_VIEN_KHO", "NHAN_VIEN_GIAO_HANG" };
         private static final Set<String> ROLE_KHU_QUAN_LY = Set.of("ROLE_QUAN_TRI", "ROLE_NHAN_VIEN_KHO",
-                        "ROLE_NHAN_VIEN_BAO_HANH");
+                        "ROLE_NHAN_VIEN_GIAO_HANG");
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService)
@@ -57,14 +57,17 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET, "/admin/kho/don-hang",
                                                                 "/admin/kho/don-hang/*")
                                                 .access(quyen("DONHANG_XEM_TATCA", "DONHANG_XULY"))
-                                                .requestMatchers(HttpMethod.POST, "/admin/kho/don-hang/*/xac-nhan",
-                                                                "/admin/kho/don-hang/*/giao-hang",
-                                                                "/admin/kho/don-hang/*/da-giao")
+                                                .requestMatchers(HttpMethod.POST, "/admin/kho/don-hang/*/xac-nhan")
                                                 .access(quyen("DONHANG_XULY"))
+                                                // TV4: nhân viên giao hàng nhận đơn, giao thành công hoặc thất bại
+                                                .requestMatchers("/admin/giao-hang", "/admin/giao-hang/**")
+                                                .access(quyen("GIAOHANG_XULY"))
                                                 .requestMatchers(HttpMethod.POST, "/admin/kho/don-hang/*/xuat-kho")
                                                 .access(quyen("KHO_XUAT_HANG"))
                                                 .requestMatchers("/admin/kho/ton-kho").access(quyen("KHO_XEM_TONKHO"))
                                                 .requestMatchers(HttpMethod.POST, "/admin/kho/ton-kho/*/yeu-cau-nhap")
+                                                .access(quyen("KHO_YEUCAU_NHAP"))
+                                                .requestMatchers("/admin/kho/yeu-cau-nhap/lap")
                                                 .access(quyen("KHO_YEUCAU_NHAP"))
                                                 .requestMatchers(HttpMethod.POST, "/admin/kho/yeu-cau-nhap/*/duyet",
                                                                 "/admin/kho/yeu-cau-nhap/*/tu-choi")

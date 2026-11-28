@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout('Đơn cần giao', 'giao-hang', ~{::main})}">
+<body>
+<!-- TV4 – NVGH01: danh sách đơn cho nhân viên giao hàng.
+     Chờ nhận: đơn đã xuất kho chưa ai nhận; Đang giao, Đã xong: đơn do chính mình nhận. -->
+<main>
+    <section class="the">
+        <div class="tien-trinh mb-3">
+            <a class="chip-loc" th:each="t : ${dsTab}" th:classappend="${tab == t} ? 'active'"
+               th:href="@{/admin/giao-hang(tab=${t.name()})}">
+                <span th:text="${t.nhan}"></span>
+                <strong th:if="${t.name() == 'CHO_NHAN'}" th:text="${soDon.choNhan()}"></strong>
+                <strong th:if="${t.name() == 'DANG_GIAO'}" th:text="${soDon.dangGiao()}"></strong>
+            </a>
+        </div>
+
+        <div class="table-responsive" th:if="${trang.hasContent()}">
+            <table class="table table-hover bang">
+                <thead><tr><th>Mã đơn</th><th>Ngày đặt</th><th>Người nhận</th><th>Địa chỉ giao</th>
+                    <th class="giua">Tổng tiền</th><th class="giua">Trạng thái</th><th class="giua">Thao tác</th></tr></thead>
+                <tbody>
+                <tr th:each="d : ${trang.content}">
+                    <td><a class="ma-don" th:href="@{/admin/giao-hang/{ma}(ma=${d.maDonHang})}" th:text="|#${d.maDonHang}|"></a></td>
+                    <td class="so-lieu"><span th:text="${#temporals.format(d.ngayDat, 'dd/MM/yyyy')}"></span>
+                        <span class="ten-phu" th:text="${#temporals.format(d.ngayDat, 'HH:mm')}"></span></td>
+                    <td><span class="ten-chinh" th:text="${d.hoTenNguoiNhan}"></span>
+                        <span class="ten-phu" th:text="${d.soDienThoaiNguoiNhan}"></span></td>
+                    <td class="text-wrap" style="max-width: 320px" th:text="${d.diaChiGiaoHang}"></td>
+                    <td class="giua so-lieu ten-chinh" th:text="|${#numbers.formatInteger(d.tongTien, 1, 'POINT')} ₫|"></td>
+                    <td class="giua"><span th:replace="~{admin/fragments :: nhan(${d.trangThai})}"></span></td>
+                    <td class="giua text-nowrap">
+                        <form th:if="${tab.name() == 'CHO_NHAN'}" class="d-inline" method="post"
+                              th:action="@{/admin/giao-hang/{ma}/nhan(ma=${d.maDonHang})}"
+                              th:data-xac-nhan="|Nhận đơn #${d.maDonHang} để đi giao?|">
+                            <button class="btn btn-sm btn-chinh" type="submit">
+                                <i class="bi bi-hand-index" aria-hidden="true"></i> Nhận đơn</button>
+                        </form>
+                        <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/giao-hang/{ma}(ma=${d.maDonHang})}"
+                           th:aria-label="|Xem đơn hàng #${d.maDonHang}|" title="Xem chi tiết">
+                            <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="bang-trong" th:unless="${trang.hasContent()}"
+           th:text="${tab.name() == 'CHO_NHAN'} ? 'Chưa có đơn nào đang chờ giao.'
+                    : (${tab.name() == 'DANG_GIAO'} ? 'Bạn không có đơn nào đang giao.' : 'Bạn chưa giao xong đơn nào.')"></p>
+        <nav th:replace="~{admin/fragments :: phan-trang(${trang})}"></nav>
+    </section>
+</main>
+</body>
+</html>

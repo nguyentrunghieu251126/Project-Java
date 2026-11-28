@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{admin/layout :: layout('Lập yêu cầu nhập hàng', 'yeu-cau-nhap', ~{::main})}">
+<body>
+<!-- TV4 – NVK09: chọn nhiều sản phẩm (cần nhập hoặc còn hàng muốn nhập thêm) vào MỘT yêu cầu nhập;
+     khi duyệt, kho lập một phiếu nhập nhiều món (NVK10) -->
+<main th:with="soCanNhap=${#lists.size(dsDong.?[canhBao()])}, tong=${#lists.size(dsDong)}">
+    <div class="thanh-hanh-dong">
+        <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/kho/yeu-cau-nhap}">
+            <i class="bi bi-arrow-left" aria-hidden="true"></i> Danh sách yêu cầu</a>
+        <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/kho/ton-kho}">
+            <i class="bi bi-boxes" aria-hidden="true"></i> Tồn kho</a>
+    </div>
+
+    <!-- Mở từ nút nhập của một sản phẩm đã có yêu cầu chưa xong: báo và dẫn tới yêu cầu đó -->
+    <div class="alert alert-warning d-flex align-items-center gap-2" th:if="${yeuCauCuaSanPhamChon != null}">
+        <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+        <span>Sản phẩm bạn chọn đang có <strong th:text="|yêu cầu nhập #${yeuCauCuaSanPhamChon}|">yêu cầu nhập</strong>
+            chưa xử lý xong nên chưa lập thêm yêu cầu mới được.</span>
+        <a class="alert-link ms-auto text-nowrap" th:href="@{/admin/kho/yeu-cau-nhap/{ma}(ma=${yeuCauCuaSanPhamChon})}">Xem yêu cầu</a>
+    </div>
+
+    <section class="the">
+        <div class="the-tieu-de">
+            <h2>Chọn sản phẩm cần nhập</h2>
+            <span class="chu-thich">Chọn được cả sản phẩm còn hàng để nhập thêm dự trữ</span>
+        </div>
+
+        <form id="formLapYeuCau" method="post" th:if="${tong > 0}"
+              th:action="@{/admin/kho/yeu-cau-nhap/lap}"
+              th:data-xac-nhan="${#authorization.expression('hasRole(''QUAN_TRI'')')}
+                  ? 'Lập yêu cầu nhập (duyệt luôn) cho các sản phẩm đã chọn? Hàng vào kho khi nhân viên kho lập phiếu nhập.'
+                  : 'Gửi một yêu cầu nhập gồm các sản phẩm đã chọn lên quản trị viên duyệt?'">
+
+            <!-- Lọc nhanh trên trang: sản phẩm đã tick vẫn được giữ khi đổi bộ lọc -->
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <div class="tien-trinh m-0" role="group" aria-label="Lọc sản phẩm">
+                    <button type="button" class="chip-loc" data-loc="can-nhap">Cần nhập <strong th:text="${soCanNhap}">0</strong></button>
+                    <button type="button" class="chip-loc" data-loc="con-hang">Còn hàng <strong th:text="${tong - soCanNhap}">0</strong></button>
+                    <button type="button" class="chip-loc" data-loc="tat-ca">Tất cả <strong th:text="${tong}">0</strong></button>
+                    <button type="button" class="chip-loc" data-loc="da-chon">Đã chọn <strong id="lycDemDaChon">0</strong></button>
+                </div>
+                <input type="search" id="lycTimNhanh" class="form-control form-control-sm ms-auto" style="max-width: 280px"
+                       placeholder="Tìm nhanh tên hoặc mã model" aria-label="Tìm nhanh sản phẩm">
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover bang bang-lap-yeu-cau">
+                    <thead><tr>
+                        <th class="giua" style="width: 48px">
+                            <input class="form-check-input" type="checkbox" id="lycChonTatCa"
+                                   aria-label="Chọn tất cả sản phẩm đang hiển thị" title="Chọn tất cả sản phẩm đang hiển thị"></th>
+                        <th>Sản phẩm</th><th>Danh mục</th><th class="giua">Tồn</th><th class="giua">Mức tối thiểu</th>
+                        <th class="giua">Tình trạng</th><th class="giua" style="width: 150px">Số lượng nhập</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr th:each="d : ${dsDong}" th:with="s=${d.sanPham()}" class="dong-nhap"
+                        th:attr="data-nhom=${d.canhBao()} ? 'can-nhap' : 'con-hang',
+                                 data-tim=${#strings.toLowerCase(s.tenSanPham + ' ' + s.maModel)}">
+                        <td class="giua">
+                            <input class="form-check-input lyc-chon" type="checkbox" name="maSanPham"
+                                   th:value="${s.maSanPham}" th:checked="${chon != null and chon == s.maSanPham}"
+                                   th:id="|chon-${s.maSanPham}|" th:aria-label="|Chọn ${s.tenSanPham}|"></td>
+                        <td><label th:for="|chon-${s.maSanPham}|" class="m-0">
+                            <span class="ten-chinh" th:text="${s.tenSanPham}"></span>
+                            <span class="ten-phu" th:text="${s.maModel}"></span></label></td>
+                        <td th:text="${s.danhMuc.tenDanhMuc}"></td>
+                        <td class="giua so-lieu ten-chinh" th:text="${s.soLuong}"></td>
+                        <td class="giua so-lieu" th:text="${s.mucTonToiThieu}"></td>
+                        <td class="giua"><span th:replace="~{admin/fragments :: nhan(${s.tinhTrangTonKho})}"></span></td>
+                        <td class="giua">
+                            <!-- Chỉ ô của dòng được chọn mới gửi lên (ô bị disabled thì trình duyệt bỏ qua),
+                                 nên danh sách soLuong luôn cùng thứ tự với maSanPham -->
+                            <input class="form-control form-control-sm text-end lyc-so-luong" type="number" name="soLuong"
+                                   min="1" max="10000" required disabled th:value="${d.soLuongGoiY()}"
+                                   th:aria-label="|Số lượng nhập của ${s.tenSanPham}|">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="bang-trong d-none" id="lycKhongCo">Không có sản phẩm phù hợp với bộ lọc.</p>
+            <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mt-3">
+                <span class="text-muted">Đã chọn <strong id="lycSoDaChon">0</strong> sản phẩm,
+                    tổng <strong id="lycTongSoLuong">0</strong> đơn vị</span>
+                <button class="btn btn-chinh" type="submit" id="lycNutGui" disabled>
+                    <i class="bi bi-box-arrow-in-down" aria-hidden="true"></i>
+                    <span th:text="${#authorization.expression('hasRole(''QUAN_TRI'')')} ? 'Lập yêu cầu nhập' : 'Gửi yêu cầu nhập'">Gửi yêu cầu nhập</span>
+                </button>
+            </div>
+        </form>
+        <p class="bang-trong" th:if="${tong == 0}">
+            Mọi sản phẩm đang kinh doanh đều đã có yêu cầu nhập đang chờ xử lý.</p>
+    </section>
+
+    <script th:inline="javascript">
+        (function () {
+            const form = document.getElementById("formLapYeuCau");
+            if (!form) return;
+            const dong = Array.from(form.querySelectorAll("tr.dong-nhap"));
+            const tatCa = document.getElementById("lycChonTatCa");
+            const timNhanh = document.getElementById("lycTimNhanh");
+            const chips = Array.from(form.querySelectorAll("[data-loc]"));
+            let boLoc = /*[[${soCanNhap > 0} ? 'can-nhap' : 'tat-ca']]*/ "tat-ca";
+
+            const daChon = tr => tr.querySelector(".lyc-chon").checked;
+            const dangHien = tr => !tr.hidden;
+
+            function locDong() {
+                const tu = timNhanh.value.trim().toLowerCase();
+                let soHien = 0;
+                dong.forEach(function (tr) {
+                    const hopNhom = boLoc === "tat-ca"
+                        || (boLoc === "da-chon" ? daChon(tr) : tr.dataset.nhom === boLoc);
+                    tr.hidden = !(hopNhom && (!tu || tr.dataset.tim.includes(tu)));
+                    if (!tr.hidden) soHien++;
+                });
+                chips.forEach(c => c.classList.toggle("active", c.dataset.loc === boLoc));
+                document.getElementById("lycKhongCo").classList.toggle("d-none", soHien > 0);
+                capNhatChonTatCa();
+            }
+
+            function capNhatChonTatCa() {
+                const hien = dong.filter(dangHien);
+                const soChon = hien.filter(daChon).length;
+                tatCa.checked = hien.length > 0 && soChon === hien.length;
+                tatCa.indeterminate = soChon > 0 && soChon < hien.length;
+            }
+
+            function capNhat() {
+                let soMon = 0, tong = 0;
+                dong.forEach(function (tr) {
+                    const chon = daChon(tr);
+                    const o = tr.querySelector(".lyc-so-luong");
+                    o.disabled = !chon;
+                    tr.classList.toggle("table-success", chon);
+                    if (chon) { soMon++; tong += parseInt(o.value || "0", 10); }
+                });
+                document.getElementById("lycSoDaChon").textContent = soMon;
+                document.getElementById("lycDemDaChon").textContent = soMon;
+                document.getElementById("lycTongSoLuong").textContent = tong;
+                document.getElementById("lycNutGui").disabled = soMon === 0;
+                capNhatChonTatCa();
+            }
+
+            chips.forEach(c => c.addEventListener("click", function () { boLoc = c.dataset.loc; locDong(); }));
+            timNhanh.addEventListener("input", locDong);
+            timNhanh.addEventListener("keydown", e => { if (e.key === "Enter") e.preventDefault(); });
+            form.addEventListener("change", capNhat);
+            form.addEventListener("input", function (e) { if (e.target.classList.contains("lyc-so-luong")) capNhat(); });
+            tatCa.addEventListener("change", function () {
+                dong.filter(dangHien).forEach(tr => { tr.querySelector(".lyc-chon").checked = tatCa.checked; });
+                capNhat();
+            });
+
+            // Mở từ nút "Nhập thêm" của sản phẩm còn hàng: chuyển sang bộ lọc chứa dòng đó và cuộn tới
+            const dongChon = dong.find(daChon);
+            if (dongChon) {
+                boLoc = dongChon.dataset.nhom;
+                setTimeout(() => dongChon.scrollIntoView({ block: "center" }), 0);
+            }
+            capNhat();
+            locDong();
+        })();
+    </script>
+</main>
+</body>
+</html>
